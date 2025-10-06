@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Amal Rahmania Ladies Hostel</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- The entire website structure will be generated here by JavaScript -->
+  <script>
+    // --- CSS Styles as a single JavaScript String ---
+    const APP_STYLES = `
+    /* -----------------------------------------------------------------
+       GLOBAL STYLES AND COLORS (LIGHT MODE DEFAULT)
+       Fixed Accent Color: #D31D60 (Deep Rose Pink)
+    ----------------------------------------------------------------- */
+    :root{
+      --bg:#fbf9fb; /* Very light pink/white background */
+      --text:#222;
+      --h2-color:#333;
+      --accent:#D31D60; /* FIXED Deep Rose Pink - primary highlight */
+      --accent-light:#ffc8d9; /* FIXED Lighter pink for subtle backgrounds */
+      --muted:#5a5a5a;
+      --card:#ffffff;
+      --card-shadow:0 10px 30px rgba(0,0,0,0.06); /* Softer, larger shadow */
+      --card-border:#f0e4f0; /* Soft border color */
+      --header-grad:linear-gradient(90deg,rgba(211,29,96,0.1),rgba(255,255,255,0.7));
+      --chip-bg:#ffeef3; /* Soft pink chip background */
+      --chip-border:rgba(211,29,96,0.3);
+      --input-bg:#ffffff;
+      --input-color:#222;
+      --input-border:#d0d0d0;
+      --maxw:1100px; /* Slightly wider layout */
+      font-family:'Inter', sans-serif; /* Modern, clean font */
+    }
+
+    /* -----------------------------------------------------------------
+       DARK MODE OVERRIDES 
+    ----------------------------------------------------------------- */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg:#1a1014; 
+            --text:#f0f0f0;
+            --h2-color:#ffffff;
+            --muted:#aaaaaa;
+            --card:#2b1d22; 
+            --card-shadow:0 10px 30px rgba(0,0,0,0.5); 
+            --card-border:#403035;
+            --header-grad:linear-gradient(90deg,rgba(211,29,96,0.2),var(--card) 70%); 
+            --chip-bg:#502030;
+            --chip-border:rgba(255,102,153,0.5);
+            --input-bg:#403035;
+            --input-color:#f0f0f0;
+            --input-border:#604045;
+        }
+        .hero img, .gallery-img { 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6); 
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       SMOOTH SCROLLING
+    ----------------------------------------------------------------- */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* -----------------------------------------------------------------
+       GLOBAL STYLES APPLYING VARIABLES
+    ----------------------------------------------------------------- */
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text); line-height: 1.6;}
+    header{
+        background:var(--header-grad);
+        padding:20px 16px;border-bottom:1px solid var(--card-border); 
+        position: sticky; top: 0; z-index: 10; backdrop-filter: blur(5px);
+    }
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .brand{display:flex;align-items:center;} 
+    
+    h1{margin:0;font-size:24px; font-weight: 800; color: var(--accent);}
+    p.lead{margin:4px 0 0;color:var(--muted); font-size: 14px;}
+
+    /* -----------------------------------------------------------------
+       RESPONSIVE GRID LAYOUT
+    ----------------------------------------------------------------- */
+    .grid{display:grid;grid-template-columns:1fr 340px;gap:24px;margin-top:24px}
+    
+    @media(max-width:880px){
+        .grid{grid-template-columns:1fr; gap: 18px;} 
+        .hero{flex-direction: column;} 
+        .hero img{max-width: 100%; width: 100%; height: 250px;} 
+    }
+
+    /* -----------------------------------------------------------------
+       COMPONENT STYLING
+    ----------------------------------------------------------------- */
+    .card{background:var(--card);padding:24px;border-radius:16px;box-shadow:var(--card-shadow); border: 1px solid var(--card-border); transition: all 0.3s;}
+    .card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow), 0 15px 40px rgba(211,29,96,0.1);}
+    
+    .hero{display:flex;gap:20px;align-items:center}
+    .hero img{width:300px;max-width:40%;border-radius:12px;object-fit:cover; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    
+    .cta{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap}
+    .btn{display:inline-block;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700; transition: all 0.2s; text-align: center;}
+    .btn-primary{background:var(--accent);color:white; box-shadow: 0 4px 10px rgba(211,29,96,0.3);}
+    .btn-primary:hover {background: #a9154f; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(211,29,96,0.4);}
+    .btn-outline{border:2px solid var(--accent);color:var(--accent);background:transparent;}
+    .btn-outline:hover {background: var(--accent); color: white;}
+    
+    h2{margin-top:0; color: var(--accent); font-size: 20px; border-bottom: 2px solid var(--accent-light); padding-bottom: 8px; margin-bottom: 15px;}
+    ul.list{padding-left:18px;margin:8px 0}
+    .facilities{display:flex;flex-wrap:wrap;gap:10px; margin-top: 15px;}
+    .chip{padding:8px 12px;border-radius:20px;background:var(--chip-bg);border:1px solid var(--chip-border); color: var(--accent); font-weight: 600; font-size: 12px;}
+    
+    /* Gallery styling */
+    .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media(max-width:880px){.gallery{grid-template-columns:repeat(2,1fr)}}
+    .gallery-img{
+        width:100%;
+        height:150px;
+        object-fit:cover;
+        border-radius:12px;
+        box-shadow:0 3px 8px rgba(0,0,0,0.1); 
+        border: 1px solid var(--card-border);
+        transition: transform 0.3s ease;
+    }
+    .gallery-img:hover {
+        transform: scale(1.05);
+    }
+    
+    .contact .tel{display:block;font-weight:700;color:var(--accent);margin-bottom:8px; font-size: 16px; text-decoration: none;}
+    footer{padding:25px;text-align:center;color:white;font-size:13px; background-color: var(--accent); border-top: none; margin-top: 24px; border-radius: 16px 16px 0 0;}
+    .rules ol{padding-left:20px;margin:0}
+    .rules li{margin:12px 0;line-height:1.6; color: var(--text); font-size: 14px;}
+    .small{font-size:14px;color:var(--muted)}
+    .map-placeholder{height:200px;border-radius:12px;background:var(--accent-light);border:2px dashed var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent); font-weight: 700; font-size: 16px;}
+    .price-box{background:var(--accent); color: white; padding:15px 20px;border-radius:10px;margin-top:15px;font-weight:700; font-size: 16px; text-align: center; box-shadow: 0 4px 15px rgba(211,29,96,0.3);}
+
+    /* Gemini Feature Styling */
+    #gemini-chat-card { margin-top: 24px; }
+    #chat-output { 
+        min-height: 90px;
+        padding: 12px;
+        border: 1px solid var(--chip-border);
+        border-radius: 8px;
+        margin-top: 15px;
+        background: var(--chip-bg);
+    }
+    #chat-output p { margin: 0; font-size: 14px; color: var(--text); }
+    .loading-spinner {
+        display: none;
+        border: 4px solid var(--card-border);
+        border-top: 4px solid var(--accent);
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        animation: spin 1s linear infinite;
+        margin: 15px auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* Tech Support Card specific styling */
+    .tech-support-icon { font-size: 28px; color: var(--accent); margin-right: 12px; }
+    
+    /* Input field styling */
+    input[type="text"], input[type="tel"], textarea {
+        width:100%;
+        padding:10px;
+        margin-bottom:12px;
+        border:1px solid var(--input-border);
+        border-radius:8px;
+        background:var(--input-bg);
+        color:var(--input-color);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--chip-bg);
+        outline: none;
+    }
+    input.error { border-color: #ff4d4d; box-shadow: 0 0 0 2px #ffeef3; }
+
+    /* -----------------------------------------------------------------
+       SCROLL ANIMATION STYLES (Fade In Effect)
+    ----------------------------------------------------------------- */
+    .scroll-animate {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+
+    .scroll-animate.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    `;
+
+    // --- Utility Functions for DOM Construction ---
+    const WHATSAPP_NUMBER_MAIN = '919946716151'; 
+    const WHATSAPP_NUMBER_ALT = '919656962786';
+    const WHATSAPP_MESSAGE = encodeURIComponent('Amal Rahmania Ladies Hostel: അഡ്മിഷൻ/ലഭ്യത എന്നിവയെക്കുറിച്ച് അന്വേഷിക്കാൻ വിളിച്ചതാണ്. കൂടുതൽ വിവരങ്ങൾ അറിയാമോ?');
+    
+    const WHATSAPP_LINK_MAIN = `https://wa.me/${WHATSAPP_NUMBER_MAIN}?text=${WHATSAPP_MESSAGE}`;
+    const WHATSAPP_LINK_ALT = `https://wa.me/${WHATSAPP_NUMBER_ALT}?text=${WHATSAPP_MESSAGE}`;
+
+    /**
+     * Injects the defined CSS styles (APP_STYLES) into the document head.
+     */
+    function injectStyles() {
+        const style = document.createElement('style');
+        style.textContent = APP_STYLES;
+        document.head.appendChild(style);
+    }
+
+    // Function to create the Header
+    function createHeader() {
+        const header = document.createElement('header');
+        header.innerHTML = `
+            <div class="container">
+                <div class="brand">
+                    <div>
+                        <h1>AMAL RAHMANIA LADIES HOSTEL</h1>
+                        <p class="lead">Safe, Comfortable, and Homely Living for Women — Near Kottayam Medical College</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        return header;
+    }
+
+    // Function to create the Hero Section
+    function createHeroSection() {
+        const section = document.createElement('section');
+        section.className = 'card hero scroll-animate';
+        section.id = 'section-hero';
+        section.innerHTML = `
+            <div style="flex:1">
+                <h2>Welcome to Amal Rahmania</h2>
+                <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിനും പ്രൈവറ്റ് ബസ് സ്റ്റാൻഡിനും സമീപമുള്ള സ്ത്രീകൾക്കായുള്ള വിശ്വസ്തമായ ഹോസ്റ്റൽ. വിദ്യാർത്ഥിനികൾക്കും ജോലി ചെയ്യുന്നവർക്കും അനുയോജ്യമായ സുഖപ്രദമായ മുറികളും ശാന്തമായ അന്തരീക്ഷവും.</p>
+
+                <div style="margin-top:12px; font-weight: bold; color: var(--accent);">പ്രധാന സൗകര്യങ്ങൾ:</div>
+                <div class="facilities">
+                    <span class="chip">🚀 ഹൈ-സ്പീഡ് WIFI</span>
+                    <span class="chip">🧺 വാഷിംഗ് മെഷീൻ</span>
+                    <span class="chip">🧊 ഫ്രിഡ്ജ് സൗകര്യം</span>
+                    <span class="chip">🍲 മൂന്നു നേരം ഭക്ഷണം</span>
+                    <span class="chip">☕ രണ്ട് നേരം ചായ / പലഹാരം</span>
+                    <span class="chip">💧 ശുദ്ധീകരിച്ച കുടിവെള്ളം</span>
+                </div>
+
+                <div class="cta">
+                    <!-- Updated to WhatsApp Link -->
+                    <a class="btn btn-primary" href="${WHATSAPP_LINK_MAIN}">💬 WhatsApp Enquiry (9946 71 6151)</a>
+                    <!-- Updated to WhatsApp Link -->
+                    <a class="btn btn-outline" href="${WHATSAPP_LINK_ALT}">📲 WhatsApp 9656 96 2786</a>
+                </div>
+            </div>
+            <!-- Hero Image: Using the external building photo from uploads -->
+            <img 
+                src="WhatsApp Image 2025-10-06 at 10.15.43_7a2930e5.jpg" 
+                onerror="this.onerror=null;this.src='https://placehold.co/300x250/A9154F/FFFFFF?text=Hostel+Building+Photo';" 
+                alt="Hostel Exterior Building Photo"
+            >
+        `;
+        return section;
+    }
+
+    // Function to create the Gallery Section
+    function createGallerySection() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'section-gallery';
+        section.innerHTML = `
+            <h2>Hostel Gallery & Facilities</h2>
+            <div class="gallery">
+                <!-- Gallery Image 1: Common Area (Using the living room photo) -->
+                <img 
+                    class="gallery-img" 
+                    src="WhatsApp Image 2025-10-06 at 10.14.42_44015340.jpg" 
+                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Common+Area';" 
+                    alt="Hostel Common Area or Lounge for recreation and relaxation">
+                
+                <!-- Gallery Image 2: Logo (Using the logo image for branding) -->
+                <img 
+                    class="gallery-img" 
+                    src="WhatsApp Image 2025-09-24 at 09.57.44_93d77be0.jpg" 
+                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Hostel+Logo';" 
+                    alt="Amal Rahmania Hostel Logo">
+                
+                <!-- Gallery Image 3: Quiet Study Area (Placeholder - Change later) -->
+                <img 
+                    class="gallery-img" 
+                    src="https://placehold.co/150x150/ffc8d9/D31D60?text=Quiet+Study+Area" 
+                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Study+Desk';" 
+                    alt="Quiet Study Area with desks and chairs">
+                
+                <!-- Gallery Image 4: Clean Washroom (Placeholder - Change later) -->
+                <img 
+                    class="gallery-img" 
+                    src="https://placehold.co/150x150/ffc8d9/D31D60?text=Clean+Washroom" 
+                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Washroom';" 
+                    alt="Well-maintained Washroom and Bath area">
+            </div>
+            <p class="small text-center" style="margin-top: 15px; color: var(--accent); font-weight: 600;">
+                ഞങ്ങളുടെ ഹോസ്റ്റലിന്റെ ഉൾക്കാഴ്ചകൾ.
+            </p>
+        `;
+        return section;
+    }
+
+    // Function to create Pricing and Meals Sections
+    function createPricingAndMealsSections() {
+        const div = document.createElement('div');
+        div.className = 'grid scroll-animate';
+        div.id = 'section-pricing';
+        div.style.cssText = 'grid-template-columns: 1fr 1fr; gap: 20px; padding: 0; margin: 0;';
+
+        // Pricing Card
+        const pricingCard = document.createElement('section');
+        pricingCard.className = 'card';
+        pricingCard.style.cssText = 'margin:0; padding: 20px;';
+        pricingCard.innerHTML = `
+            <h2>Rooms & Pricing</h2>
+            <p class="small">നിലവിൽ: ഒരു മുറിയിൽ **3 പേർക്ക്** താമസിക്കാം. തിരക്ക് കൂടുന്നതനുസരിച്ച് മാനേജ്‌മെൻ്റ് നിയമങ്ങൾ പാലിച്ച് **4 പേർ വരെ ആകാം**.</p>
+            <div class="price-box">
+                **പ്രതിമാസ വാടക: ₹6,500**<br>
+                സുരക്ഷാ നിക്ഷേപം (Deposit): ₹5,000
+            </div>
+            <ul class="list small" style="margin-top: 15px;">
+                <li>✔️ പ്രതിമാസ ഭക്ഷണ ചെലവ് ഉൾപ്പെടെയുള്ള വാടക.</li>
+                <li>✔️ അധിക ചിലവുകൾ ഇല്ല (പ്രത്യേക ആവശ്യങ്ങൾ ഒഴികെ).</li>
+            </ul>
+        `;
+        div.appendChild(pricingCard);
+
+        // Meal Timings Card
+        const mealsCard = document.createElement('section');
+        mealsCard.className = 'card';
+        mealsCard.style.cssText = 'margin:0; padding: 20px;';
+        mealsCard.innerHTML = `
+            <h2>ഭക്ഷണ സമയക്രമം / Meal Timings</h2>
+            <ul class="list small">
+                <li>**പ്രഭാത ഭക്ഷണം (Breakfast):** 7 am - 8 am</li>
+                <li>**ഉച്ചഭക്ഷണം (Lunch):** 12 pm - 2 pm</li>
+                <li>**വൈകുന്നേരം ചായ (Evening Tea):** 4 pm - 5 pm</li>
+                <li>**ഡിന്നർ (Dinner):** 7 pm - 8 pm</li>
+            </ul>
+            <p class="small" style="font-weight: bold; color: var(--accent);">ഔട്ട് പാസ് സമയം: രാത്രി 8 മണിവരെ.</p>
+            <p class="small">വിദ്യാർഥിനികൾ ഈ സമയക്രമം പാലിച്ച് ഡൈനിംഗ് ഹാളിൽ എത്തേണ്ടതാണ്.</p>
+        `;
+        div.appendChild(mealsCard);
+
+        return div;
+    }
+
+    // Function to create Rules Section
+    function createRulesSection() {
+        const section = document.createElement('section');
+        section.className = 'card rules scroll-animate';
+        section.id = 'section-rules';
+        section.innerHTML = `
+            <h2>ഹോസ്റ്റൽ നിബന്ധനകൾ / Hostel Rules</h2>
+            <ol id="hostel-rules-list">
+                <li>**1:** വാർഡന്റെ സമ്മതത്തോടെ മാത്രമേ ഹോസ്റ്റലിൽ നിന്നും പുറത്തു പോകാൻ പാടുള്ളൂ. രജിസ്റ്ററിൽ രേഖപ്പെടുത്തുകയും ചെയ്യണം.</li>
+                <li>**2:** സന്ദർശകരുടെ പേരും അഡ്രസ്സും രജിസ്റ്ററിൽ രേഖപ്പെടുത്തി സൂക്ഷിക്കുന്നതാണ്.</li>
+                <li>**3:** വിദ്യാർഥിനികൾക്ക് ശാരീരികമോ മാനസികമോ ആയ ബുദ്ധിമുട്ടുണ്ടായാൽ ഉടൻതന്നെ വാർഡനെ അറിയിക്കേണ്ടതാണ്.</li>
+                <li>**4:** രാത്രി 8 മണിക്ക് ശേഷം നിശബ്ദത പാലിക്കുക. അനുവദിച്ചിരിക്കുന്ന മുറികളിൽ മാത്രമേ ഉറങ്ങുവാൻ പാടുള്ളൂ.</li>
+                <li>**5:** റൂമുകളിൽ ലൈറ്റ് 10 മണിക്ക് ശേഷം ഓഫ് ചെയ്യേണ്ടതാണ്. പഠനത്തിനുള്ള സൗകര്യം ഡൈനിങ് ഹാളിൽ പ്രയോജനപ്പെടുത്തുക.</li>
+                <li>**6:** മുറിയുടെയും കിടക്കയുടെയും വൃത്തി എല്ലാ റൂംമേറ്റുകളുടെയും വ്യക്തിപരമായ കടമകളാണ്.</li>
+                <li>**7:** ഹോസ്റ്റൽ മുറികൾ അധികൃതർക്ക് എപ്പോൾ വേണമെങ്കിലും പരിശോധിക്കാനുള്ള അധികാരം ഉണ്ടായിരിക്കും.</li>
+                <li>**8:** മാനേജ്മെന്റ് തീരുമാനിക്കുന്ന മെനുപ്രകാരമാണ് ഭക്ഷണം തയ്യാറാക്കുന്നത്.</li>
+                <li>**9:** നിലവിൽ ഒരു മുറിയിൽ **മൂന്നുപേർക്കാണ്** താമസം ഉൾപ്പെടുത്തിയിരിക്കുന്നത്. വിദ്യാർത്ഥിനികൾ കൂടുതൽ വന്നാൽ **നാലു പേർ വരെ ആകാം**.</li>
+                <li>**10:** പൊതുസ്ഥലങ്ങളായ കുളിമുറികൾ, ടോയ്ലറ്റ്, ഇടനാഴികൾ, ഡൈനിങ് ഹാൾ എന്നിവയുടെ ശുചിത്വം ശ്രദ്ധിക്കുക.</li>
+                <li>**11:** പാഡ്, നാപ്കിൻ തുടങ്ങിയ വസ്തുക്കൾ പറഞ്ഞിരിക്കുന്ന സ്ഥലങ്ങളിൽ മാത്രം നിക്ഷേപിക്കുക.</li>
+                <li>**12:** മുറി പൂട്ടി പോകുന്ന വിദ്യാർത്ഥിനികൾ താക്കോൽ വാർഡനെ ഏൽപ്പിച്ചിട്ടേ പോകാവൂ.</li>
+                <li>**13:** മറ്റുള്ള വിദ്യാർത്ഥിനികൾക്ക് ശല്യമാകുന്ന യാതൊരുവിധ പ്രവർത്തനങ്ങളും (ഉച്ചത്തിലുള്ള സംസാരം, മൊബൈൽ ഉപയോഗം) ഒഴിവാക്കേണ്ടതാണ്.</li>
+                <li>**14:** ഫാൻ, ലൈറ്റ് തുടങ്ങിയവ ഉപയോഗത്തിന് ശേഷം ഓഫ് ചെയ്തിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക.</li>
+            </ol>
+            <p class="small" style="margin-top: 20px; font-weight: bold; border-top: 1px solid var(--card-border); padding-top: 12px; color: var(--text);">
+                മുകളിൽ പറഞ്ഞിരിക്കുന്ന കാര്യങ്ങൾ ഹോസ്റ്റൽ മാനേജ്മെന്റിന്റെ നിർദ്ദേശപ്രകാരം പാലിക്കാൻ വിദ്യാർഥിനികൾ ബാധ്യസ്ഥരാണ്.
+            </p>
+        `;
+        return section;
+    }
+
+    // Function to create Gemini Chat Card
+    function createChatCard() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'gemini-chat-card';
+        section.innerHTML = `
+            <h2>Ask About Life Here ✨</h2>
+            <p class="small">നിയമങ്ങൾ, സൗകര്യങ്ങൾ, ദിനചര്യ എന്നിവയെക്കുറിച്ച് വേഗത്തിൽ അറിയുക. (Powered by Gemini)</p>
+            <div style="margin-top:12px;">
+                <input type="text" id="chat-input" placeholder="ഉദാഹരണം: പുറത്തു പോകാൻ അനുവാദമുള്ള സമയം?">
+                <button class="btn btn-primary" id="ask-button" style="width:100%;border:none;cursor:pointer">
+                    ചോദ്യം ചോദിക്കൂ
+                </button>
+            </div>
+            <div class="loading-spinner" id="loading-spinner"></div>
+            <div id="chat-output">
+                <p>നിങ്ങളുടെ ചോദ്യം മുകളിലെ ബോക്സിൽ ടൈപ്പ് ചെയ്ത് 'ചോദ്യം ചോദിക്കൂ' എന്ന ബട്ടൺ ക്ലിക്കുചെയ്യുക.</p>
+            </div>
+        `;
+        return section;
+    }
+
+    // Function to create Contact Card
+    function createContactCard() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'contact';
+        section.style.marginTop = '24px';
+        
+        const form = document.createElement('form');
+        form.style.marginTop = '16px';
+        form.addEventListener('submit', handleFormSubmit);
+
+        form.innerHTML = `
+            <input type="text" id="contact-name" placeholder="Your Name" required>
+            <input type="tel" id="contact-phone" placeholder="Phone Number (10 digits)" required maxlength="10">
+            <textarea id="contact-message" placeholder="Message / Enquiry (Optional)" rows="3"></textarea>
+            <button class="btn btn-primary" id="contact-submit" type="submit" style="width:100%;border:none;cursor:pointer">Send Enquiry</button>
+            <p id="form-message" class="small" style="margin-top: 10px; font-weight: bold;"></p>
+        `;
+
+        section.innerHTML = `
+            <h2>Quick Contact / Enquiry</h2>
+            <p class="small">അഡ്മിഷൻ ലഭ്യത, സംശയങ്ങൾ എന്നിവക്കായി വിളിക്കുകയോ **WhatsApp വഴി മെസ്സേജ് അയക്കുകയോ** ചെയ്യുക.</p>
+            <div class="contact" style="margin-top:12px">
+                <!-- Updated to WhatsApp Link -->
+                <a class="tel" href="${WHATSAPP_LINK_MAIN}">💬 **WhatsApp Main: 9946 71 6151**</a>
+                <!-- Updated to WhatsApp Link -->
+                <a class="tel" href="${WHATSAPP_LINK_ALT}">💬 **WhatsApp Alt: 9656 96 2786**</a>
+            </div>
+        `;
+        section.appendChild(form);
+        return section;
+    }
+
+    // Function to create Tech Support Card
+    function createSupportCard() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'section-support';
+        section.style.marginTop = '24px';
+        section.innerHTML = `
+            <h2>💻 ടെക്നിക്കൽ സപ്പോർട്ട്</h2>
+            <p class="small">ലാപ്‌ടോപ്പ്, കമ്പ്യൂട്ടർ നെറ്റ്വർക്ക് എന്നിവ സംബന്ധിച്ച സാങ്കേതിക സഹായത്തിനായി വിളിക്കുക.</p>
+            <div class="contact" style="margin-top:15px">
+                <p class="small" style="margin: 0 0 6px; font-weight: 600; color: var(--h2-color);">ടെക് സപ്പോർട്ട് കോൺടാക്റ്റ്:</p>
+                <!-- Kept as tel link as it is for technical calling support -->
+                <a class="tel" href="tel:+919946716151" style="display: flex; align-items: center;">
+                    <span class="tech-support-icon">⚙️</span>
+                    9946 71 6151
+                </a>
+            </div>
+        `;
+        return section;
+    }
+
+    // Function to create Location Card
+    function createLocationCard() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'section-location';
+        section.style.marginTop = '24px';
+        section.innerHTML = `
+            <h2>Location</h2>
+            <p class="small">Near Kottayam Medical College, Gandhinagar, Kottayam, Kerala - 686008</p>
+            <div class="map-placeholder" style="margin-top:15px">
+                📍 Location Pinpoint (Map Area)
+            </div>
+        `;
+        return section;
+    }
+
+    // Function to create the Footer
+    function createFooter() {
+        const footer = document.createElement('footer');
+        footer.innerHTML = '&copy; 2025 Amal Rahmania Ladies Hostel. All rights reserved. | Developed for Digital Presence.';
+        return footer;
+    }
+
+    // --- Main Rendering Function ---
+    function renderApp() {
+        injectStyles(); // Step 1: Inject all CSS styles
+        
+        const body = document.body;
+
+        // 2. Append Header
+        body.appendChild(createHeader());
+
+        // 3. Create Main Container
+        const main = document.createElement('main');
+        main.className = 'container';
+
+        // 4. Create Grid
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'grid';
+
+        // Left Column (Content)
+        const leftColumn = document.createElement('div');
+        leftColumn.style.cssText = 'display: flex; flex-direction: column; gap: 24px;';
+        
+        leftColumn.appendChild(createHeroSection());
+        leftColumn.appendChild(createGallerySection());
+        leftColumn.appendChild(createPricingAndMealsSections());
+        leftColumn.appendChild(createRulesSection());
+        
+        gridDiv.appendChild(leftColumn);
+
+        // Right Column (Sidebar)
+        const rightColumn = document.createElement('div');
+        
+        rightColumn.appendChild(createChatCard());
+        rightColumn.appendChild(createContactCard());
+        rightColumn.appendChild(createSupportCard());
+        rightColumn.appendChild(createLocationCard());
+        
+        gridDiv.appendChild(rightColumn);
+        main.appendChild(gridDiv);
+        body.appendChild(main);
+        
+        // 5. Append Footer
+        body.appendChild(createFooter());
+
+        // 6. Initialize post-DOM-creation scripts
+        initializeScripts();
+    }
+
+    // --- Contact Form Validation and Submission Logic ---
+    function handleFormSubmit(event) {
+        event.preventDefault();
+        const phoneInput = document.getElementById('contact-phone');
+        const formMessage = document.getElementById('form-message');
+        
+        if (!phoneInput || !formMessage) return;
+
+        const phone = phoneInput.value.trim();
+        const phoneRegex = /^\d{10}$/;
+
+        if (!phoneRegex.test(phone)) {
+            phoneInput.classList.add('error');
+            formMessage.style.color = '#ff4d4d';
+            formMessage.innerText = '⚠️ ദയവായി 10 അക്കമുള്ള ഒരു ഫോൺ നമ്പർ നൽകുക.';
+            return;
+        }
+
+        phoneInput.classList.remove('error');
+        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+        formMessage.style.color = accentColor;
+        formMessage.innerText = '✅ നിങ്ങളുടെ അന്വേഷണം അയച്ചിരിക്കുന്നു. ഉടൻ ബന്ധപ്പെടാം!';
+        
+        document.getElementById('contact-name').value = '';
+        document.getElementById('contact-phone').value = '';
+        document.getElementById('contact-message').value = '';
+
+        setTimeout(() => {
+            formMessage.innerText = '';
+        }, 5000);
+    }
+
+    // --- Scroll Animation Logic ---
+    function checkVisibility() {
+        const elements = document.querySelectorAll('.scroll-animate');
+        elements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 150) {
+                el.classList.add('is-visible');
+            }
+        });
+    }
+
+    // --- Gemini Chat Logic ---
+    function setupGeminiChat() {
+        const askButton = document.getElementById('ask-button');
+        const chatInput = document.getElementById('chat-input');
+        const chatOutput = document.getElementById('chat-output');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        if (!askButton || !chatInput || !chatOutput || !loadingSpinner) return;
+
+        function getHostelContext() {
+            const rulesList = document.getElementById('hostel-rules-list');
+            const rules = rulesList ? Array.from(rulesList.querySelectorAll('li')).map(li => li.textContent.trim()).join('; ') : '';
+            
+            const facilities = Array.from(document.querySelectorAll('.facilities .chip')).map(span => span.textContent.trim()).join(', ');
+
+            const mealTimingsText = `
+                പ്രഭാത ഭക്ഷണം (Breakfast): 7 am - 8 am; 
+                ഉച്ചഭക്ഷണം (Lunch): 12 pm - 2 pm;
+                വൈകുന്നേരം ചായ (Evening Tea): 4 pm - 5 pm;
+                ഡിന്നർ (Dinner): 7 pm - 8 pm
+            `;
+
+            const outPassTime = "രാത്രി 8 മണിവരെ."; 
+
+            const context = `
+                ഹോസ്റ്റലിൻ്റെ പേര്: അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ.
+                സ്ഥലം: കോട്ടയം മെഡിക്കൽ കോളേജിനടുത്ത്.
+                റൂം കപ്പാസിറ്റി: നിലവിൽ ഒരു മുറിയിൽ 3 പേർക്കാണ് താമസം. വിദ്യാർത്ഥിനികൾ കൂടുതൽ വന്നാൽ 4 പേർ വരെ ആകാം.
+                വാടക: ₹6,500/മാസം, Deposit: ₹5,000.
+                സൗകര്യങ്ങൾ: ${facilities}.
+                ഭക്ഷണ സമയക്രമം: ${mealTimingsText}. ഔട്ട് പാസ് സമയം: ${outPassTime}.
+                ഹോസ്റ്റൽ നിയമങ്ങൾ: ${rules}
+            `;
+            return context;
+        }
+
+        askButton.addEventListener('click', () => {
+            const userQuery = chatInput.value.trim();
+            if (!userQuery) {
+                chatOutput.innerHTML = '<p style="color:red;">ദയവായി ഒരു ചോദ്യം ടൈപ്പ് ചെയ്യുക.</p>';
+                return;
+            }
+
+            const context = getHostelContext();
+            
+            const systemPrompt = "നിങ്ങൾ അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റലിൻ്റെ കസ്റ്റമർ സർവീസ് അസിസ്റ്റന്റാണ്. നൽകിയിട്ടുള്ള വിവരങ്ങൾ മാത്രം ഉപയോഗിച്ച് മലയാളത്തിൽ മറുപടി നൽകുക. വിവരങ്ങൾ ലഭ്യമല്ലെങ്കിൽ, 'കൂടുതൽ വിവരങ്ങൾ അറിയാൻ മാനേജ്‌മെൻ്റുമായി ബന്ധപ്പെടുക' എന്ന് പറയുക. മറുപടി സൗഹാർദ്ദപരവും സംക്ഷിപ്തവുമായിരിക്കണം.";
+            
+            const fullQuery = `Context: ${context} \n\nUser Question: ${userQuery}`;
+
+            chatOutput.innerHTML = '';
+            loadingSpinner.style.display = 'block';
+            askButton.disabled = true;
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: fullQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    maxOutputTokens: 250, 
+                    temperature: 0.2, 
+                }
+            };
+
+            const maxRetries = 3;
+            let retryCount = 0;
+
+            async function callGeminiApi() {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "മറുപടി ലഭ്യമായില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.";
+                    
+                    chatOutput.innerHTML = '<p>' + text.replace(/\n/g, '<br>') + '</p>';
+
+                } catch (error) {
+                    if (retryCount < maxRetries) {
+                        retryCount++;
+                        const delay = Math.pow(2, retryCount) * 1000; 
+                        setTimeout(callGeminiApi, delay);
+                    } else {
+                        chatOutput.innerHTML = '<p style="color:#ff4d4d;">മറുപടി ലഭ്യമാക്കുന്നതിൽ പിശക് സംഭവിച്ചു. ദയവായി മാനേജ്‌മെൻ്റുമായി നേരിട്ട് ബന്ധപ്പെടുക.</p>';
+                    }
+                } finally {
+                    loadingSpinner.style.display = 'none';
+                    askButton.disabled = false;
+                    chatInput.value = ''; 
+                }
+            }
+            callGeminiApi();
+        });
+    }
+
+    // --- Initialize all event listeners and post-DOM content ---
+    function initializeScripts() {
+        // Scroll Animation Listeners
+        window.addEventListener('load', checkVisibility);
+        window.addEventListener('scroll', checkVisibility);
+        window.addEventListener('resize', checkVisibility);
+
+        // Set up Gemini Chat functionality
+        setupGeminiChat();
+        
+        // Initial check for elements already in view (like the Hero section)
+        checkVisibility();
+    }
+    
+    // Execute the main rendering function when the document structure is loaded
+    document.addEventListener('DOMContentLoaded', renderApp);
+
+  </script>
+</body>
+</html>
