@@ -1,122 +1,84 @@
-/* -------------------- VARIABLES -------------------- */
-:root{
-  --bg:#fbf9fb;
-  --text:#222;
-  --h2-color:#333;
-  --accent:#D31D60;
-  --accent-light:#ffc8d9;
-  --muted:#5a5a5a;
-  --card:#ffffff;
-  --card-shadow:0 10px 30px rgba(0,0,0,0.06);
-  --card-border:#f0e4f0;
-  --header-grad:linear-gradient(90deg,rgba(211,29,96,0.1),rgba(255,255,255,0.7));
-  --chip-bg:#ffeef3;
-  --chip-border:rgba(211,29,96,0.3);
-  --input-bg:#ffffff;
-  --input-color:#222;
-  --input-border:#d0d0d0;
-  --maxw:1100px;
-  font-family:'Inter', sans-serif;
-}
+const WHATSAPP_NUMBER_MAIN = '919946716151';
+const WHATSAPP_NUMBER_ALT = '919656962786';
+const WHATSAPP_MESSAGE = encodeURIComponent('Amal Rahmania Ladies Hostel: അഡ്മിഷൻ/ലഭ്യത അന്വേഷിക്കാൻ വിളിച്ചതാണ്.');
 
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#1a1014;
-    --text:#f0f0f0;
-    --h2-color:#fff;
-    --muted:#aaa;
-    --card:#2b1d22;
-    --card-shadow:0 10px 30px rgba(0,0,0,0.5);
-    --card-border:#403035;
-    --header-grad:linear-gradient(90deg,rgba(211,29,96,0.2),var(--card) 70%);
-    --chip-bg:#502030;
-    --chip-border:rgba(255,102,153,0.5);
-    --input-bg:#403035;
-    --input-color:#f0f0f0;
-    --input-border:#604045;
-  }
-  .hero img, .gallery-img{
-    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-  }
-}
+const WHATSAPP_LINK_MAIN = `https://wa.me/${WHATSAPP_NUMBER_MAIN}?text=${WHATSAPP_MESSAGE}`;
+const WHATSAPP_LINK_ALT = `https://wa.me/${WHATSAPP_NUMBER_ALT}?text=${WHATSAPP_MESSAGE}`;
 
-/* -------------------- GLOBAL STYLES -------------------- */
-html{scroll-behavior:smooth;}
-*{box-sizing:border-box;}
-body{margin:0; background:var(--bg); color:var(--text); line-height:1.6;}
-.container{max-width:var(--maxw); margin:0 auto; padding:18px;}
-h1{margin:0; font-size:24px; font-weight:800; color:var(--accent);}
-p.lead{margin:4px 0 0;color:var(--muted); font-size:14px;}
-h2{margin-top:0; color:var(--accent); font-size:20px; border-bottom:2px solid var(--accent-light); padding-bottom:8px; margin-bottom:15px;}
+const GOOGLE_MAPS_EMBED_URL = 'https://maps.google.com/maps?q=9.628944,76.520111&z=15&output=embed';
 
-/* -------------------- LAYOUT -------------------- */
-header{
-  background:var(--header-grad);
-  padding:20px 16px;
-  border-bottom:1px solid var(--card-border);
-  position:sticky;
-  top:0;
-  z-index:10;
-  backdrop-filter: blur(5px);
-}
-.grid{display:grid;grid-template-columns:1fr 340px;gap:24px;margin-top:24px;}
-@media(max-width:880px){
-  .grid{grid-template-columns:1fr; gap:18px;}
-}
+// Inject content after DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+    const body = document.body;
 
-/* -------------------- CARDS -------------------- */
-.card{
-  background:var(--card);
-  padding:24px;
-  border-radius:16px;
-  box-shadow:var(--card-shadow);
-  border:1px solid var(--card-border);
-  transition: all 0.3s;
-}
-.card:hover{
-  transform:translateY(-2px);
-  box-shadow: var(--card-shadow), 0 15px 40px rgba(211,29,96,0.1);
-}
+    // ----- HEADER -----
+    const header = document.createElement('header');
+    header.innerHTML = `
+      <div class="container">
+        <h1>AMAL RAHMANIA LADIES HOSTEL</h1>
+        <p class="lead">Safe, Comfortable, and Homely Living for Women — Near Kottayam Medical College</p>
+      </div>`;
+    body.appendChild(header);
 
-/* -------------------- HERO -------------------- */
-.hero{display:flex;gap:20px;align-items:center;}
-.hero img{width:300px;max-width:40%;border-radius:12px;object-fit:cover; box-shadow:0 4px 15px rgba(0,0,0,0.1);}
+    // ----- MAIN CONTAINER -----
+    const main = document.createElement('main');
+    main.className = 'container';
 
-/* -------------------- BUTTONS -------------------- */
-.btn{display:inline-block;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700; transition: all 0.2s;text-align:center;}
-.btn-primary{background:var(--accent);color:white;box-shadow:0 4px 10px rgba(211,29,96,0.3);}
-.btn-primary:hover{background:#a9154f;transform:translateY(-1px);box-shadow:0 6px 15px rgba(211,29,96,0.4);}
-.btn-outline{border:2px solid var(--accent);color:var(--accent);background:transparent;}
-.btn-outline:hover{background:var(--accent);color:white;}
+    const gridDiv = document.createElement('div');
+    gridDiv.className = 'grid';
 
-/* -------------------- GALLERY -------------------- */
-.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-@media(max-width:880px){.gallery{grid-template-columns:repeat(2,1fr);}}
-.gallery-img{width:100%;height:150px;object-fit:cover;border-radius:12px;box-shadow:0 3px 8px rgba(0,0,0,0.1);border:1px solid var(--card-border);transition: transform 0.3s ease;}
-.gallery-img:hover{transform:scale(1.05);}
+    // Left Column
+    const leftColumn = document.createElement('div');
+    leftColumn.style.display = 'flex';
+    leftColumn.style.flexDirection = 'column';
+    leftColumn.style.gap = '24px';
 
-/* -------------------- CHIPS -------------------- */
-.facilities{display:flex;flex-wrap:wrap;gap:10px; margin-top: 15px;}
-.chip{padding:8px 12px;border-radius:20px;background:var(--chip-bg);border:1px solid var(--chip-border);color:var(--accent);font-weight:600;font-size:12px;}
+    // Hero Section
+    const hero = document.createElement('section');
+    hero.className = 'card hero scroll-animate';
+    hero.innerHTML = `
+      <div style="flex:1">
+        <h2>Welcome to Amal Rahmania</h2>
+        <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിനും പ്രൈവറ്റ് ബസ് സ്റ്റാൻഡിനും സമീപമുള്ള സ്ത്രീകൾക്കായുള്ള വിശ്വസ്തമായ ഹോസ്റ്റൽ.</p>
+        <div class="facilities">
+          <span class="chip">🚀 ഹൈ-സ്പീഡ് WIFI</span>
+          <span class="chip">🧺 വാഷിംഗ് മെഷീൻ</span>
+          <span class="chip">🧊 ഫ്രിഡ്ജ് സൗകര്യം</span>
+          <span class="chip">🍲 മൂന്നു നേരം ഭക്ഷണം</span>
+        </div>
+        <div class="cta">
+          <a class="btn btn-primary" href="${WHATSAPP_LINK_MAIN}">💬 WhatsApp Enquiry</a>
+          <a class="btn btn-outline" href="${WHATSAPP_LINK_ALT}">📲 WhatsApp Alt</a>
+        </div>
+      </div>
+      <img src="WhatsApp Image 2025-10-06 at 10.15.43_7a2930e5.jpg" alt="Hostel Exterior Building Photo" onerror="this.src='https://placehold.co/300x250/A9154F/FFFFFF?text=Hostel+Building';">
+    `;
+    leftColumn.appendChild(hero);
 
-/* -------------------- FORM -------------------- */
-input[type="text"], input[type="tel"], textarea{
-  width:100%;padding:10px;margin-bottom:12px;border:1px solid var(--input-border);border-radius:8px;background:var(--input-bg);color:var(--input-color);transition:border-color 0.2s, box-shadow 0.2s;
-}
-input:focus, textarea:focus{
-  border-color: var(--accent);
-  box-shadow:0 0 0 2px var(--chip-bg);
-  outline:none;
-}
-input.error{border-color:#ff4d4d;box-shadow:0 0 0 2px #ffeef3;}
+    // TODO: Add Gallery, Pricing, Rules Sections (similar to Hero)
+    gridDiv.appendChild(leftColumn);
 
-/* -------------------- MAP -------------------- */
-.map-container{position:relative;width:100%;padding-bottom:75%;height:0;overflow:hidden;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);}
-.map-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
+    // Right Column
+    const rightColumn = document.createElement('div');
+    // TODO: Add Chat, Contact, Support, Location cards
+    gridDiv.appendChild(rightColumn);
 
-/* -------------------- FOOTER -------------------- */
-footer{padding:25px;text-align:center;color:white;font-size:13px;background-color:var(--accent);border-top:none;margin-top:24px;border-radius:16px 16px 0 0;}
+    main.appendChild(gridDiv);
+    body.appendChild(main);
 
-/* -------------------- SCROLL ANIMATION -------------------- */
-.scroll-animate{opacity:0;transform:translateY(20px);transition:opacity 0.8s ease-out, transform 0.8s ease-out;}
-.scroll-animate.is-visible{opacity:1;transform:translateY(0);}
+    // Footer
+    const footer = document.createElement('footer');
+    footer.innerHTML = '&copy; 2025 Amal Rahmania Ladies Hostel. All rights reserved.';
+    body.appendChild(footer);
+
+    // Scroll animations
+    const scrollAnimate = () => {
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 150) el.classList.add('is-visible');
+        });
+    };
+    window.addEventListener('load', scrollAnimate);
+    window.addEventListener('scroll', scrollAnimate);
+    window.addEventListener('resize', scrollAnimate);
+});
