@@ -138,7 +138,27 @@
     .rules ol{padding-left:20px;margin:0}
     .rules li{margin:12px 0;line-height:1.6; color: var(--text); font-size: 14px;}
     .small{font-size:14px;color:var(--muted)}
-    .map-placeholder{height:200px;border-radius:12px;background:var(--accent-light);border:2px dashed var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent); font-weight: 700; font-size: 16px;}
+    
+    /* Updated Map Styling */
+    .map-container {
+        position: relative;
+        width: 100%;
+        /* 4:3 Aspect Ratio for the iframe wrapper */
+        padding-bottom: 75%; 
+        height: 0;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .map-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
     .price-box{background:var(--accent); color: white; padding:15px 20px;border-radius:10px;margin-top:15px;font-weight:700; font-size: 16px; text-align: center; box-shadow: 0 4px 15px rgba(211,29,96,0.3);}
 
     /* Gemini Feature Styling */
@@ -207,6 +227,10 @@
     
     const WHATSAPP_LINK_MAIN = `https://wa.me/${WHATSAPP_NUMBER_MAIN}?text=${WHATSAPP_MESSAGE}`;
     const WHATSAPP_LINK_ALT = `https://wa.me/${WHATSAPP_NUMBER_ALT}?text=${WHATSAPP_MESSAGE}`;
+    
+    // Google Maps Embed URL for coordinates 9°37'44.2"N 76°31'12.4"E
+    const GOOGLE_MAPS_EMBED_URL = 'https://maps.google.com/maps?q=9.628944,76.520111&z=15&output=embed';
+
 
     /**
      * Injects the defined CSS styles (APP_STYLES) into the document head.
@@ -425,13 +449,13 @@
             <input type="text" id="contact-name" placeholder="Your Name" required>
             <input type="tel" id="contact-phone" placeholder="Phone Number (10 digits)" required maxlength="10">
             <textarea id="contact-message" placeholder="Message / Enquiry (Optional)" rows="3"></textarea>
-            <button class="btn btn-primary" id="contact-submit" type="submit" style="width:100%;border:none;cursor:pointer">Send Enquiry</button>
+            <button class="btn btn-primary" id="contact-submit" type="submit" style="width:100%;border:none;cursor:pointer">Send Enquiry via WhatsApp</button>
             <p id="form-message" class="small" style="margin-top: 10px; font-weight: bold;"></p>
         `;
 
         section.innerHTML = `
             <h2>Quick Contact / Enquiry</h2>
-            <p class="small">അഡ്മിഷൻ ലഭ്യത, സംശയങ്ങൾ എന്നിവക്കായി വിളിക്കുകയോ **WhatsApp വഴി മെസ്സേജ് അയക്കുകയോ** ചെയ്യുക.</p>
+            <p class="small">അഡ്മിഷൻ ലഭ്യത, സംശയങ്ങൾ എന്നിവക്കായി വിളിക്കുകയോ ഈ ഫോം ഉപയോഗിച്ച് **WhatsApp വഴി മെസ്സേജ് അയക്കുകയോ** ചെയ്യുക.</p>
             <div class="contact" style="margin-top:12px">
                 <!-- Updated to WhatsApp Link -->
                 <a class="tel" href="${WHATSAPP_LINK_MAIN}">💬 **WhatsApp Main: 9946 71 6151**</a>
@@ -470,12 +494,25 @@
         section.className = 'card scroll-animate';
         section.id = 'section-location';
         section.style.marginTop = '24px';
-        section.innerHTML = `
-            <h2>Location</h2>
-            <p class="small">Near Kottayam Medical College, Gandhinagar, Kottayam, Kerala - 686008</p>
-            <div class="map-placeholder" style="margin-top:15px">
-                📍 Location Pinpoint (Map Area)
+        
+        // Google Maps iframe embedding the provided coordinates
+        const mapEmbedHtml = `
+            <div class="map-container">
+                <iframe 
+                    src="${GOOGLE_MAPS_EMBED_URL}" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Amal Rahmania Ladies Hostel Location">
+                </iframe>
             </div>
+        `;
+
+        section.innerHTML = `
+            <h2>Location & Directions</h2>
+            <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിന് സമീപം, ഗാന്ധിനഗർ. കൃത്യമായ ലൊക്കേഷൻ താഴെ മാപ്പിൽ കാണാം.</p>
+            ${mapEmbedHtml}
+            <p class="small" style="margin-top:10px; font-weight: 600;">GPS കോർഡിനേറ്റ്സ്: $9^\circ37'44.2"N\ 76^\circ31'12.4"E$</p>
         `;
         return section;
     }
@@ -537,33 +574,41 @@
     // --- Contact Form Validation and Submission Logic ---
     function handleFormSubmit(event) {
         event.preventDefault();
-        const phoneInput = document.getElementById('contact-phone');
-        const formMessage = document.getElementById('form-message');
         
-        if (!phoneInput || !formMessage) return;
-
+        const name = document.getElementById('contact-name').value.trim();
+        const phoneInput = document.getElementById('contact-phone');
         const phone = phoneInput.value.trim();
+        const message = document.getElementById('contact-message').value.trim();
+        const formMessage = document.getElementById('form-message');
         const phoneRegex = /^\d{10}$/;
+
+        if (!phoneInput || !formMessage) return;
 
         if (!phoneRegex.test(phone)) {
             phoneInput.classList.add('error');
             formMessage.style.color = '#ff4d4d';
-            formMessage.innerText = '⚠️ ദയവായി 10 അക്കമുള്ള ഒരു ഫോൺ നമ്പർ നൽകുക.';
+            formMessage.innerText = '⚠️ ദയവായി 10 അക്കമുള്ള ഫോൺ നമ്പർ നൽകുക.';
             return;
         }
 
         phoneInput.classList.remove('error');
-        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-        formMessage.style.color = accentColor;
-        formMessage.innerText = '✅ നിങ്ങളുടെ അന്വേഷണം അയച്ചിരിക്കുന്നു. ഉടൻ ബന്ധപ്പെടാം!';
-        
+
+        // WhatsApp URL with prefilled message
+        const waMessage = encodeURIComponent(`Amal Rahmania Hostel Enquiry\n\nName: ${name}\nPhone: ${phone}\nMessage: ${message}`);
+        const waLink = `https://wa.me/919946716151?text=${waMessage}`; // main number
+
+        // Open WhatsApp in a new tab
+        window.open(waLink, '_blank');
+
+        // Reset form
         document.getElementById('contact-name').value = '';
         document.getElementById('contact-phone').value = '';
         document.getElementById('contact-message').value = '';
-
-        setTimeout(() => {
-            formMessage.innerText = '';
-        }, 5000);
+        
+        formMessage.style.color = 'green';
+        formMessage.innerText = '✅ WhatsApp തുറന്നിരിക്കുന്നു! ദയവായി മെസ്സേജ് അയക്കുക.';
+        
+        setTimeout(() => formMessage.innerText = '', 5000);
     }
 
     // --- Scroll Animation Logic ---
