@@ -4,225 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Amal Rahmania Ladies Hostel</title>
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Birthstone Formal (for titles) + Inter (for body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Birthstone+Formal:wght@400&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- The entire website structure will be generated here by JavaScript -->
-  <script>
-    // --- CSS Styles as a single JavaScript String ---
-    const APP_STYLES = `
-    /* -----------------------------------------------------------------
-       GLOBAL STYLES AND COLORS (LIGHT MODE DEFAULT)
-       Fixed Accent Color: #D31D60 (Deep Rose Pink)
-    ----------------------------------------------------------------- */
-    :root{
-      --bg:#fbf9fb; /* Very light pink/white background */
-      --text:#222;
-      --h2-color:#333;
-      --accent:#D31D60; /* FIXED Deep Rose Pink - primary highlight */
-      --accent-light:#ffc8d9; /* FIXED Lighter pink for subtle backgrounds */
-      --muted:#5a5a5a;
-      --card:#ffffff;
-      --card-shadow:0 10px 30px rgba(0,0,0,0.06); /* Softer, larger shadow */
-      --card-border:#f0e4f0; /* Soft border color */
-      --header-grad:linear-gradient(90deg,rgba(211,29,96,0.1),rgba(255,255,255,0.7));
-      --chip-bg:#ffeef3; /* Soft pink chip background */
-      --chip-border:rgba(211,29,96,0.3);
-      --input-bg:#ffffff;
-      --input-color:#222;
-      --input-border:#d0d0d0;
-      --maxw:1100px; /* Slightly wider layout */
-      font-family:'Inter', sans-serif; /* Modern, clean font */
-    }
-
-    /* -----------------------------------------------------------------
-       DARK MODE OVERRIDES 
-    ----------------------------------------------------------------- */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --bg:#1a1014; 
-            --text:#f0f0f0;
-            --h2-color:#ffffff;
-            --muted:#aaaaaa;
-            --card:#2b1d22; 
-            --card-shadow:0 10px 30px rgba(0,0,0,0.5); 
-            --card-border:#403035;
-            --header-grad:linear-gradient(90deg,rgba(211,29,96,0.2),var(--card) 70%); 
-            --chip-bg:#502030;
-            --chip-border:rgba(255,102,153,0.5);
-            --input-bg:#403035;
-            --input-color:#f0f0f0;
-            --input-border:#604045;
-        }
-        .hero img, .gallery-img { 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6); 
-        }
-    }
-
-    /* -----------------------------------------------------------------
-       SMOOTH SCROLLING
-    ----------------------------------------------------------------- */
-    html {
-        scroll-behavior: smooth;
-    }
-
-    /* -----------------------------------------------------------------
-       GLOBAL STYLES APPLYING VARIABLES
-    ----------------------------------------------------------------- */
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text); line-height: 1.6;}
-    header{
-        background:var(--header-grad);
-        padding:20px 16px;border-bottom:1px solid var(--card-border); 
-        position: sticky; top: 0; z-index: 10; backdrop-filter: blur(5px);
-    }
-    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
-    .brand{display:flex;align-items:center;} 
+  <script type="module">
+    // --- FIREBASE IMPORTS (MANDATORY MODULE IMPORTS) ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, query, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
     
-    h1{margin:0;font-size:24px; font-weight: 800; color: var(--accent);}
-    p.lead{margin:4px 0 0;color:var(--muted); font-size: 14px;}
+    // --- GLOBAL FIREBASE VARS ---
+    let app, db, auth, storage;
+    let currentUserId = null;
+    let isAuthReady = false;
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-hostel-app';
+    const FIREBASE_CONFIG = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+    const INITIAL_AUTH_TOKEN = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-    /* -----------------------------------------------------------------
-       RESPONSIVE GRID LAYOUT
-    ----------------------------------------------------------------- */
-    .grid{display:grid;grid-template-columns:1fr 340px;gap:24px;margin-top:24px}
-    
-    @media(max-width:880px){
-        .grid{grid-template-columns:1fr; gap: 18px;} 
-        .hero{flex-direction: column;} 
-        .hero img{max-width: 100%; width: 100%; height: 250px;} 
-    }
+    // --- GLOBAL STATE ---
+    let uploadedImages = []; // Stores URLs of community-uploaded photos
+    let uploadedVideos = []; // Stores URLs of community-uploaded videos
+    let hostelReviews = []; // Stores all submitted reviews
+    let selectedRating = 0; // State for the review form rating
+    let currentUserName = 'Guest'; // NEW: To store Google Display Name or 'Anonymous User'
+    let currentUserPhotoURL = null; // NEW: To store Google Profile Picture
 
-    /* -----------------------------------------------------------------
-       COMPONENT STYLING
-    ----------------------------------------------------------------- */
-    .card{background:var(--card);padding:24px;border-radius:16px;box-shadow:var(--card-shadow); border: 1px solid var(--card-border); transition: all 0.3s;}
-    .card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow), 0 15px 40px rgba(211,29,96,0.1);}
+    // --- Utility Functions for DOM Construction and Data ---
+    const WHATSAPP_NUMBER_MAIN = '919946716151'; // Main contact number (also used for call button)
+    const WHATSAPP_NUMBER_ALT = '919656962786'; 
+    const MAX_PHOTO_SIZE = 2 * 1024 * 1024; // 2MB
+    const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB (Client-side limit)
     
-    .hero{display:flex;gap:20px;align-items:center}
-    .hero img{width:300px;max-width:40%;border-radius:12px;object-fit:cover; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
-    
-    .cta{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap}
-    .btn{display:inline-block;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700; transition: all 0.2s; text-align: center;}
-    .btn-primary{background:var(--accent);color:white; box-shadow: 0 4px 10px rgba(211,29,96,0.3);}
-    .btn-primary:hover {background: #a9154f; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(211,29,96,0.4);}
-    .btn-outline{border:2px solid var(--accent);color:var(--accent);background:transparent;}
-    .btn-outline:hover {background: var(--accent); color: white;}
-    
-    h2{margin-top:0; color: var(--accent); font-size: 20px; border-bottom: 2px solid var(--accent-light); padding-bottom: 8px; margin-bottom: 15px;}
-    ul.list{padding-left:18px;margin:8px 0}
-    .facilities{display:flex;flex-wrap:wrap;gap:10px; margin-top: 15px;}
-    .chip{padding:8px 12px;border-radius:20px;background:var(--chip-bg);border:1px solid var(--chip-border); color: var(--accent); font-weight: 600; font-size: 12px;}
-    
-    /* Gallery styling */
-    .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    @media(max-width:880px){.gallery{grid-template-columns:repeat(2,1fr)}}
-    .gallery-img{
-        width:100%;
-        height:150px;
-        object-fit:cover;
-        border-radius:12px;
-        box-shadow:0 3px 8px rgba(0,0,0,0.1); 
-        border: 1px solid var(--card-border);
-        transition: transform 0.3s ease;
-    }
-    .gallery-img:hover {
-        transform: scale(1.05);
-    }
-    
-    .contact .tel{display:block;font-weight:700;color:var(--accent);margin-bottom:8px; font-size: 16px; text-decoration: none;}
-    footer{padding:25px;text-align:center;color:white;font-size:13px; background-color: var(--accent); border-top: none; margin-top: 24px; border-radius: 16px 16px 0 0;}
-    .rules ol{padding-left:20px;margin:0}
-    .rules li{margin:12px 0;line-height:1.6; color: var(--text); font-size: 14px;}
-    .small{font-size:14px;color:var(--muted)}
-    
-    /* Updated Map Styling */
-    .map-container {
-        position: relative;
-        width: 100%;
-        /* 4:3 Aspect Ratio for the iframe wrapper */
-        padding-bottom: 75%; 
-        height: 0;
-        overflow: hidden;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .map-container iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: 0;
-    }
-
-    .price-box{background:var(--accent); color: white; padding:15px 20px;border-radius:10px;margin-top:15px;font-weight:700; font-size: 16px; text-align: center; box-shadow: 0 4px 15px rgba(211,29,96,0.3);}
-
-    /* Gemini Feature Styling */
-    #gemini-chat-card { margin-top: 24px; }
-    #chat-output { 
-        min-height: 90px;
-        padding: 12px;
-        border: 1px solid var(--chip-border);
-        border-radius: 8px;
-        margin-top: 15px;
-        background: var(--chip-bg);
-    }
-    #chat-output p { margin: 0; font-size: 14px; color: var(--text); }
-    .loading-spinner {
-        display: none;
-        border: 4px solid var(--card-border);
-        border-top: 4px solid var(--accent);
-        border-radius: 50%;
-        width: 25px;
-        height: 25px;
-        animation: spin 1s linear infinite;
-        margin: 15px auto;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    
-    /* Tech Support Card specific styling */
-    .tech-support-icon { font-size: 28px; color: var(--accent); margin-right: 12px; }
-    
-    /* Input field styling */
-    input[type="text"], input[type="tel"], textarea {
-        width:100%;
-        padding:10px;
-        margin-bottom:12px;
-        border:1px solid var(--input-border);
-        border-radius:8px;
-        background:var(--input-bg);
-        color:var(--input-color);
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    input:focus, textarea:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px var(--chip-bg);
-        outline: none;
-    }
-    input.error { border-color: #ff4d4d; box-shadow: 0 0 0 2px #ffeef3; }
-
-    /* -----------------------------------------------------------------
-       SCROLL ANIMATION STYLES (Fade In Effect)
-    ----------------------------------------------------------------- */
-    .scroll-animate {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-    }
-
-    .scroll-animate.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    `;
-
-    // --- Utility Functions for DOM Construction ---
-    const WHATSAPP_NUMBER_MAIN = '919946716151'; 
-    const WHATSAPP_NUMBER_ALT = '919656962786';
     const WHATSAPP_MESSAGE = encodeURIComponent('Amal Rahmania Ladies Hostel: അഡ്മിഷൻ/ലഭ്യത എന്നിവയെക്കുറിച്ച് അന്വേഷിക്കാൻ വിളിച്ചതാണ്. കൂടുതൽ വിവരങ്ങൾ അറിയാമോ?');
     
     const WHATSAPP_LINK_MAIN = `https://wa.me/${WHATSAPP_NUMBER_MAIN}?text=${WHATSAPP_MESSAGE}`;
@@ -231,133 +48,1176 @@
     // Google Maps Embed URL for coordinates 9°37'44.2"N 76°31'12.4"E
     const GOOGLE_MAPS_EMBED_URL = 'https://maps.google.com/maps?q=9.628944,76.520111&z=15&output=embed';
 
+    // File names for static assets
+    const NEW_LOGO_FILENAME = '1000042305.jpg'; 
+    const BUILDING_PHOTO_1 = 'WhatsApp Image 2025-10-06 at 10.15.43_7a2930e5.jpg'; 
+    const COMMON_AREA_PHOTO = 'WhatsApp Image 2025-10-06 at 10.14.42_44015340.jpg';
+    const BUILDING_PHOTO_2 = 'WhatsApp Image 2025-09-24 at 09.57.44_93d77be0.jpg';
+    const WORK_AREA_PHOTO = 'image_58eb1f.png';
+    const ROOM_INTERIOR_PHOTO = '1000044799.jpg';
+    
+    /**
+     * Helper function to convert rating number to star display (e.g., 4.5 -> '⭐⭐⭐⭐⭐')
+     * @param {number} rating 
+     * @returns {string} HTML for star rating
+     */
+    function renderStars(rating) {
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 >= 0.5 ? '½' : '';
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        
+        // Using two spans for color control: gold for filled, gray for empty
+        return `
+            <span style="color: #FFC300; letter-spacing: 1px; font-size: 18px;">${'★'.repeat(fullStars)}${halfStar ? '★' : ''}</span>
+            <span style="color: #ccc; letter-spacing: 1px; font-size: 18px;">${'★'.repeat(emptyStars)}</span>
+        `;
+    }
 
     /**
-     * Injects the defined CSS styles (APP_STYLES) into the document head.
+     * Simulates a typing effect by displaying text character by character.
+     * @param {HTMLElement} element The DOM element to write the text into.
+     * @param {string} text The full text to display.
+     * @param {number} delay The delay in milliseconds between characters.
      */
+    function typeResponse(element, text, delay = 25) { 
+        let i = 0;
+        element.innerHTML = '';
+        // Use an invisible cursor to simulate typing effect
+        element.style.borderRight = '2px solid white'; 
+        
+        const interval = setInterval(() => {
+            if (i < text.length) {
+                if (text.charAt(i) === '\n') {
+                    element.innerHTML += '<br>';
+                } else {
+                    element.innerHTML += text.charAt(i);
+                }
+                i++;
+            } else {
+                clearInterval(interval);
+                element.style.borderRight = 'none'; // Remove cursor after typing
+            }
+        }, delay);
+    }
+
+
+    // --- CSS Styles as a single JavaScript String (VIBRANT STYLING with Birthstone Formal) ---
+    const APP_STYLES = `
+    /* -----------------------------------------------------------------
+       GLOBAL STYLES AND COLORS (VIBRANT LOOK)
+       Primary Accent Color: #FF6B6B (Coral Pink/Vibrant Red)
+       Secondary Accent: #1ABC9C (Bright Teal/Aqua)
+    ----------------------------------------------------------------- */
+    :root{
+      --bg:#F8F9FA; /* Very Light Gray/White */
+      --text:#333;
+      --h2-color:#333;
+      --accent:#FF6B6B; /* Primary: Coral Pink */
+      --accent-dark:#FF4B4B; 
+      --accent-light:#FFE9E9; /* Very Light Pink for backgrounds */
+      --secondary-accent: #1ABC9C; /* Bright Aqua/Teal */
+      --secondary-dark: #16A085;
+      --muted:#6C757D;
+      --card:#ffffff;
+      --card-shadow:0 10px 30px rgba(0,0,0,0.08); /* Soft but noticeable shadow */
+      --card-border:#e9ecef; 
+      --header-grad:linear-gradient(90deg,rgba(255,107,107,0.05),rgba(255,255,255,0.9)); 
+      --chip-bg:#E6F7F5; /* Light Aqua background for chips */
+      --chip-border:rgba(26,188,156,0.3);
+      --input-bg:#ffffff;
+      --input-color:#333;
+      --input-border:#ced4da;
+      --maxw:1200px; 
+      font-family:'Inter', sans-serif; /* Inter for general body text readability */
+    }
+
+    /* -----------------------------------------------------------------
+       DARK MODE OVERRIDES 
+    ----------------------------------------------------------------- */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg:#1E293B; /* Dark Blue Slate */
+            --text:#e2e8f0;
+            --h2-color:#ffffff;
+            --muted:#a0aec0;
+            --card:#2D3748; /* Darker Card */
+            --card-shadow:0 12px 30px rgba(0,0,0,0.6); 
+            --card-border:#4A5568;
+            --header-grad:linear-gradient(90deg,rgba(255,107,107,0.1),var(--card) 70%); 
+            --chip-bg:#2F495E;
+            --chip-border:rgba(26,188,156,0.5);
+            --input-bg:#3A455A;
+            --input-color:#e2e8f0;
+            --input-border:#5c687d;
+        }
+        .hero img, .gallery-img, .gallery-video { 
+            filter: brightness(0.9) contrast(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6); 
+        }
+        .price-box {
+            background: var(--secondary-dark) !important;
+            box-shadow: 0 8px 25px rgba(26, 188, 156, 0.4) !important; 
+        }
+    }
+    
+    body {
+        background-color: var(--bg);
+        transition: background-color 0.5s;
+    }
+    html { scroll-behavior: smooth; }
+
+    /* -----------------------------------------------------------------
+       HEADER & BRANDING
+    ----------------------------------------------------------------- */
+    header{
+        background:var(--header-grad);
+        padding:18px 16px;
+        border-bottom:1px solid var(--card-border); 
+        position: sticky; top: 0; z-index: 10; 
+        backdrop-filter: blur(10px); 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
+    }
+    .container{max-width:var(--maxw);margin:0 auto;padding:24px}
+    .brand{display:flex;align-items:center; gap: 15px;} 
+    
+    .logo-img {
+        width: 60px; 
+        height: 60px;
+        border-radius: 50%; 
+        object-fit: contain;
+        padding: 5px; 
+        background-color: white; 
+        border: 4px solid var(--accent-light);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        transition: transform 0.3s;
+    }
+    .logo-img:hover {
+        transform: scale(1.05) rotate(-3deg);
+    }
+
+    /* Birthstone Formal applied to H1 */
+    h1{
+        margin:0;
+        font-family: 'Birthstone Formal', cursive; /* NEW FONT */
+        font-size: 40px; 
+        font-weight: 400; /* Birthstone Formal is typically 400 */
+        color: var(--accent); 
+        letter-spacing: 0.5px;
+        line-height: 1;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    } 
+    p.lead{margin:4px 0 0;color:var(--muted); font-size: 15px; font-weight: 600;}
+
+    /* -----------------------------------------------------------------
+       WELCOME OVERLAY (Stylish Typing Animation)
+    ----------------------------------------------------------------- */
+    #welcome-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(135deg, var(--accent-dark), var(--accent)); /* Subtle Gradient */
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 1s ease-out, visibility 1s ease-out; 
+        overflow: hidden;
+    }
+    #welcome-overlay.fade-out {
+        opacity: 0;
+        visibility: hidden;
+    }
+    /* Birthstone Formal applied to Welcome Text */
+    .welcome-text {
+        font-family: 'Birthstone Formal', cursive; /* NEW FONT */
+        font-size: 5.5rem; /* Larger size for script font */
+        font-weight: 400; 
+        letter-spacing: 5px;
+        text-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        white-space: nowrap; 
+        overflow: hidden; 
+        border-right: 2px solid white; 
+        animation: blink-caret 0.75s step-end infinite;
+    }
+    
+    @keyframes blink-caret {
+        from, to { border-color: transparent }
+        50% { border-color: white }
+    }
+
+    @media(max-width: 600px) {
+        .welcome-text {
+            font-size: 3rem; /* Adjusted mobile size */
+            letter-spacing: 3px;
+            padding: 0 10px;
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       GRID LAYOUT
+    ----------------------------------------------------------------- */
+    .grid{display:grid;grid-template-columns:1fr 400px;gap:40px;margin-top:24px}
+    
+    @media(max-width:1024px){
+        .grid{grid-template-columns:1fr; gap: 30px;} 
+        .hero{flex-direction: column;} 
+        .hero img{max-width: 100%; width: 100%; height: 350px;} 
+    }
+
+    /* -----------------------------------------------------------------
+       COMPONENT STYLING
+    ----------------------------------------------------------------- */
+    .card{
+        background:var(--card);
+        padding:30px; 
+        border-radius:25px; /* Softer, rounder cards */
+        box-shadow:var(--card-shadow); 
+        border: 1px solid var(--card-border); 
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+        position: relative;
+    }
+    .card:hover { 
+        transform: translateY(-5px); 
+        box-shadow: var(--card-shadow), 0 18px 50px rgba(255, 107, 107, 0.15); /* Pink hover shadow */
+    } 
+    
+    .hero{display:flex;gap:35px;align-items:center}
+    .hero img{
+        width:400px;max-width:45%;height:350px;
+        border-radius:20px; /* Rounder corners on images */
+        object-fit:cover; 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    }
+    
+    h2{
+        margin-top:0; 
+        color: var(--accent-dark); 
+        font-size: 26px; 
+        font-weight: 800;
+        /* Highlighted header style */
+        background: linear-gradient(90deg, var(--accent-light) 0%, transparent 100%);
+        padding: 5px 0;
+        margin-bottom: 25px;
+    }
+    
+    /* Buttons */
+    .cta{margin-top:25px;display:flex;gap:15px;flex-wrap:wrap}
+    .btn{
+        display:inline-block;padding:14px 28px;border-radius:30px; /* Pill-shaped buttons */
+        text-decoration:none;font-weight:700; transition: all 0.3s; 
+        text-align: center;
+        letter-spacing: 0.5px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-primary{
+        background:var(--accent);color:white; 
+        box-shadow: 0 6px 15px rgba(255, 107, 107, 0.5); /* Pink shadow */
+    }
+    .btn-primary:hover {
+        background: var(--accent-dark); 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.7);
+    }
+    .btn-outline{
+        border:2px solid var(--secondary-accent);
+        color:var(--secondary-accent);
+        background:transparent;
+    }
+    .btn-outline:hover {
+        background: var(--secondary-accent); 
+        color: white; 
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4);
+    }
+
+    .btn-call {
+        background: #3B82F6 !important; /* Blue for call, standard look */
+        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.5) !important;
+    }
+    .btn-call:hover {
+        background: #2563EB !important; 
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.7) !important;
+    }
+    
+    /* Chips */
+    .facilities{display:flex;flex-wrap:wrap;gap:12px; margin-top: 20px;}
+    .chip{
+        padding:10px 18px;
+        border-radius:30px; /* Pill shape */
+        background:var(--chip-bg);
+        border:1px solid var(--chip-border); 
+        color: var(--secondary-dark); 
+        font-weight: 700; /* Bolder text */
+        font-size: 14px; 
+        transition: background 0.2s;
+    }
+    .chip:hover {
+        background: var(--secondary-accent);
+        color: white;
+    }
+    
+    /* Gallery styling (Updated for Video) */
+    .gallery{
+        display:grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+        gap:20px; 
+    } 
+
+    .gallery-img{
+        width:100%;
+        height:180px; 
+        object-fit:cover;
+        border-radius:18px; /* Rounder corners on images/videos */
+        box-shadow:0 6px 15px rgba(0,0,0,0.1); 
+        border: 4px solid var(--card-border);
+        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), box-shadow 0.3s ease; /* Bouncy transition */
+    }
+    .gallery-img:hover {
+        transform: scale(1.08) rotate(1deg); 
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        z-index: 1; 
+    }
+    
+    /* Video Specific Styles */
+    .gallery-video-container {
+        position: relative;
+        height: 180px; /* Match gallery-img height */
+        border-radius: 18px;
+        overflow: hidden;
+    }
+    .gallery-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        background-color: black;
+    }
+    .video-overlay {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        pointer-events: none; /* Allows click to pass through to video element */
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    
+    /* Pricing Box - Highlighted */
+    .price-box{
+        background: linear-gradient(135deg, var(--secondary-accent), var(--secondary-dark)); 
+        color: white; 
+        padding:35px; /* More padding */
+        border-radius:20px;
+        margin-top:20px;
+        font-weight:900; 
+        font-size: 28px; 
+        text-align: center; 
+        box-shadow: 0 10px 30px rgba(26, 188, 156, 0.5); /* Aqua shadow */
+        line-height: 1.3;
+        position: relative;
+        overflow: hidden;
+    } 
+    .price-box::before {
+        content: "VALUE DEAL";
+        position: absolute;
+        top: 0; right: 0;
+        background: var(--accent);
+        color: white;
+        padding: 5px 15px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        transform: rotate(45deg) translate(30%, -10%);
+        transform-origin: 100% 0;
+        width: 150px;
+        text-align: center;
+    }
+    .price-box span{
+        font-size: 18px; 
+        font-weight: 600; 
+        display: block; 
+        opacity: 0.95;
+        margin-top: 5px;
+    }
+
+
+    /* Review Summary */
+    .review-summary {
+        background: var(--accent-light);
+        padding: 30px; 
+        border-radius: 20px;
+        margin-bottom: 30px;
+        text-align: center;
+        border: 2px solid var(--accent); /* Solid Pink border */
+        box-shadow: inset 0 0 15px rgba(255, 107, 107, 0.2);
+    }
+    .review-summary h3 {
+        color: var(--accent-dark);
+        font-size: 45px;
+        font-weight: 900;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+    .review-stars-large {
+        color: #FFC300; 
+        font-size: 30px; 
+        letter-spacing: 4px;
+    }
+    
+    /* Individual Review Style */
+    .review-item {
+        border-bottom: 1px dashed var(--card-border);
+        padding: 18px 0;
+    }
+    .review-author {
+        font-weight: 800;
+        color: var(--accent);
+        font-size: 18px;
+    }
+    
+    /* Input Fields */
+    input[type="text"], input[type="tel"], textarea, input[type="file"] {
+        width: 100%;
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--input-color);
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus, textarea:focus {
+        border-color: var(--secondary-accent);
+        box-shadow: 0 0 0 4px rgba(26, 188, 156, 0.2);
+        outline: none;
+    }
+
+    /* Star Rating Widget in Form */
+    .rating-widget {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 15px 0 30px;
+        cursor: pointer;
+        user-select: none;
+    }
+    .rating-widget span {
+        font-size: 45px; 
+        color: var(--input-border);
+        transition: color 0.2s, transform 0.2s;
+    }
+    .rating-widget span:hover,
+    .rating-widget span.selected {
+        color: #FFC300;
+        transform: scale(1.2) rotate(-5deg); 
+    }
+    
+    /* Rules List */
+    .rules li{
+        margin:16px 0;
+        line-height:1.7; 
+        color: var(--text); 
+        font-size: 16px; 
+        padding-left: 15px; 
+        border-left: 5px solid var(--secondary-accent); 
+        border-radius: 3px;
+    }
+    
+    /* Footer */
+    footer{
+        padding:40px 20px;
+        text-align:center;color:white;font-size:15px; 
+        background: linear-gradient(135deg, var(--accent-dark), var(--accent)); 
+        margin-top: 50px; 
+        border-radius: 30px 30px 0 0; 
+        box-shadow: 0 -8px 20px rgba(0,0,0,0.1);
+    }
+    
+    /* Utility */
+    .small{font-size:14px;color:var(--muted)}
+    .map-container {
+        padding-bottom: 60%; 
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+    .map-container iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    .loading-spinner {
+        /* Standard Spinner CSS... */
+        width: 24px;
+        height: 24px;
+        border: 4px solid var(--card-border);
+        border-top-color: var(--accent); 
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 10px auto;
+        display: none;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* -----------------------------------------------------------------
+       SCROLL ANIMATION STYLES
+    ----------------------------------------------------------------- */
+    .scroll-animate {
+        opacity: 0;
+        transform: translateY(60px); 
+        transition: opacity 1.2s cubic-bezier(0.2, 0.5, 0.1, 1), transform 1s cubic-bezier(0.2, 0.5, 0.1, 1);
+    }
+
+    .scroll-animate.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Google Sign In Button Styling */
+    .btn-google {
+        background: white !important;
+        color: #4285F4 !important;
+        border: 1px solid #ddd !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-weight: 700;
+    }
+    .btn-google:hover {
+        background: #f7f7f7 !important;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        transform: translateY(-1px);
+    }
+    .btn-google img {
+        width: 20px;
+        height: 20px;
+    }
+    `;
+
+    // --- Firebase Core Logic ---
+    async function initializeFirebase() {
+        if (!FIREBASE_CONFIG) {
+            console.error("Firebase configuration is missing.");
+            return;
+        }
+        
+        try {
+            app = initializeApp(FIREBASE_CONFIG);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            storage = getStorage(app);
+
+            await setPersistence(auth, browserSessionPersistence);
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    // Check if signed in via Google to get display name and photo
+                    const isGoogleUser = user.providerData.some(p => p.providerId === GoogleAuthProvider.PROVIDER_ID);
+                    if (isGoogleUser && user.displayName) {
+                        currentUserName = user.displayName;
+                        currentUserPhotoURL = user.photoURL;
+                    } else if (user.isAnonymous) {
+                        currentUserName = 'Anonymous User (Canvas)'; // For default Canvas/Anonymous
+                        currentUserPhotoURL = null;
+                    } else {
+                        currentUserName = 'Hostel Resident';
+                        currentUserPhotoURL = null;
+                    }
+                } else {
+                    // If no user is logged in, attempt initial sign-in via custom token or anonymously
+                    if (INITIAL_AUTH_TOKEN) {
+                        try {
+                            await signInWithCustomToken(auth, INITIAL_AUTH_TOKEN);
+                        } catch(e) {
+                            console.error("Custom token sign-in failed. Signing in anonymously.", e);
+                            await signInAnonymously(auth);
+                        }
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    // The onAuthStateChanged listener will fire again with the new user object
+                }
+                isAuthReady = true;
+                setupListeners();
+                updateUIForAuth();
+            });
+
+        } catch (e) {
+            console.error("Firebase Initialization Error:", e);
+        }
+    }
+
+    // New: Google Sign-In function
+    async function signInWithGoogle() {
+        const provider = new GoogleAuthProvider();
+        const statusDiv = document.getElementById('auth-status');
+        if (statusDiv) statusDiv.innerHTML = '<span style="color:var(--secondary-accent);">Google Sign-In initiating...</span>';
+        
+        try {
+            // Note: signInWithPopup might be blocked by iframe, user needs to allow it.
+            await signInWithPopup(auth, provider);
+            // The onAuthStateChanged listener handles the rest
+            if (statusDiv) statusDiv.innerHTML = '<span style="color:green; font-weight: bold;">✅ Successfully signed in with Google!</span>';
+        } catch (error) {
+            console.error("Google Sign-In Failed:", error);
+            if (statusDiv) statusDiv.innerHTML = '<span style="color:red;">❌ Sign-In Failed: ' + error.message.split('(')[0] + '</span>';
+        }
+    }
+
+    // New: Sign Out function
+    async function handleSignOut() {
+         const statusDiv = document.getElementById('auth-status');
+         if (statusDiv) statusDiv.innerHTML = '<span style="color:var(--accent);">Signing out...</span>';
+         
+         try {
+             await signOut(auth);
+             // After sign out, the onAuthStateChanged listener will auto-sign-in anonymously
+             if (statusDiv) statusDiv.innerHTML = '<span style="color:var(--secondary-dark);">Signed out. Auto-reverting to Anonymous Access.</span>';
+         } catch (error) {
+             console.error("Sign Out Failed:", error);
+             if (statusDiv) statusDiv.innerHTML = '<span style="color:red;">❌ Sign Out Failed.</span>';
+         }
+    }
+
+
+    function updateUIForAuth() {
+        const uploadSection = document.getElementById('section-upload');
+        if (uploadSection) {
+            uploadSection.style.display = 'block';
+        }
+        
+        // Update Authentication Card Content
+        const authCardContent = document.getElementById('auth-card-content');
+        if (authCardContent) {
+            const isGoogleUser = currentUserPhotoURL !== null;
+            const profileImageUrl = currentUserPhotoURL || 'https://placehold.co/50x50/1ABC9C/ffffff?text=👤';
+
+            authCardContent.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <img src="${profileImageUrl}" 
+                         onerror="this.onerror=null;this.src='https://placehold.co/50x50/1ABC9C/ffffff?text=👤';"
+                         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <p style="margin: 0; font-weight: 700; color: var(--secondary-accent);">Hello, ${currentUserName}!</p>
+                        <p class="small" style="margin: 0; color: var(--muted);">${isGoogleUser ? 'Signed in with Google' : 'Anonymous Access (Canvas)'}</p>
+                    </div>
+                </div>
+                ${isGoogleUser ? 
+                    // Sign Out button for Google users
+                    `<button class="btn btn-outline" id="sign-out-btn" style="width:100%;" onclick="handleSignOut()">Sign Out</button>` : 
+                    // Google Sign In button for Anonymous users
+                    `<button class="btn btn-google" id="google-sign-in-btn" style="width:100%;" onclick="signInWithGoogle()">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png" alt="Google icon">
+                        Sign In with Google
+                    </button>`
+                }
+                <div id="auth-status" class="small" style="margin-top: 10px; min-height: 20px;"></div>
+            `;
+        }
+        
+        // Update display name in Review/Upload sections
+        const nameDisplays = document.querySelectorAll('.user-name-display');
+        nameDisplays.forEach(display => {
+             display.innerHTML = `<span style="font-weight:700;">Current User:</span> ${currentUserName}`;
+        });
+    }
+
+    // --- Media Upload Logic (Combined Photo/Video Upload) ---
+    async function handleMediaUpload() {
+        if (!isAuthReady || !currentUserId || !storage || !db) {
+            console.error("Firebase services or user not ready.");
+            document.getElementById('upload-status').innerHTML = '<span style="color:red;">Authentication not ready. Please wait.</span>';
+            return;
+        }
+
+        const fileInput = document.getElementById('media-upload-input'); 
+        const file = fileInput.files[0];
+        const statusDiv = document.getElementById('upload-status');
+        const uploadButton = document.getElementById('upload-media-btn'); 
+
+        if (!file) {
+            statusDiv.innerHTML = '<span style="color:red;">⚠️ ദയവായി ഒരു ചിത്രമോ വീഡിയോയോ തിരഞ്ഞെടുക്കുക.</span>';
+            return;
+        }
+
+        const mimeType = file.type;
+        let fileType, maxSize;
+        let firestoreCollectionName;
+
+        if (mimeType.startsWith('image/')) {
+            fileType = 'Photo';
+            maxSize = MAX_PHOTO_SIZE;
+            firestoreCollectionName = 'user_photos';
+        } else if (mimeType.startsWith('video/')) {
+            fileType = 'Video';
+            maxSize = MAX_VIDEO_SIZE;
+            firestoreCollectionName = 'user_videos';
+        } else {
+            statusDiv.innerHTML = '<span style="color:red;">⚠️ ഒരു ഇമേജ് (JPG, PNG) അല്ലെങ്കിൽ വീഡിയോ (MP4, MOV) മാത്രം അപ്‌ലോഡ് ചെയ്യുക.</span>';
+            return;
+        }
+
+        if (file.size > maxSize) {
+             statusDiv.innerHTML = `<span style="color:red;">⚠️ ${fileType}-യുടെ പരമാവധി വലുപ്പം ${fileType === 'Photo' ? '2MB' : '10MB'} ആണ്.</span>`;
+             return;
+        }
+
+        const timestamp = Date.now();
+        // Separate storage path for videos and photos for clarity
+        const storagePath = `artifacts/${appId}/public/media/${currentUserId}/${fileType.toLowerCase()}/${timestamp}_${file.name}`;
+        const storageRef = ref(storage, storagePath);
+
+        statusDiv.innerHTML = `<span style="color:var(--accent);">⬆️ ${fileType} Uploading... Please wait.</span>`;
+        uploadButton.disabled = true;
+
+        try {
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            // Use the determined collection name
+            const publicMediaRef = collection(db, `artifacts/${appId}/public/data/${firestoreCollectionName}`);
+            await addDoc(publicMediaRef, {
+                url: downloadURL,
+                userId: currentUserId,
+                userName: currentUserName, // Include user name for tracking
+                type: fileType.toLowerCase(),
+                timestamp: serverTimestamp(),
+                filename: file.name
+            });
+
+            statusDiv.innerHTML = `<span style="color:green; font-weight: bold;">✅ ${fileType} Successfully uploaded! Gallery will update shortly.</span>`;
+            fileInput.value = ''; 
+
+        } catch (error) {
+            console.error("Upload error:", error);
+            statusDiv.innerHTML = '<span style="color:red;">❌ Upload Failed: ' + error.message + '</span>';
+        } finally {
+            uploadButton.disabled = false;
+        }
+    }
+
+
+    // --- Listener Setup (Combined) ---
+    function setupListeners() {
+        if (!db || !isAuthReady) return;
+        setupGalleryListener(); 
+        setupVideosListener(); 
+        setupReviewsListener();
+    }
+    
+    // --- Gallery Data Logic (Photos) ---
+    function setupGalleryListener() {
+        if (!db || !isAuthReady) return;
+        
+        const loadingDiv = document.getElementById('gallery-loading');
+        
+        const publicPhotosRef = collection(db, `artifacts/${appId}/public/data/user_photos`);
+        const q = query(publicPhotosRef);
+
+        onSnapshot(q, (snapshot) => {
+            if(loadingDiv) loadingDiv.style.display = 'none';
+            uploadedImages = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.url && data.userId) {
+                    uploadedImages.push(data.url);
+                }
+            });
+            renderGallery(); // Call combined render function
+        }, (error) => {
+            console.error("Error fetching photos: ", error);
+            if(loadingDiv) loadingDiv.innerHTML = 'Error loading community photos.';
+        });
+    }
+
+    // --- Video Data Logic (New) ---
+    function setupVideosListener() {
+        if (!db || !isAuthReady) return;
+        
+        const publicVideosRef = collection(db, `artifacts/${appId}/public/data/user_videos`);
+        const q = query(publicVideosRef);
+
+        onSnapshot(q, (snapshot) => {
+            uploadedVideos = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.url && data.userId) {
+                    uploadedVideos.push(data.url);
+                }
+            });
+            renderGallery(); // Call combined render function
+        }, (error) => {
+            console.error("Error fetching videos: ", error);
+        });
+    }
+
+    // --- Combined Gallery Renderer ---
+    function renderGallery() {
+        const galleryGrid = document.getElementById('image-gallery-grid');
+        if (!galleryGrid) return;
+        
+        const staticImages = [
+            COMMON_AREA_PHOTO,
+            ROOM_INTERIOR_PHOTO,
+            BUILDING_PHOTO_2,
+            WORK_AREA_PHOTO,
+            BUILDING_PHOTO_1,
+            NEW_LOGO_FILENAME
+        ]; 
+        
+        // Combine all media, mapping videos to objects for type identification
+        const userMedia = [
+            ...uploadedImages.map(url => ({ url, type: 'image', isStatic: false })),
+            ...uploadedVideos.map(url => ({ url, type: 'video', isStatic: false })),
+            ...staticImages.map(url => ({ url, type: 'image', isStatic: true }))
+        ];
+        
+        // Shuffle the combined array for varied display
+        userMedia.sort(() => Math.random() - 0.5); 
+
+        galleryGrid.innerHTML = userMedia.map((media, index) => {
+            const fallbackText = media.isStatic ? 'Image' : (media.type === 'video' ? 'User Video' : 'User Photo');
+            
+            if (media.type === 'image') {
+                return `
+                    <img 
+                        class="gallery-img" 
+                        src="${media.url}" 
+                        onerror="this.onerror=null;this.src='https://placehold.co/180x180/FF6B6B/ffffff?text=${fallbackText}';" 
+                        alt="Hostel Photo ${index + 1}"
+                    >
+                `;
+            } else if (media.type === 'video') {
+                return `
+                    <div class="gallery-video-container">
+                        <video 
+                            class="gallery-img gallery-video" 
+                            src="${media.url}" 
+                            controls 
+                            preload="metadata"
+                            alt="Hostel Video ${index + 1}"
+                            onclick="this.paused ? this.play() : this.pause();"
+                            onerror="this.onerror=null; this.parentNode.innerHTML='<div class=small style=padding:10px;text-align:center;color:red;>Video Failed to Load.</div>';"
+                        >
+                            Your browser does not support the video tag.
+                        </video>
+                        <span class="video-overlay">▶️ VIDEO</span>
+                    </div>
+                `;
+            }
+            return '';
+        }).join('');
+    }
+    
+    // --- Review System Logic (Same as before) ---
+    function setupReviewsListener() {
+        if (!db || !isAuthReady) return;
+        
+        const reviewsRef = collection(db, `artifacts/${appId}/public/data/user_reviews`);
+        const q = query(reviewsRef, orderBy('timestamp', 'desc')); 
+
+        onSnapshot(q, (snapshot) => {
+            hostelReviews = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.rating && data.name && data.reviewText) {
+                    hostelReviews.push({ id: doc.id, ...data });
+                }
+            });
+            renderReviews();
+        }, (error) => {
+            console.error("Error fetching reviews: ", error);
+        });
+    }
+    
+    function renderReviews() {
+        const summaryDiv = document.getElementById('review-summary-display');
+        const listDiv = document.getElementById('reviews-list');
+        
+        if (!summaryDiv || !listDiv) return;
+
+        if (hostelReviews.length === 0) {
+            summaryDiv.innerHTML = `<p class="small" style="text-align: center; color: var(--muted); margin: 0;">No reviews yet. Be the first!</p>`;
+            listDiv.innerHTML = '';
+            return;
+        }
+        
+        const totalRating = hostelReviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = (totalRating / hostelReviews.length).toFixed(1);
+
+        summaryDiv.innerHTML = `
+            <div class="review-summary">
+                <h3>${averageRating} <span style="font-size: 20px;">/ 5.0</span></h3>
+                <div class="review-stars-large">${renderStars(parseFloat(averageRating))}</div>
+                <p class="small" style="margin: 5px 0 0; color: var(--accent-dark); font-weight: 700;">(${hostelReviews.length} Verified Reviews)</p>
+            </div>
+        `;
+        
+        listDiv.innerHTML = hostelReviews.map(review => {
+            const date = review.timestamp ? new Date(review.timestamp.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
+            const safeName = review.name.length > 25 ? review.name.substring(0, 22) + '...' : review.name;
+            
+            return `
+                <div class="review-item">
+                    <div class="review-meta">
+                        <div class="review-author">${safeName}</div>
+                        <div class="review-stars" style="font-size: 14px; margin-left: 10px;">
+                            ${renderStars(review.rating)}
+                        </div>
+                    </div>
+                    <p class="review-text">${review.reviewText}</p>
+                    <p class="small" style="font-size: 12px; margin-top: 5px; color: var(--muted);">Reviewed on ${date}</p>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Attach event listeners for the star widget
+    function setupRatingWidget() {
+        const widget = document.getElementById('rating-widget');
+        if (!widget) return;
+
+        widget.innerHTML = '<span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>';
+        const stars = widget.querySelectorAll('span');
+
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                selectedRating = index + 1;
+                updateStarDisplay(stars, selectedRating);
+            });
+        });
+    }
+    
+    function updateStarDisplay(stars, rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('selected');
+            } else {
+                star.classList.remove('selected');
+            }
+        });
+    }
+
+    // Handle Review Form Submission
+    async function handleReviewSubmit(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('review-name').value.trim();
+        const phone = document.getElementById('review-phone').value.trim();
+        const reviewText = document.getElementById('review-text').value.trim();
+        const statusDiv = document.getElementById('review-status');
+        const submitButton = document.getElementById('review-submit-btn');
+        const phoneRegex = /^\d{10}$/;
+
+        if (!selectedRating) {
+            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ ദയവായി ഒരു റേറ്റിംഗ് തിരഞ്ഞെടുക്കുക.</span>';
+            return;
+        }
+        if (!name || !phone || !reviewText) {
+            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ എല്ലാ കോളങ്ങളും പൂരിപ്പിക്കുക.</span>';
+            return;
+        }
+        if (!phoneRegex.test(phone)) {
+            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ 10 അക്ക ഫോൺ നമ്പർ നൽകുക.</span>';
+            return;
+        }
+        
+        if (!isAuthReady || !currentUserId || !db) {
+            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ Authentication error. Try refreshing.</span>';
+            return;
+        }
+        
+        statusDiv.innerHTML = '<span style="color:var(--secondary-accent);">⬆️ Submitting review...</span>';
+        submitButton.disabled = true;
+
+        try {
+            const reviewsRef = collection(db, `artifacts/${appId}/public/data/user_reviews`);
+            await addDoc(reviewsRef, {
+                rating: selectedRating,
+                name: name,
+                phone: phone, 
+                reviewText: reviewText,
+                userId: currentUserId,
+                userName: currentUserName, // Include user name for tracking
+                timestamp: serverTimestamp()
+            });
+
+            statusDiv.innerHTML = '<span style="color:var(--secondary-dark); font-weight: bold;">✅ Thank you for your review!</span>';
+            
+            // Clear form fields and reset rating
+            document.getElementById('review-name').value = '';
+            document.getElementById('review-phone').value = '';
+            document.getElementById('review-text').value = '';
+            selectedRating = 0;
+            updateStarDisplay(document.getElementById('rating-widget').querySelectorAll('span'), 0);
+
+        } catch (error) {
+            console.error("Review submission error:", error);
+            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">❌ Submission Failed: ' + error.message + '</span>';
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
+
+    // --- DOM Construction Functions ---
+
     function injectStyles() {
         const style = document.createElement('style');
         style.textContent = APP_STYLES;
         document.head.appendChild(style);
     }
 
-    // Function to create the Header
+    // Function to create the Welcome Overlay (UPDATED STYLE)
+    function createWelcomeOverlay() {
+        const overlay = document.createElement('div');
+        overlay.id = 'welcome-overlay';
+        overlay.innerHTML = '<div class="welcome-text" id="animated-welcome-text"></div>'; // Empty div for typing effect
+        return overlay;
+    }
+
     function createHeader() {
         const header = document.createElement('header');
         header.innerHTML = `
-            <div class="container">
+            <div class="container" style="padding: 0 18px;">
                 <div class="brand">
+                    <img 
+                        class="logo-img"
+                        src="${NEW_LOGO_FILENAME}"
+                        onerror="this.onerror=null;this.src='https://placehold.co/60x60/FF6B6B/ffffff?text=AR';" 
+                        alt="Amal Rahmania Ladies Hostel Logo"
+                    >
                     <div>
-                        <h1>AMAL RAHMANIA LADIES HOSTEL</h1>
-                        <p class="lead">Safe, Comfortable, and Homely Living for Women — Near Kottayam Medical College</p>
+                        <h1>AMAL RAHMANIA</h1>
+                        <p class="lead">Safe, Comfortable, and Homely Living for Women</p>
                     </div>
                 </div>
             </div>
         `;
         return header;
     }
+    
+    function createReviewsDisplaySection() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'section-reviews-display';
+        section.innerHTML = `
+            <h2><span style="margin-right: 5px;">⭐</span>ഹോസ്റ്റൽ അഭിപ്രായങ്ങൾ / Hostel Reviews</h2>
+            <div id="review-summary-display">
+                <!-- Average Rating Summary will be loaded here -->
+            </div>
+            <p class="small" style="font-weight: 600; color: var(--accent);">Recent Feedback:</p>
+            <div id="reviews-list">
+                <!-- Individual reviews will be loaded here -->
+            </div>
+        `;
+        return section;
+    }
 
-    // Function to create the Hero Section
     function createHeroSection() {
         const section = document.createElement('section');
         section.className = 'card hero scroll-animate';
         section.id = 'section-hero';
         section.innerHTML = `
             <div style="flex:1">
-                <h2>Welcome to Amal Rahmania</h2>
+                <h2>ഹോംലി ലിവിംഗ്, പ്രൊഫഷണൽ സൗകര്യങ്ങൾ</h2>
                 <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിനും പ്രൈവറ്റ് ബസ് സ്റ്റാൻഡിനും സമീപമുള്ള സ്ത്രീകൾക്കായുള്ള വിശ്വസ്തമായ ഹോസ്റ്റൽ. വിദ്യാർത്ഥിനികൾക്കും ജോലി ചെയ്യുന്നവർക്കും അനുയോജ്യമായ സുഖപ്രദമായ മുറികളും ശാന്തമായ അന്തരീക്ഷവും.</p>
 
-                <div style="margin-top:12px; font-weight: bold; color: var(--accent);">പ്രധാന സൗകര്യങ്ങൾ:</div>
+                <div style="margin-top:20px; font-weight: 800; color: var(--accent-dark); border-bottom: 2px solid var(--accent-light); padding-bottom: 10px;">
+                    💖 Premium Amenities Included:
+                </div>
                 <div class="facilities">
                     <span class="chip">🚀 ഹൈ-സ്പീഡ് WIFI</span>
-                    <span class="chip">🧺 വാഷിംഗ് മെഷീൻ</span>
+                    <span class="chip">🧺 ഓട്ടോമാറ്റിക് വാഷിംഗ് മെഷീൻ</span>
                     <span class="chip">🧊 ഫ്രിഡ്ജ് സൗകര്യം</span>
-                    <span class="chip">🍲 മൂന്നു നേരം ഭക്ഷണം</span>
-                    <span class="chip">☕ രണ്ട് നേരം ചായ / പലഹാരം</span>
-                    <span class="chip">💧 ശുദ്ധീകരിച്ച കുടിവെള്ളം</span>
+                    <span class="chip">🍲 $3 \times$ ടൈംസ് ഹോം ഫുഡ്</span>
+                    <span class="chip">☕ $2 \times$ ടൈംസ് ചായ / പലഹാരം</span>
+                    <span class="chip">💧 RO പ്യൂരിഫൈഡ് വാട്ടർ</span>
                 </div>
 
                 <div class="cta">
-                    <!-- Updated to WhatsApp Link -->
                     <a class="btn btn-primary" href="${WHATSAPP_LINK_MAIN}">💬 WhatsApp Enquiry (9946 71 6151)</a>
-                    <!-- Updated to WhatsApp Link -->
                     <a class="btn btn-outline" href="${WHATSAPP_LINK_ALT}">📲 WhatsApp 9656 96 2786</a>
                 </div>
             </div>
-            <!-- Hero Image: Using the external building photo from uploads -->
             <img 
-                src="WhatsApp Image 2025-10-06 at 10.15.43_7a2930e5.jpg" 
-                onerror="this.onerror=null;this.src='https://placehold.co/300x250/A9154F/FFFFFF?text=Hostel+Building+Photo';" 
+                src="${BUILDING_PHOTO_1}" 
+                onerror="this.onerror=null;this.src='https://placehold.co/400x350/FF6B6B/FFFFFF?text=Hostel+Building+Photo';" 
                 alt="Hostel Exterior Building Photo"
             >
         `;
         return section;
     }
 
-    // Function to create the Gallery Section
     function createGallerySection() {
         const section = document.createElement('section');
         section.className = 'card scroll-animate';
         section.id = 'section-gallery';
         section.innerHTML = `
-            <h2>Hostel Gallery & Facilities</h2>
-            <div class="gallery">
-                <!-- Gallery Image 1: Common Area (Using the living room photo) -->
-                <img 
-                    class="gallery-img" 
-                    src="WhatsApp Image 2025-10-06 at 10.14.42_44015340.jpg" 
-                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Common+Area';" 
-                    alt="Hostel Common Area or Lounge for recreation and relaxation">
-                
-                <!-- Gallery Image 2: Logo (Using the logo image for branding) -->
-                <img 
-                    class="gallery-img" 
-                    src="WhatsApp Image 2025-09-24 at 09.57.44_93d77be0.jpg" 
-                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Hostel+Logo';" 
-                    alt="Amal Rahmania Hostel Logo">
-                
-                <!-- Gallery Image 3: Quiet Study Area (Placeholder - Change later) -->
-                <img 
-                    class="gallery-img" 
-                    src="https://placehold.co/150x150/ffc8d9/D31D60?text=Quiet+Study+Area" 
-                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Study+Desk';" 
-                    alt="Quiet Study Area with desks and chairs">
-                
-                <!-- Gallery Image 4: Clean Washroom (Placeholder - Change later) -->
-                <img 
-                    class="gallery-img" 
-                    src="https://placehold.co/150x150/ffc8d9/D31D60?text=Clean+Washroom" 
-                    onerror="this.onerror=null;this.src='https://placehold.co/150x150/ffc8d9/D31D60?text=Washroom';" 
-                    alt="Well-maintained Washroom and Bath area">
+            <h2><span style="margin-right: 5px;">📸/🎬</span> ഹോസ്റ്റൽ ഗാലറി & കമ്മ്യൂണിറ്റി മീഡിയ</h2>
+            <div id="gallery-loading" style="text-align: center; color: var(--muted); padding: 20px; font-size: 14px;">
+                Connecting to database and loading photos and videos...
             </div>
-            <p class="small text-center" style="margin-top: 15px; color: var(--accent); font-weight: 600;">
-                ഞങ്ങളുടെ ഹോസ്റ്റലിന്റെ ഉൾക്കാഴ്ചകൾ.
+            <div class="gallery" id="image-gallery-grid">
+                <!-- Dynamic images and videos will be loaded here by renderGallery() -->
+            </div>
+            <p class="small text-center" style="margin-top: 20px; color: var(--accent-dark); font-weight: 700; border-top: 1px dashed var(--card-border); padding-top: 15px;">
+                നിങ്ങളുടെ ഹോസ്റ്റൽ ജീവിതം, ഞങ്ങളുടെ ക്യാമറയിൽ.
             </p>
         `;
         return section;
     }
 
-    // Function to create Pricing and Meals Sections
     function createPricingAndMealsSections() {
         const div = document.createElement('div');
-        div.className = 'grid scroll-animate';
+        div.className = 'grid-mini scroll-animate';
         div.id = 'section-pricing';
-        div.style.cssText = 'grid-template-columns: 1fr 1fr; gap: 20px; padding: 0; margin: 0;';
+        
+        // Use inline styles to enforce the 2-column grid or 1-column on small screens
+        const mediaQuery = window.matchMedia('(max-width: 768px)');
+        const gridStyle = mediaQuery.matches ? 
+            'display: grid; grid-template-columns: 1fr; gap: 20px; padding: 0; margin: 0;' :
+            'display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 0; margin: 0;';
+        div.style.cssText = gridStyle;
 
         // Pricing Card
         const pricingCard = document.createElement('section');
         pricingCard.className = 'card';
-        pricingCard.style.cssText = 'margin:0; padding: 20px;';
+        pricingCard.style.cssText = 'margin:0; padding: 25px;';
         pricingCard.innerHTML = `
-            <h2>Rooms & Pricing</h2>
-            <p class="small">നിലവിൽ: ഒരു മുറിയിൽ **3 പേർക്ക്** താമസിക്കാം. തിരക്ക് കൂടുന്നതനുസരിച്ച് മാനേജ്‌മെൻ്റ് നിയമങ്ങൾ പാലിച്ച് **4 പേർ വരെ ആകാം**.</p>
+            <h2><span style="margin-right: 5px;">💰</span> റൂമുകളും വിലയും / Pricing</h2>
+            <p class="small">നിലവിൽ: ഒരു മുറിയിൽ 3 പേർക്ക് താമസിക്കാം. മാനേജ്‌മെൻ്റ് നിയമങ്ങൾക്കനുസരിച്ച് 4 പേർ വരെ ആകാം.</p>
             <div class="price-box">
-                **പ്രതിമാസ വാടക: ₹6,500**<br>
-                സുരക്ഷാ നിക്ഷേപം (Deposit): ₹5,000
+                ₹6,500 <span style="font-size: 16px;">/ Per Month (All Inclusive)</span><br>
+                <span>സുരക്ഷാ നിക്ഷേപം (Deposit): ₹5,000</span>
             </div>
-            <ul class="list small" style="margin-top: 15px;">
-                <li>✔️ പ്രതിമാസ ഭക്ഷണ ചെലവ് ഉൾപ്പെടെയുള്ള വാടക.</li>
-                <li>✔️ അധിക ചിലവുകൾ ഇല്ല (പ്രത്യേക ആവശ്യങ്ങൾ ഒഴികെ).</li>
+            <ul class="list small" style="margin-top: 25px;">
+                <li>✔️ വൈദ്യുതി, വെള്ളം, ഭക്ഷണ ചെലവുകൾ ഉൾപ്പെടെ.</li>
+                <li>✔️ യാതൊരുവിധ അധിക ചിലവുകളും ഇല്ല.</li>
             </ul>
         `;
         div.appendChild(pricingCard);
@@ -365,139 +1225,208 @@
         // Meal Timings Card
         const mealsCard = document.createElement('section');
         mealsCard.className = 'card';
-        mealsCard.style.cssText = 'margin:0; padding: 20px;';
+        mealsCard.style.cssText = 'margin:0; padding: 25px;';
         mealsCard.innerHTML = `
-            <h2>ഭക്ഷണ സമയക്രമം / Meal Timings</h2>
-            <ul class="list small">
-                <li>**പ്രഭാത ഭക്ഷണം (Breakfast):** 7 am - 8 am</li>
-                <li>**ഉച്ചഭക്ഷണം (Lunch):** 12 pm - 2 pm</li>
-                <li>**വൈകുന്നേരം ചായ (Evening Tea):** 4 pm - 5 pm</li>
-                <li>**ഡിന്നർ (Dinner):** 7 pm - 8 pm</li>
+            <h2><span style="margin-right: 5px;">⏰</span> പ്രധാന സമയക്രമം / Key Timings</h2>
+            <ul class="list small" style="list-style-type: none; padding-left: 0;">
+                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px;">
+                    <span style="font-weight: 700; color: var(--accent-dark);">🚪 ഔട്ട് പാസ് സമയം (Curfew):</span><br>
+                    <span style="font-size: 15px; color: var(--text);">രാത്രി $8$ മണിവരെ. കൃത്യമായി പാലിക്കുക.</span>
+                </li>
+                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px;">
+                    <span style="font-weight: 700; color: var(--accent-dark);">🍽️ ഡിന്നർ:</span><br>
+                    <span style="font-size: 15px; color: var(--text);">$7\ \text{pm} - 8\ \text{pm}$ (കൃത്യ സമയത്ത് ഡൈനിംഗ് ഹാളിൽ)</span>
+                </li>
+                <li style="border-left: 3px solid var(--accent); padding-left: 10px;">
+                    <span style="font-weight: 700; color: var(--accent-dark);">💤 ലൈറ്റ് ഓഫ്:</span><br>
+                    <span style="font-size: 15px; color: var(--text);">റൂമുകളിൽ $10\ \text{pm}$ ന് ശേഷം ലൈറ്റ് ഓഫ് ചെയ്യേണ്ടതാണ്.</span>
+                </li>
             </ul>
-            <p class="small" style="font-weight: bold; color: var(--accent);">ഔട്ട് പാസ് സമയം: രാത്രി 8 മണിവരെ.</p>
-            <p class="small">വിദ്യാർഥിനികൾ ഈ സമയക്രമം പാലിച്ച് ഡൈനിംഗ് ഹാളിൽ എത്തേണ്ടതാണ്.</p>
+            <p class="small" style="font-weight: bold; color: var(--secondary-accent); border-top: 1px dashed var(--card-border); padding-top: 15px;">
+                ശാന്തമായ അന്തരീക്ഷം എല്ലാവർക്കും ഉറപ്പാക്കുന്നു.
+            </p>
         `;
         div.appendChild(mealsCard);
 
         return div;
     }
 
-    // Function to create Rules Section
     function createRulesSection() {
         const section = document.createElement('section');
         section.className = 'card rules scroll-animate';
         section.id = 'section-rules';
         section.innerHTML = `
-            <h2>ഹോസ്റ്റൽ നിബന്ധനകൾ / Hostel Rules</h2>
+            <h2><span style="margin-right: 5px;">⚖️</span> ഹോസ്റ്റൽ നിബന്ധനകൾ / Core Rules</h2>
             <ol id="hostel-rules-list">
-                <li>**1:** വാർഡന്റെ സമ്മതത്തോടെ മാത്രമേ ഹോസ്റ്റലിൽ നിന്നും പുറത്തു പോകാൻ പാടുള്ളൂ. രജിസ്റ്ററിൽ രേഖപ്പെടുത്തുകയും ചെയ്യണം.</li>
-                <li>**2:** സന്ദർശകരുടെ പേരും അഡ്രസ്സും രജിസ്റ്ററിൽ രേഖപ്പെടുത്തി സൂക്ഷിക്കുന്നതാണ്.</li>
-                <li>**3:** വിദ്യാർഥിനികൾക്ക് ശാരീരികമോ മാനസികമോ ആയ ബുദ്ധിമുട്ടുണ്ടായാൽ ഉടൻതന്നെ വാർഡനെ അറിയിക്കേണ്ടതാണ്.</li>
-                <li>**4:** രാത്രി 8 മണിക്ക് ശേഷം നിശബ്ദത പാലിക്കുക. അനുവദിച്ചിരിക്കുന്ന മുറികളിൽ മാത്രമേ ഉറങ്ങുവാൻ പാടുള്ളൂ.</li>
-                <li>**5:** റൂമുകളിൽ ലൈറ്റ് 10 മണിക്ക് ശേഷം ഓഫ് ചെയ്യേണ്ടതാണ്. പഠനത്തിനുള്ള സൗകര്യം ഡൈനിങ് ഹാളിൽ പ്രയോജനപ്പെടുത്തുക.</li>
-                <li>**6:** മുറിയുടെയും കിടക്കയുടെയും വൃത്തി എല്ലാ റൂംമേറ്റുകളുടെയും വ്യക്തിപരമായ കടമകളാണ്.</li>
-                <li>**7:** ഹോസ്റ്റൽ മുറികൾ അധികൃതർക്ക് എപ്പോൾ വേണമെങ്കിലും പരിശോധിക്കാനുള്ള അധികാരം ഉണ്ടായിരിക്കും.</li>
-                <li>**8:** മാനേജ്മെന്റ് തീരുമാനിക്കുന്ന മെനുപ്രകാരമാണ് ഭക്ഷണം തയ്യാറാക്കുന്നത്.</li>
-                <li>**9:** നിലവിൽ ഒരു മുറിയിൽ **മൂന്നുപേർക്കാണ്** താമസം ഉൾപ്പെടുത്തിയിരിക്കുന്നത്. വിദ്യാർത്ഥിനികൾ കൂടുതൽ വന്നാൽ **നാലു പേർ വരെ ആകാം**.</li>
-                <li>**10:** പൊതുസ്ഥലങ്ങളായ കുളിമുറികൾ, ടോയ്ലറ്റ്, ഇടനാഴികൾ, ഡൈനിങ് ഹാൾ എന്നിവയുടെ ശുചിത്വം ശ്രദ്ധിക്കുക.</li>
-                <li>**11:** പാഡ്, നാപ്കിൻ തുടങ്ങിയ വസ്തുക്കൾ പറഞ്ഞിരിക്കുന്ന സ്ഥലങ്ങളിൽ മാത്രം നിക്ഷേപിക്കുക.</li>
-                <li>**12:** മുറി പൂട്ടി പോകുന്ന വിദ്യാർത്ഥിനികൾ താക്കോൽ വാർഡനെ ഏൽപ്പിച്ചിട്ടേ പോകാവൂ.</li>
-                <li>**13:** മറ്റുള്ള വിദ്യാർത്ഥിനികൾക്ക് ശല്യമാകുന്ന യാതൊരുവിധ പ്രവർത്തനങ്ങളും (ഉച്ചത്തിലുള്ള സംസാരം, മൊബൈൽ ഉപയോഗം) ഒഴിവാക്കേണ്ടതാണ്.</li>
-                <li>**14:** ഫാൻ, ലൈറ്റ് തുടങ്ങിയവ ഉപയോഗത്തിന് ശേഷം ഓഫ് ചെയ്തിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക.</li>
+                <li>1: വാർഡൻ്റെ സമ്മതത്തോടെ മാത്രമേ ഹോസ്റ്റലിൽ നിന്നും പുറത്തു പോകാൻ പാടുള്ളൂ. രജിസ്റ്ററിൽ രേഖപ്പെടുത്തണം.</li>
+                <li>2: രാത്രി $8$ മണിക്ക് ശേഷം നിശബ്ദത പാലിക്കുക. അനുവദിച്ചിരിക്കുന്ന മുറികളിൽ മാത്രമേ ഉറങ്ങുവാൻ പാടുള്ളൂ.</li>
+                <li>3: മുറിയുടെയും കിടക്കയുടെയും വൃത്തി എല്ലാ റൂംമേറ്റുകളുടെയും വ്യക്തിപരമായ കടമകളാണ്.</li>
+                <li>4: റൂമുകളിൽ ലൈറ്റ് $10\ \text{pm}$ ന് ശേഷം ഓഫ് ചെയ്യേണ്ടതാണ്. പഠനത്തിനായി ഡൈനിങ് ഹാൾ ഉപയോഗിക്കുക.</li>
+                <li>5: മറ്റുള്ള വിദ്യാർത്ഥിനികൾക്ക് ശല്യമാകുന്ന യാതൊരുവിധ പ്രവർത്തനങ്ങളും (ഉച്ചത്തിലുള്ള സംസാരം, മൊബൈൽ ഉപയോഗം) ഒഴിവാക്കുക.</li>
+                <li>6: ഹോസ്റ്റൽ മുറികൾ അധികൃതർക്ക് എപ്പോൾ വേണമെങ്കിലും പരിശോധിക്കാനുള്ള അധികാരം ഉണ്ടായിരിക്കും.</li>
+                <li>7: ഫാൻ, ലൈറ്റ് തുടങ്ങിയവ ഉപയോഗത്തിന് ശേഷം ഓഫ് ചെയ്തിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക.</li>
             </ol>
-            <p class="small" style="margin-top: 20px; font-weight: bold; border-top: 1px solid var(--card-border); padding-top: 12px; color: var(--text);">
-                മുകളിൽ പറഞ്ഞിരിക്കുന്ന കാര്യങ്ങൾ ഹോസ്റ്റൽ മാനേജ്മെന്റിന്റെ നിർദ്ദേശപ്രകാരം പാലിക്കാൻ വിദ്യാർഥിനികൾ ബാധ്യസ്ഥരാണ്.
+            <p class="small" style="margin-top: 25px; font-weight: bold; border-top: 1px dashed var(--card-border); padding-top: 15px; color: var(--accent-dark);">
+                ഈ നിയമങ്ങൾ വിദ്യാർഥിനികളുടെ സുരക്ഷക്കും സൗകര്യത്തിനും വേണ്ടി മാത്രമുള്ളതാണ്.
             </p>
         `;
         return section;
     }
+    
+    // NEW: Authentication Status Card
+    function createAuthCard() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'auth-card';
+        section.innerHTML = `
+            <h2><span style="margin-right: 5px;">🔑</span> Student Sign-In</h2>
+            <div id="auth-card-content">
+                <div style="text-align:center; padding: 20px;">
+                    <p class="small" style="color:var(--muted);">Loading authentication status...</p>
+                    <div class="loading-spinner" style="display:block;"></div>
+                </div>
+            </div>
+        `;
+        return section;
+    }
+    
+    function createReviewSubmissionCard() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'section-submit-review';
 
-    // Function to create Gemini Chat Card
+        section.innerHTML = `
+            <h2><span style="margin-right: 5px;">✍️</span> നിങ്ങളുടെ അഭിപ്രായം രേഖപ്പെടുത്തുക</h2>
+            <p class="small">ഹോസ്റ്റലിനെക്കുറിച്ചുള്ള നിങ്ങളുടെ അനുഭവം ഇവിടെ പങ്കുവെക്കാം. (5 Star Rating)</p>
+            <p class="user-name-display small" style="margin-bottom: 15px; color: var(--muted);"></p>
+
+            <form id="review-form">
+                <div class="rating-widget" id="rating-widget">
+                    <!-- Stars populated by JS -->
+                </div>
+                <input type="text" id="review-name" placeholder="നിങ്ങളുടെ പേര് (Name)" required>
+                <input type="tel" id="review-phone" placeholder="ഫോൺ നമ്പർ (10 digits)" required maxlength="10">
+                <textarea id="review-text" placeholder="നിങ്ങളുടെ സത്യസന്ധമായ അഭിപ്രായം ഇവിടെ എഴുതുക (Review)" rows="4" required></textarea>
+                
+                <button class="btn btn-primary" id="review-submit-btn" type="submit" style="width:100%;">
+                    Submit Review
+                </button>
+                <div id="review-status" class="small" style="margin-top: 10px; min-height: 20px;"></div>
+            </form>
+        `;
+        
+        setTimeout(() => {
+            const reviewForm = document.getElementById('review-form');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', handleReviewSubmit);
+            }
+            setupRatingWidget();
+        }, 100);
+        
+        return section;
+    }
+
     function createChatCard() {
         const section = document.createElement('section');
         section.className = 'card scroll-animate';
         section.id = 'gemini-chat-card';
         section.innerHTML = `
-            <h2>Ask About Life Here ✨</h2>
-            <p class="small">നിയമങ്ങൾ, സൗകര്യങ്ങൾ, ദിനചര്യ എന്നിവയെക്കുറിച്ച് വേഗത്തിൽ അറിയുക. (Powered by Gemini)</p>
+            <h2><span style="margin-right: 5px;">💬</span> ഹോസ്റ്റലിനെക്കുറിച്ച് ചോദിക്കാം</h2>
+            <p class="small">നിയമങ്ങൾ, സൗകര്യങ്ങൾ, ദിനചര്യ എന്നിവയെക്കുറിച്ച് അറിയുക. (Powered by Gemini)</p>
             <div style="margin-top:12px;">
-                <input type="text" id="chat-input" placeholder="ഉദാഹരണം: പുറത്തു പോകാൻ അനുവാദമുള്ള സമയം?">
-                <button class="btn btn-primary" id="ask-button" style="width:100%;border:none;cursor:pointer">
+                <input type="text" id="chat-input" placeholder="ഉദാഹരണം: കറന്റ് പോയാൽ ഇൻവെർട്ടർ ഉണ്ടോ?">
+                <button class="btn btn-primary" id="ask-button" type="button" style="width:100%;">
                     ചോദ്യം ചോദിക്കൂ
                 </button>
             </div>
             <div class="loading-spinner" id="loading-spinner"></div>
-            <div id="chat-output">
-                <p>നിങ്ങളുടെ ചോദ്യം മുകളിലെ ബോക്സിൽ ടൈപ്പ് ചെയ്ത് 'ചോദ്യം ചോദിക്കൂ' എന്ന ബട്ടൺ ക്ലിക്കുചെയ്യുക.</p>
+            <div id="chat-output" style="background: var(--accent-light); border: 1px solid var(--chip-border); padding: 15px; border-radius: 10px;">
+                <p>നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്ത് 'ചോദ്യം ചോദിക്കൂ' ക്ലിക്കുചെയ്യുക.</p>
             </div>
         `;
         return section;
     }
 
-    // Function to create Contact Card
+    // Function to create the Media Upload Section (Updated to handle Photo and Video)
+    function createMediaUploadSection() {
+        const section = document.createElement('section');
+        section.className = 'card scroll-animate';
+        section.id = 'section-upload';
+        section.style.display = 'none'; 
+
+        section.innerHTML = `
+            <h2><span style="margin-right: 5px;">📷/🎬</span> കമ്മ്യൂണിറ്റി മീഡിയ പങ്കിടുക</h2>
+            <p class="small">ഹോസ്റ്റലിലെ മനോഹരമായ ചിത്രങ്ങളോ വീഡിയോകളോ അപ്‌ലോഡ് ചെയ്യാം (<span style="font-weight: 700; color: var(--accent-dark);">Photo max 2MB, Video max 10MB</span>).</p>
+            <p class="user-name-display small" style="margin-bottom: 15px; color: var(--muted);"></p>
+
+            <!-- Input updated to accept images AND videos -->
+            <input type="file" id="media-upload-input" accept="image/*,video/*" style="width:100%; margin-top:10px; padding:8px; border:1px solid var(--input-border); border-radius:8px;">
+            
+            <button class="btn btn-primary" id="upload-media-btn" type="button" style="width:100%; margin-top:12px;">
+                Upload Photo/Video to Gallery
+            </button>
+            <div id="upload-status" class="small" style="margin-top: 10px; min-height: 20px;"></div>
+        `;
+        
+        setTimeout(() => {
+            const uploadButton = document.getElementById('upload-media-btn');
+            if (uploadButton) {
+                uploadButton.addEventListener('click', handleMediaUpload); // Updated function name
+            }
+        }, 100);
+        
+        return section;
+    }
+
     function createContactCard() {
+        const CALL_NUMBER = WHATSAPP_NUMBER_MAIN; 
+        const CALL_LINK = `tel:${CALL_NUMBER}`;
+
         const section = document.createElement('section');
         section.className = 'card scroll-animate';
         section.id = 'contact';
-        section.style.marginTop = '24px';
         
+        // This form is for WhatsApp enquiry, not for submitting to Firestore
         const form = document.createElement('form');
-        form.style.marginTop = '16px';
+        form.style.marginTop = '20px';
         form.addEventListener('submit', handleFormSubmit);
 
         form.innerHTML = `
             <input type="text" id="contact-name" placeholder="Your Name" required>
             <input type="tel" id="contact-phone" placeholder="Phone Number (10 digits)" required maxlength="10">
             <textarea id="contact-message" placeholder="Message / Enquiry (Optional)" rows="3"></textarea>
-            <button class="btn btn-primary" id="contact-submit" type="submit" style="width:100%;border:none;cursor:pointer">Send Enquiry via WhatsApp</button>
+            <button class="btn btn-primary" id="contact-submit" type="submit" style="width:100%;">Send Enquiry via WhatsApp</button>
             <p id="form-message" class="small" style="margin-top: 10px; font-weight: bold;"></p>
         `;
 
         section.innerHTML = `
-            <h2>Quick Contact / Enquiry</h2>
-            <p class="small">അഡ്മിഷൻ ലഭ്യത, സംശയങ്ങൾ എന്നിവക്കായി വിളിക്കുകയോ ഈ ഫോം ഉപയോഗിച്ച് **WhatsApp വഴി മെസ്സേജ് അയക്കുകയോ** ചെയ്യുക.</p>
-            <div class="contact" style="margin-top:12px">
-                <!-- Updated to WhatsApp Link -->
-                <a class="tel" href="${WHATSAPP_LINK_MAIN}">💬 **WhatsApp Main: 9946 71 6151**</a>
-                <!-- Updated to WhatsApp Link -->
-                <a class="tel" href="${WHATSAPP_LINK_ALT}">💬 **WhatsApp Alt: 9656 96 2786**</a>
+            <h2><span style="margin-right: 5px;">📞</span> അഡ്മിഷൻ / കോൺടാക്റ്റ്</h2>
+            
+            <div class="cta" style="margin-top: 10px; margin-bottom: 25px;">
+                <a class="btn btn-primary btn-call" href="${CALL_LINK}" style="width: 100%; font-size: 18px; padding: 15px 22px;">
+                    <span style="margin-right: 8px;">☎️</span> Call Now: ${CALL_NUMBER.substring(2).replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3')}
+                </a>
+            </div>
+
+            <p class="small">ഈ ഫോം ഉപയോഗിച്ച് WhatsApp വഴി വേഗത്തിൽ ബന്ധപ്പെടുക:</p>
+            
+            <div class="contact" style="margin-top:15px">
+                <a class="tel small" href="${WHATSAPP_LINK_MAIN}" style="font-weight: 700; color: var(--accent); display:block; margin-bottom: 5px;">💬 WhatsApp Main: 9946 71 6151</a>
+                <a class="tel small" href="${WHATSAPP_LINK_ALT}" style="font-weight: 700; color: var(--accent); display:block; margin-bottom: 15px;">💬 WhatsApp Alt: 9656 96 2786</a>
             </div>
         `;
         section.appendChild(form);
         return section;
     }
 
-    // Function to create Tech Support Card
-    function createSupportCard() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'section-support';
-        section.style.marginTop = '24px';
-        section.innerHTML = `
-            <h2>💻 ടെക്നിക്കൽ സപ്പോർട്ട്</h2>
-            <p class="small">ലാപ്‌ടോപ്പ്, കമ്പ്യൂട്ടർ നെറ്റ്വർക്ക് എന്നിവ സംബന്ധിച്ച സാങ്കേതിക സഹായത്തിനായി വിളിക്കുക.</p>
-            <div class="contact" style="margin-top:15px">
-                <p class="small" style="margin: 0 0 6px; font-weight: 600; color: var(--h2-color);">ടെക് സപ്പോർട്ട് കോൺടാക്റ്റ്:</p>
-                <!-- Kept as tel link as it is for technical calling support -->
-                <a class="tel" href="tel:+919946716151" style="display: flex; align-items: center;">
-                    <span class="tech-support-icon">⚙️</span>
-                    9946 71 6151
-                </a>
-            </div>
-        `;
-        return section;
-    }
 
-    // Function to create Location Card
     function createLocationCard() {
         const section = document.createElement('section');
         section.className = 'card scroll-animate';
         section.id = 'section-location';
-        section.style.marginTop = '24px';
         
-        // Google Maps iframe embedding the provided coordinates
         const mapEmbedHtml = `
-            <div class="map-container">
+            <div class="map-container" style="position: relative; height: 0;">
                 <iframe 
                     src="${GOOGLE_MAPS_EMBED_URL}" 
                     allowfullscreen="" 
@@ -509,69 +1438,80 @@
         `;
 
         section.innerHTML = `
-            <h2>Location & Directions</h2>
-            <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിന് സമീപം, ഗാന്ധിനഗർ. കൃത്യമായ ലൊക്കേഷൻ താഴെ മാപ്പിൽ കാണാം.</p>
+            <h2><span style="margin-right: 5px;">📍</span> ലൊക്കേഷൻ / Location</h2>
+            <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിന് സമീപം, ഗാന്ധിനഗർ. മാപ്പിൽ ലൊക്കേഷൻ കാണാം.</p>
             ${mapEmbedHtml}
-            <p class="small" style="margin-top:10px; font-weight: 600;">GPS കോർഡിനേറ്റ്സ്: $9^\circ37'44.2"N\ 76^\circ31'12.4"E$</p>
+            <p class="small" style="margin-top:10px; font-weight: 700; text-align: center; color: var(--secondary-accent);">
+                GPS കോർഡിനേറ്റ്സ്: $9^\circ37'44.2"N\ 76^\circ31'12.4"E$
+            </p>
         `;
         return section;
     }
 
-    // Function to create the Footer
     function createFooter() {
         const footer = document.createElement('footer');
-        footer.innerHTML = '&copy; 2025 Amal Rahmania Ladies Hostel. All rights reserved. | Developed for Digital Presence.';
+        footer.innerHTML = '&copy; 2025 Amal Rahmania Ladies Hostel. All rights reserved. | Kottayam, Kerala';
         return footer;
     }
 
     // --- Main Rendering Function ---
     function renderApp() {
-        injectStyles(); // Step 1: Inject all CSS styles
+        injectStyles(); 
         
         const body = document.body;
 
-        // 2. Append Header
+        // 1. Create Welcome Overlay (Appears first)
+        body.appendChild(createWelcomeOverlay());
+        
+        // 2. Initialize Firebase Services
+        initializeFirebase();
+
+        // 3. Append Header
         body.appendChild(createHeader());
 
-        // 3. Create Main Container
+        // 4. Create Main Container
         const main = document.createElement('main');
         main.className = 'container';
 
-        // 4. Create Grid
+        // 5. Create Grid
         const gridDiv = document.createElement('div');
         gridDiv.className = 'grid';
 
         // Left Column (Content)
         const leftColumn = document.createElement('div');
-        leftColumn.style.cssText = 'display: flex; flex-direction: column; gap: 24px;';
+        leftColumn.style.cssText = 'display: flex; flex-direction: column; gap: 40px;'; 
         
         leftColumn.appendChild(createHeroSection());
-        leftColumn.appendChild(createGallerySection());
+        leftColumn.appendChild(createReviewsDisplaySection()); 
         leftColumn.appendChild(createPricingAndMealsSections());
         leftColumn.appendChild(createRulesSection());
+        leftColumn.appendChild(createGallerySection()); // Gallery moved to bottom-left for visual flow
         
         gridDiv.appendChild(leftColumn);
 
         // Right Column (Sidebar)
         const rightColumn = document.createElement('div');
+        rightColumn.style.cssText = 'display: flex; flex-direction: column; gap: 30px;'; 
         
-        rightColumn.appendChild(createChatCard());
+        rightColumn.appendChild(createAuthCard()); // NEW: Auth Status Card
         rightColumn.appendChild(createContactCard());
-        rightColumn.appendChild(createSupportCard());
         rightColumn.appendChild(createLocationCard());
+        rightColumn.appendChild(createReviewSubmissionCard()); 
+        rightColumn.appendChild(createMediaUploadSection()); 
+        rightColumn.appendChild(createChatCard());
         
         gridDiv.appendChild(rightColumn);
         main.appendChild(gridDiv);
         body.appendChild(main);
         
-        // 5. Append Footer
+        // 6. Append Footer
         body.appendChild(createFooter());
 
-        // 6. Initialize post-DOM-creation scripts
+        // 7. Initialize post-DOM-creation scripts
         initializeScripts();
     }
 
-    // --- Contact Form Validation and Submission Logic ---
+    // --- Contact Form Logic (Same as before) ---
     function handleFormSubmit(event) {
         event.preventDefault();
         
@@ -586,43 +1526,90 @@
 
         if (!phoneRegex.test(phone)) {
             phoneInput.classList.add('error');
-            formMessage.style.color = '#ff4d4d';
+            formMessage.style.color = 'var(--accent-dark)';
             formMessage.innerText = '⚠️ ദയവായി 10 അക്കമുള്ള ഫോൺ നമ്പർ നൽകുക.';
             return;
         }
 
         phoneInput.classList.remove('error');
 
-        // WhatsApp URL with prefilled message
         const waMessage = encodeURIComponent(`Amal Rahmania Hostel Enquiry\n\nName: ${name}\nPhone: ${phone}\nMessage: ${message}`);
-        const waLink = `https://wa.me/919946716151?text=${waMessage}`; // main number
+        const waLink = `https://wa.me/919946716151?text=${waMessage}`; 
 
-        // Open WhatsApp in a new tab
         window.open(waLink, '_blank');
 
-        // Reset form
         document.getElementById('contact-name').value = '';
         document.getElementById('contact-phone').value = '';
         document.getElementById('contact-message').value = '';
         
-        formMessage.style.color = 'green';
+        formMessage.style.color = 'var(--secondary-dark)';
         formMessage.innerText = '✅ WhatsApp തുറന്നിരിക്കുന്നു! ദയവായി മെസ്സേജ് അയക്കുക.';
         
         setTimeout(() => formMessage.innerText = '', 5000);
     }
 
-    // --- Scroll Animation Logic ---
+    // --- Welcome Animation Logic (UPDATED) ---
+    function setupWelcomeAnimation() {
+        const overlay = document.getElementById('welcome-overlay');
+        const textElement = document.getElementById('animated-welcome-text');
+        const welcomeText = "Welcome to Amal Rahmania";
+        
+        if (!overlay || !textElement) return;
+        
+        // Start typing effect immediately
+        typeResponse(textElement, welcomeText, 70); // Slightly slower typing for effect
+        
+        let hasScrolled = false;
+
+        // Function to hide the overlay
+        function hideOverlay() {
+            if (overlay.classList.contains('fade-out')) return; 
+
+            overlay.classList.add('fade-out');
+            
+            setTimeout(() => {
+                if(overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+            }, 1100);
+            
+            // Cleanup listeners
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('touchmove', handleScroll);
+            clearTimeout(timeoutId);
+        }
+        
+        function handleScroll() {
+             if (!hasScrolled) {
+                hasScrolled = true;
+                hideOverlay();
+            }
+        }
+
+        // 1. Initial Timeout: Guarantee removal after 4 seconds (to allow typing to finish and pause)
+        const timeoutId = setTimeout(() => {
+            if (!hasScrolled) {
+                 hideOverlay();
+            }
+        }, 4000); 
+
+        // 2. Scroll and Touch Listeners: Hide immediately on user interaction
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('touchmove', handleScroll, { passive: true });
+    }
+
+    // --- Scroll Animation Logic (Same as before) ---
     function checkVisibility() {
         const elements = document.querySelectorAll('.scroll-animate');
         elements.forEach(el => {
             const rect = el.getBoundingClientRect();
-            if (rect.top < window.innerHeight - 150) {
+            if (rect.top < window.innerHeight - 200) { // Check slightly higher for a smoother start
                 el.classList.add('is-visible');
             }
         });
     }
 
-    // --- Gemini Chat Logic ---
+    // --- Gemini Chat Logic (Same as before) ---
     function setupGeminiChat() {
         const askButton = document.getElementById('ask-button');
         const chatInput = document.getElementById('chat-input');
@@ -661,17 +1648,19 @@
         askButton.addEventListener('click', () => {
             const userQuery = chatInput.value.trim();
             if (!userQuery) {
-                chatOutput.innerHTML = '<p style="color:red;">ദയവായി ഒരു ചോദ്യം ടൈപ്പ് ചെയ്യുക.</p>';
+                typeResponse(chatOutput.querySelector('p') || chatOutput, "ദയവായി ഒരു ചോദ്യം ടൈപ്പ് ചെയ്യുക.", 20);
                 return;
             }
 
             const context = getHostelContext();
             
-            const systemPrompt = "നിങ്ങൾ അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റലിൻ്റെ കസ്റ്റമർ സർവീസ് അസിസ്റ്റന്റാണ്. നൽകിയിട്ടുള്ള വിവരങ്ങൾ മാത്രം ഉപയോഗിച്ച് മലയാളത്തിൽ മറുപടി നൽകുക. വിവരങ്ങൾ ലഭ്യമല്ലെങ്കിൽ, 'കൂടുതൽ വിവരങ്ങൾ അറിയാൻ മാനേജ്‌മെൻ്റുമായി ബന്ധപ്പെടുക' എന്ന് പറയുക. മറുപടി സൗഹാർദ്ദപരവും സംക്ഷിപ്തവുമായിരിക്കണം.";
+            const systemPrompt = "നിങ്ങൾ അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റലിൻ്റെ സന്തോഷവതിയായ ഒരു കസ്റ്റമർ സർവീസ് അസിസ്റ്റന്റാണ്. നൽകിയിട്ടുള്ള വിവരങ്ങൾ മാത്രം ഉപയോഗിച്ച് മലയാളത്തിൽ മറുപടി നൽകുക. മറുപടിയിൽ ചോദ്യത്തെക്കുറിച്ച് പ്രതിപാദിക്കുകയും, ഹോസ്റ്റലിൽ താമസം തുടങ്ങാൻ അവരെ ക്ഷണിക്കുകയും ചെയ്യുക. വിവരങ്ങൾ ലഭ്യമല്ലെങ്കിൽ, 'കൂടുതൽ വിവരങ്ങൾ അറിയാൻ മാനേജ്‌മെൻ്റുമായി ബന്ധപ്പെടുക' എന്ന് പറയുക. മറുപടി സൗഹാർദ്ദപരവും സംക്ഷിപ്തവുമായിരിക്കണം.";
             
             const fullQuery = `Context: ${context} \n\nUser Question: ${userQuery}`;
 
-            chatOutput.innerHTML = '';
+            chatOutput.innerHTML = '<p></p>'; 
+            const outputParagraph = chatOutput.querySelector('p');
+
             loadingSpinner.style.display = 'block';
             askButton.disabled = true;
 
@@ -708,7 +1697,7 @@
                     
                     const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "മറുപടി ലഭ്യമായില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.";
                     
-                    chatOutput.innerHTML = '<p>' + text.replace(/\n/g, '<br>') + '</p>';
+                    typeResponse(outputParagraph, text.trim());
 
                 } catch (error) {
                     if (retryCount < maxRetries) {
@@ -716,7 +1705,8 @@
                         const delay = Math.pow(2, retryCount) * 1000; 
                         setTimeout(callGeminiApi, delay);
                     } else {
-                        chatOutput.innerHTML = '<p style="color:#ff4d4d;">മറുപടി ലഭ്യമാക്കുന്നതിൽ പിശക് സംഭവിച്ചു. ദയവായി മാനേജ്‌മെൻ്റുമായി നേരിട്ട് ബന്ധപ്പെടുക.</p>';
+                        outputParagraph.innerHTML = 'മറുപടി ലഭ്യമാക്കുന്നതിൽ പിശക് സംഭവിച്ചു. ദയവായി മാനേജ്‌മെൻ്റുമായി നേരിട്ട് ബന്ധപ്പെടുക.';
+                        outputParagraph.style.color = 'var(--accent-dark)';
                     }
                 } finally {
                     loadingSpinner.style.display = 'none';
@@ -730,17 +1720,23 @@
 
     // --- Initialize all event listeners and post-DOM content ---
     function initializeScripts() {
-        // Scroll Animation Listeners
+        // Scroll Animation Listeners for content fade-in
         window.addEventListener('load', checkVisibility);
         window.addEventListener('scroll', checkVisibility);
         window.addEventListener('resize', checkVisibility);
+        
+        // Setup Welcome Animation
+        setupWelcomeAnimation();
 
         // Set up Gemini Chat functionality
         setupGeminiChat();
         
-        // Initial check for elements already in view (like the Hero section)
         checkVisibility();
     }
+    
+    // Make these functions globally accessible for the onclick attributes in the UI
+    window.signInWithGoogle = signInWithGoogle;
+    window.handleSignOut = handleSignOut;
     
     // Execute the main rendering function when the document structure is loaded
     document.addEventListener('DOMContentLoaded', renderApp);
