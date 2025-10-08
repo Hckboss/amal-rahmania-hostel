@@ -1,1746 +1,752 @@
-<!doctype html>
+<!DOCTYPE html>
+<!-- The 'dark' class will be added/removed by JavaScript based on system preference -->
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Amal Rahmania Ladies Hostel</title>
-  <!-- Google Fonts: Birthstone Formal (for titles) + Inter (for body) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Birthstone+Formal:wght@400&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Amal Rahmania Ladies Hostel - Safe, Secure, Serene Living</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to enable 'class' dark mode and use custom colors -->
+    <script>
+        tailwind.config = {
+            // Enable dark mode based on the presence of the 'dark' class on the HTML tag
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#4f46e5', // Indigo-600
+                        'secondary': '#ec4899', // Pink-500
+                        'bg-light': '#f7f9fb', // Light Mode Page Background
+                        'whatsapp': '#25D366', // WhatsApp Green
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Custom CSS for smooth transitions and hover effects -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Body classes are primarily handled by Tailwind on the <body> tag now */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom animation for section reveal */
+        .section-anim {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-anim.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Subtle glow on cards, adjusted for dark mode visibility */
+        .card-glow:hover {
+            box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.2), 0 4px 6px -2px rgba(236, 72, 153, 0.1);
+        }
+        .dark .card-glow:hover {
+            box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.4), 0 4px 6px -2px rgba(236, 72, 153, 0.2);
+        }
+    </style>
 </head>
-<body>
-  <!-- The entire website structure will be generated here by JavaScript -->
-  <script type="module">
-    // --- FIREBASE IMPORTS (MANDATORY MODULE IMPORTS) ---
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, query, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
-    
-    // --- GLOBAL FIREBASE VARS ---
-    let app, db, auth, storage;
-    let currentUserId = null;
-    let isAuthReady = false;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-hostel-app';
-    const FIREBASE_CONFIG = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-    const INITIAL_AUTH_TOKEN = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-    // --- GLOBAL STATE ---
-    let uploadedImages = []; // Stores URLs of community-uploaded photos
-    let uploadedVideos = []; // Stores URLs of community-uploaded videos
-    let hostelReviews = []; // Stores all submitted reviews
-    let selectedRating = 0; // State for the review form rating
-    let currentUserName = 'Guest'; // NEW: To store Google Display Name or 'Anonymous User'
-    let currentUserPhotoURL = null; // NEW: To store Google Profile Picture
-
-    // --- Utility Functions for DOM Construction and Data ---
-    const WHATSAPP_NUMBER_MAIN = '919946716151'; // Main contact number (also used for call button)
-    const WHATSAPP_NUMBER_ALT = '919656962786'; 
-    const MAX_PHOTO_SIZE = 2 * 1024 * 1024; // 2MB
-    const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB (Client-side limit)
-    
-    const WHATSAPP_MESSAGE = encodeURIComponent('Amal Rahmania Ladies Hostel: അഡ്മിഷൻ/ലഭ്യത എന്നിവയെക്കുറിച്ച് അന്വേഷിക്കാൻ വിളിച്ചതാണ്. കൂടുതൽ വിവരങ്ങൾ അറിയാമോ?');
-    
-    const WHATSAPP_LINK_MAIN = `https://wa.me/${WHATSAPP_NUMBER_MAIN}?text=${WHATSAPP_MESSAGE}`;
-    const WHATSAPP_LINK_ALT = `https://wa.me/${WHATSAPP_NUMBER_ALT}?text=${WHATSAPP_MESSAGE}`;
-    
-    // Google Maps Embed URL for coordinates 9°37'44.2"N 76°31'12.4"E
-    const GOOGLE_MAPS_EMBED_URL = 'https://maps.google.com/maps?q=9.628944,76.520111&z=15&output=embed';
-
-    // File names for static assets
-    const NEW_LOGO_FILENAME = '1000042305.jpg'; 
-    const BUILDING_PHOTO_1 = 'WhatsApp Image 2025-10-06 at 10.15.43_7a2930e5.jpg'; 
-    const COMMON_AREA_PHOTO = 'WhatsApp Image 2025-10-06 at 10.14.42_44015340.jpg';
-    const BUILDING_PHOTO_2 = 'WhatsApp Image 2025-09-24 at 09.57.44_93d77be0.jpg';
-    const WORK_AREA_PHOTO = 'image_58eb1f.png';
-    const ROOM_INTERIOR_PHOTO = '1000044799.jpg';
-    
-    /**
-     * Helper function to convert rating number to star display (e.g., 4.5 -> '⭐⭐⭐⭐⭐')
-     * @param {number} rating 
-     * @returns {string} HTML for star rating
-     */
-    function renderStars(rating) {
-        const fullStars = Math.floor(rating);
-        const halfStar = rating % 1 >= 0.5 ? '½' : '';
-        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-        
-        // Using two spans for color control: gold for filled, gray for empty
-        return `
-            <span style="color: #FFC300; letter-spacing: 1px; font-size: 18px;">${'★'.repeat(fullStars)}${halfStar ? '★' : ''}</span>
-            <span style="color: #ccc; letter-spacing: 1px; font-size: 18px;">${'★'.repeat(emptyStars)}</span>
-        `;
-    }
-
-    /**
-     * Simulates a typing effect by displaying text character by character.
-     * @param {HTMLElement} element The DOM element to write the text into.
-     * @param {string} text The full text to display.
-     * @param {number} delay The delay in milliseconds between characters.
-     */
-    function typeResponse(element, text, delay = 25) { 
-        let i = 0;
-        element.innerHTML = '';
-        // Use an invisible cursor to simulate typing effect
-        element.style.borderRight = '2px solid white'; 
-        
-        const interval = setInterval(() => {
-            if (i < text.length) {
-                if (text.charAt(i) === '\n') {
-                    element.innerHTML += '<br>';
-                } else {
-                    element.innerHTML += text.charAt(i);
-                }
-                i++;
-            } else {
-                clearInterval(interval);
-                element.style.borderRight = 'none'; // Remove cursor after typing
-            }
-        }, delay);
-    }
-
-
-    // --- CSS Styles as a single JavaScript String (VIBRANT STYLING with Birthstone Formal) ---
-    const APP_STYLES = `
-    /* -----------------------------------------------------------------
-       GLOBAL STYLES AND COLORS (VIBRANT LOOK)
-       Primary Accent Color: #FF6B6B (Coral Pink/Vibrant Red)
-       Secondary Accent: #1ABC9C (Bright Teal/Aqua)
-    ----------------------------------------------------------------- */
-    :root{
-      --bg:#F8F9FA; /* Very Light Gray/White */
-      --text:#333;
-      --h2-color:#333;
-      --accent:#FF6B6B; /* Primary: Coral Pink */
-      --accent-dark:#FF4B4B; 
-      --accent-light:#FFE9E9; /* Very Light Pink for backgrounds */
-      --secondary-accent: #1ABC9C; /* Bright Aqua/Teal */
-      --secondary-dark: #16A085;
-      --muted:#6C757D;
-      --card:#ffffff;
-      --card-shadow:0 10px 30px rgba(0,0,0,0.08); /* Soft but noticeable shadow */
-      --card-border:#e9ecef; 
-      --header-grad:linear-gradient(90deg,rgba(255,107,107,0.05),rgba(255,255,255,0.9)); 
-      --chip-bg:#E6F7F5; /* Light Aqua background for chips */
-      --chip-border:rgba(26,188,156,0.3);
-      --input-bg:#ffffff;
-      --input-color:#333;
-      --input-border:#ced4da;
-      --maxw:1200px; 
-      font-family:'Inter', sans-serif; /* Inter for general body text readability */
-    }
-
-    /* -----------------------------------------------------------------
-       DARK MODE OVERRIDES 
-    ----------------------------------------------------------------- */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --bg:#1E293B; /* Dark Blue Slate */
-            --text:#e2e8f0;
-            --h2-color:#ffffff;
-            --muted:#a0aec0;
-            --card:#2D3748; /* Darker Card */
-            --card-shadow:0 12px 30px rgba(0,0,0,0.6); 
-            --card-border:#4A5568;
-            --header-grad:linear-gradient(90deg,rgba(255,107,107,0.1),var(--card) 70%); 
-            --chip-bg:#2F495E;
-            --chip-border:rgba(26,188,156,0.5);
-            --input-bg:#3A455A;
-            --input-color:#e2e8f0;
-            --input-border:#5c687d;
-        }
-        .hero img, .gallery-img, .gallery-video { 
-            filter: brightness(0.9) contrast(1.05);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6); 
-        }
-        .price-box {
-            background: var(--secondary-dark) !important;
-            box-shadow: 0 8px 25px rgba(26, 188, 156, 0.4) !important; 
-        }
-    }
-    
-    body {
-        background-color: var(--bg);
-        transition: background-color 0.5s;
-    }
-    html { scroll-behavior: smooth; }
-
-    /* -----------------------------------------------------------------
-       HEADER & BRANDING
-    ----------------------------------------------------------------- */
-    header{
-        background:var(--header-grad);
-        padding:18px 16px;
-        border-bottom:1px solid var(--card-border); 
-        position: sticky; top: 0; z-index: 10; 
-        backdrop-filter: blur(10px); 
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
-    }
-    .container{max-width:var(--maxw);margin:0 auto;padding:24px}
-    .brand{display:flex;align-items:center; gap: 15px;} 
-    
-    .logo-img {
-        width: 60px; 
-        height: 60px;
-        border-radius: 50%; 
-        object-fit: contain;
-        padding: 5px; 
-        background-color: white; 
-        border: 4px solid var(--accent-light);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        transition: transform 0.3s;
-    }
-    .logo-img:hover {
-        transform: scale(1.05) rotate(-3deg);
-    }
-
-    /* Birthstone Formal applied to H1 */
-    h1{
-        margin:0;
-        font-family: 'Birthstone Formal', cursive; /* NEW FONT */
-        font-size: 40px; 
-        font-weight: 400; /* Birthstone Formal is typically 400 */
-        color: var(--accent); 
-        letter-spacing: 0.5px;
-        line-height: 1;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-    } 
-    p.lead{margin:4px 0 0;color:var(--muted); font-size: 15px; font-weight: 600;}
-
-    /* -----------------------------------------------------------------
-       WELCOME OVERLAY (Stylish Typing Animation)
-    ----------------------------------------------------------------- */
-    #welcome-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: linear-gradient(135deg, var(--accent-dark), var(--accent)); /* Subtle Gradient */
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 1s ease-out, visibility 1s ease-out; 
-        overflow: hidden;
-    }
-    #welcome-overlay.fade-out {
-        opacity: 0;
-        visibility: hidden;
-    }
-    /* Birthstone Formal applied to Welcome Text */
-    .welcome-text {
-        font-family: 'Birthstone Formal', cursive; /* NEW FONT */
-        font-size: 5.5rem; /* Larger size for script font */
-        font-weight: 400; 
-        letter-spacing: 5px;
-        text-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        white-space: nowrap; 
-        overflow: hidden; 
-        border-right: 2px solid white; 
-        animation: blink-caret 0.75s step-end infinite;
-    }
-    
-    @keyframes blink-caret {
-        from, to { border-color: transparent }
-        50% { border-color: white }
-    }
-
-    @media(max-width: 600px) {
-        .welcome-text {
-            font-size: 3rem; /* Adjusted mobile size */
-            letter-spacing: 3px;
-            padding: 0 10px;
-        }
-    }
-
-    /* -----------------------------------------------------------------
-       GRID LAYOUT
-    ----------------------------------------------------------------- */
-    .grid{display:grid;grid-template-columns:1fr 400px;gap:40px;margin-top:24px}
-    
-    @media(max-width:1024px){
-        .grid{grid-template-columns:1fr; gap: 30px;} 
-        .hero{flex-direction: column;} 
-        .hero img{max-width: 100%; width: 100%; height: 350px;} 
-    }
-
-    /* -----------------------------------------------------------------
-       COMPONENT STYLING
-    ----------------------------------------------------------------- */
-    .card{
-        background:var(--card);
-        padding:30px; 
-        border-radius:25px; /* Softer, rounder cards */
-        box-shadow:var(--card-shadow); 
-        border: 1px solid var(--card-border); 
-        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-        position: relative;
-    }
-    .card:hover { 
-        transform: translateY(-5px); 
-        box-shadow: var(--card-shadow), 0 18px 50px rgba(255, 107, 107, 0.15); /* Pink hover shadow */
-    } 
-    
-    .hero{display:flex;gap:35px;align-items:center}
-    .hero img{
-        width:400px;max-width:45%;height:350px;
-        border-radius:20px; /* Rounder corners on images */
-        object-fit:cover; 
-        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-    }
-    
-    h2{
-        margin-top:0; 
-        color: var(--accent-dark); 
-        font-size: 26px; 
-        font-weight: 800;
-        /* Highlighted header style */
-        background: linear-gradient(90deg, var(--accent-light) 0%, transparent 100%);
-        padding: 5px 0;
-        margin-bottom: 25px;
-    }
-    
-    /* Buttons */
-    .cta{margin-top:25px;display:flex;gap:15px;flex-wrap:wrap}
-    .btn{
-        display:inline-block;padding:14px 28px;border-radius:30px; /* Pill-shaped buttons */
-        text-decoration:none;font-weight:700; transition: all 0.3s; 
-        text-align: center;
-        letter-spacing: 0.5px;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-    }
-    .btn-primary{
-        background:var(--accent);color:white; 
-        box-shadow: 0 6px 15px rgba(255, 107, 107, 0.5); /* Pink shadow */
-    }
-    .btn-primary:hover {
-        background: var(--accent-dark); 
-        transform: translateY(-2px); 
-        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.7);
-    }
-    .btn-outline{
-        border:2px solid var(--secondary-accent);
-        color:var(--secondary-accent);
-        background:transparent;
-    }
-    .btn-outline:hover {
-        background: var(--secondary-accent); 
-        color: white; 
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4);
-    }
-
-    .btn-call {
-        background: #3B82F6 !important; /* Blue for call, standard look */
-        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.5) !important;
-    }
-    .btn-call:hover {
-        background: #2563EB !important; 
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.7) !important;
-    }
-    
-    /* Chips */
-    .facilities{display:flex;flex-wrap:wrap;gap:12px; margin-top: 20px;}
-    .chip{
-        padding:10px 18px;
-        border-radius:30px; /* Pill shape */
-        background:var(--chip-bg);
-        border:1px solid var(--chip-border); 
-        color: var(--secondary-dark); 
-        font-weight: 700; /* Bolder text */
-        font-size: 14px; 
-        transition: background 0.2s;
-    }
-    .chip:hover {
-        background: var(--secondary-accent);
-        color: white;
-    }
-    
-    /* Gallery styling (Updated for Video) */
-    .gallery{
-        display:grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-        gap:20px; 
-    } 
-
-    .gallery-img{
-        width:100%;
-        height:180px; 
-        object-fit:cover;
-        border-radius:18px; /* Rounder corners on images/videos */
-        box-shadow:0 6px 15px rgba(0,0,0,0.1); 
-        border: 4px solid var(--card-border);
-        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), box-shadow 0.3s ease; /* Bouncy transition */
-    }
-    .gallery-img:hover {
-        transform: scale(1.08) rotate(1deg); 
-        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        z-index: 1; 
-    }
-    
-    /* Video Specific Styles */
-    .gallery-video-container {
-        position: relative;
-        height: 180px; /* Match gallery-img height */
-        border-radius: 18px;
-        overflow: hidden;
-    }
-    .gallery-video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        cursor: pointer;
-        background-color: black;
-    }
-    .video-overlay {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        pointer-events: none; /* Allows click to pass through to video element */
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    
-    /* Pricing Box - Highlighted */
-    .price-box{
-        background: linear-gradient(135deg, var(--secondary-accent), var(--secondary-dark)); 
-        color: white; 
-        padding:35px; /* More padding */
-        border-radius:20px;
-        margin-top:20px;
-        font-weight:900; 
-        font-size: 28px; 
-        text-align: center; 
-        box-shadow: 0 10px 30px rgba(26, 188, 156, 0.5); /* Aqua shadow */
-        line-height: 1.3;
-        position: relative;
-        overflow: hidden;
-    } 
-    .price-box::before {
-        content: "VALUE DEAL";
-        position: absolute;
-        top: 0; right: 0;
-        background: var(--accent);
-        color: white;
-        padding: 5px 15px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        transform: rotate(45deg) translate(30%, -10%);
-        transform-origin: 100% 0;
-        width: 150px;
-        text-align: center;
-    }
-    .price-box span{
-        font-size: 18px; 
-        font-weight: 600; 
-        display: block; 
-        opacity: 0.95;
-        margin-top: 5px;
-    }
-
-
-    /* Review Summary */
-    .review-summary {
-        background: var(--accent-light);
-        padding: 30px; 
-        border-radius: 20px;
-        margin-bottom: 30px;
-        text-align: center;
-        border: 2px solid var(--accent); /* Solid Pink border */
-        box-shadow: inset 0 0 15px rgba(255, 107, 107, 0.2);
-    }
-    .review-summary h3 {
-        color: var(--accent-dark);
-        font-size: 45px;
-        font-weight: 900;
-        line-height: 1;
-        margin-bottom: 5px;
-    }
-    .review-stars-large {
-        color: #FFC300; 
-        font-size: 30px; 
-        letter-spacing: 4px;
-    }
-    
-    /* Individual Review Style */
-    .review-item {
-        border-bottom: 1px dashed var(--card-border);
-        padding: 18px 0;
-    }
-    .review-author {
-        font-weight: 800;
-        color: var(--accent);
-        font-size: 18px;
-    }
-    
-    /* Input Fields */
-    input[type="text"], input[type="tel"], textarea, input[type="file"] {
-        width: 100%;
-        padding: 12px 15px;
-        margin-bottom: 15px;
-        border-radius: 10px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--input-color);
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    input:focus, textarea:focus {
-        border-color: var(--secondary-accent);
-        box-shadow: 0 0 0 4px rgba(26, 188, 156, 0.2);
-        outline: none;
-    }
-
-    /* Star Rating Widget in Form */
-    .rating-widget {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin: 15px 0 30px;
-        cursor: pointer;
-        user-select: none;
-    }
-    .rating-widget span {
-        font-size: 45px; 
-        color: var(--input-border);
-        transition: color 0.2s, transform 0.2s;
-    }
-    .rating-widget span:hover,
-    .rating-widget span.selected {
-        color: #FFC300;
-        transform: scale(1.2) rotate(-5deg); 
-    }
-    
-    /* Rules List */
-    .rules li{
-        margin:16px 0;
-        line-height:1.7; 
-        color: var(--text); 
-        font-size: 16px; 
-        padding-left: 15px; 
-        border-left: 5px solid var(--secondary-accent); 
-        border-radius: 3px;
-    }
-    
-    /* Footer */
-    footer{
-        padding:40px 20px;
-        text-align:center;color:white;font-size:15px; 
-        background: linear-gradient(135deg, var(--accent-dark), var(--accent)); 
-        margin-top: 50px; 
-        border-radius: 30px 30px 0 0; 
-        box-shadow: 0 -8px 20px rgba(0,0,0,0.1);
-    }
-    
-    /* Utility */
-    .small{font-size:14px;color:var(--muted)}
-    .map-container {
-        padding-bottom: 60%; 
-        overflow: hidden;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        margin-top: 20px;
-    }
-    .map-container iframe {
-        border: none;
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-    .loading-spinner {
-        /* Standard Spinner CSS... */
-        width: 24px;
-        height: 24px;
-        border: 4px solid var(--card-border);
-        border-top-color: var(--accent); 
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 10px auto;
-        display: none;
-    }
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    /* -----------------------------------------------------------------
-       SCROLL ANIMATION STYLES
-    ----------------------------------------------------------------- */
-    .scroll-animate {
-        opacity: 0;
-        transform: translateY(60px); 
-        transition: opacity 1.2s cubic-bezier(0.2, 0.5, 0.1, 1), transform 1s cubic-bezier(0.2, 0.5, 0.1, 1);
-    }
-
-    .scroll-animate.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    /* Google Sign In Button Styling */
-    .btn-google {
-        background: white !important;
-        color: #4285F4 !important;
-        border: 1px solid #ddd !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        font-weight: 700;
-    }
-    .btn-google:hover {
-        background: #f7f7f7 !important;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-        transform: translateY(-1px);
-    }
-    .btn-google img {
-        width: 20px;
-        height: 20px;
-    }
-    `;
-
-    // --- Firebase Core Logic ---
-    async function initializeFirebase() {
-        if (!FIREBASE_CONFIG) {
-            console.error("Firebase configuration is missing.");
-            return;
-        }
-        
-        try {
-            app = initializeApp(FIREBASE_CONFIG);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            storage = getStorage(app);
-
-            await setPersistence(auth, browserSessionPersistence);
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    currentUserId = user.uid;
-                    // Check if signed in via Google to get display name and photo
-                    const isGoogleUser = user.providerData.some(p => p.providerId === GoogleAuthProvider.PROVIDER_ID);
-                    if (isGoogleUser && user.displayName) {
-                        currentUserName = user.displayName;
-                        currentUserPhotoURL = user.photoURL;
-                    } else if (user.isAnonymous) {
-                        currentUserName = 'Anonymous User (Canvas)'; // For default Canvas/Anonymous
-                        currentUserPhotoURL = null;
-                    } else {
-                        currentUserName = 'Hostel Resident';
-                        currentUserPhotoURL = null;
-                    }
-                } else {
-                    // If no user is logged in, attempt initial sign-in via custom token or anonymously
-                    if (INITIAL_AUTH_TOKEN) {
-                        try {
-                            await signInWithCustomToken(auth, INITIAL_AUTH_TOKEN);
-                        } catch(e) {
-                            console.error("Custom token sign-in failed. Signing in anonymously.", e);
-                            await signInAnonymously(auth);
-                        }
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    // The onAuthStateChanged listener will fire again with the new user object
-                }
-                isAuthReady = true;
-                setupListeners();
-                updateUIForAuth();
-            });
-
-        } catch (e) {
-            console.error("Firebase Initialization Error:", e);
-        }
-    }
-
-    // New: Google Sign-In function
-    async function signInWithGoogle() {
-        const provider = new GoogleAuthProvider();
-        const statusDiv = document.getElementById('auth-status');
-        if (statusDiv) statusDiv.innerHTML = '<span style="color:var(--secondary-accent);">Google Sign-In initiating...</span>';
-        
-        try {
-            // Note: signInWithPopup might be blocked by iframe, user needs to allow it.
-            await signInWithPopup(auth, provider);
-            // The onAuthStateChanged listener handles the rest
-            if (statusDiv) statusDiv.innerHTML = '<span style="color:green; font-weight: bold;">✅ Successfully signed in with Google!</span>';
-        } catch (error) {
-            console.error("Google Sign-In Failed:", error);
-            if (statusDiv) statusDiv.innerHTML = '<span style="color:red;">❌ Sign-In Failed: ' + error.message.split('(')[0] + '</span>';
-        }
-    }
-
-    // New: Sign Out function
-    async function handleSignOut() {
-         const statusDiv = document.getElementById('auth-status');
-         if (statusDiv) statusDiv.innerHTML = '<span style="color:var(--accent);">Signing out...</span>';
-         
-         try {
-             await signOut(auth);
-             // After sign out, the onAuthStateChanged listener will auto-sign-in anonymously
-             if (statusDiv) statusDiv.innerHTML = '<span style="color:var(--secondary-dark);">Signed out. Auto-reverting to Anonymous Access.</span>';
-         } catch (error) {
-             console.error("Sign Out Failed:", error);
-             if (statusDiv) statusDiv.innerHTML = '<span style="color:red;">❌ Sign Out Failed.</span>';
-         }
-    }
-
-
-    function updateUIForAuth() {
-        const uploadSection = document.getElementById('section-upload');
-        if (uploadSection) {
-            uploadSection.style.display = 'block';
-        }
-        
-        // Update Authentication Card Content
-        const authCardContent = document.getElementById('auth-card-content');
-        if (authCardContent) {
-            const isGoogleUser = currentUserPhotoURL !== null;
-            const profileImageUrl = currentUserPhotoURL || 'https://placehold.co/50x50/1ABC9C/ffffff?text=👤';
-
-            authCardContent.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                    <img src="${profileImageUrl}" 
-                         onerror="this.onerror=null;this.src='https://placehold.co/50x50/1ABC9C/ffffff?text=👤';"
-                         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
-                    <div>
-                        <p style="margin: 0; font-weight: 700; color: var(--secondary-accent);">Hello, ${currentUserName}!</p>
-                        <p class="small" style="margin: 0; color: var(--muted);">${isGoogleUser ? 'Signed in with Google' : 'Anonymous Access (Canvas)'}</p>
-                    </div>
-                </div>
-                ${isGoogleUser ? 
-                    // Sign Out button for Google users
-                    `<button class="btn btn-outline" id="sign-out-btn" style="width:100%;" onclick="handleSignOut()">Sign Out</button>` : 
-                    // Google Sign In button for Anonymous users
-                    `<button class="btn btn-google" id="google-sign-in-btn" style="width:100%;" onclick="signInWithGoogle()">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png" alt="Google icon">
-                        Sign In with Google
-                    </button>`
-                }
-                <div id="auth-status" class="small" style="margin-top: 10px; min-height: 20px;"></div>
-            `;
-        }
-        
-        // Update display name in Review/Upload sections
-        const nameDisplays = document.querySelectorAll('.user-name-display');
-        nameDisplays.forEach(display => {
-             display.innerHTML = `<span style="font-weight:700;">Current User:</span> ${currentUserName}`;
-        });
-    }
-
-    // --- Media Upload Logic (Combined Photo/Video Upload) ---
-    async function handleMediaUpload() {
-        if (!isAuthReady || !currentUserId || !storage || !db) {
-            console.error("Firebase services or user not ready.");
-            document.getElementById('upload-status').innerHTML = '<span style="color:red;">Authentication not ready. Please wait.</span>';
-            return;
-        }
-
-        const fileInput = document.getElementById('media-upload-input'); 
-        const file = fileInput.files[0];
-        const statusDiv = document.getElementById('upload-status');
-        const uploadButton = document.getElementById('upload-media-btn'); 
-
-        if (!file) {
-            statusDiv.innerHTML = '<span style="color:red;">⚠️ ദയവായി ഒരു ചിത്രമോ വീഡിയോയോ തിരഞ്ഞെടുക്കുക.</span>';
-            return;
-        }
-
-        const mimeType = file.type;
-        let fileType, maxSize;
-        let firestoreCollectionName;
-
-        if (mimeType.startsWith('image/')) {
-            fileType = 'Photo';
-            maxSize = MAX_PHOTO_SIZE;
-            firestoreCollectionName = 'user_photos';
-        } else if (mimeType.startsWith('video/')) {
-            fileType = 'Video';
-            maxSize = MAX_VIDEO_SIZE;
-            firestoreCollectionName = 'user_videos';
-        } else {
-            statusDiv.innerHTML = '<span style="color:red;">⚠️ ഒരു ഇമേജ് (JPG, PNG) അല്ലെങ്കിൽ വീഡിയോ (MP4, MOV) മാത്രം അപ്‌ലോഡ് ചെയ്യുക.</span>';
-            return;
-        }
-
-        if (file.size > maxSize) {
-             statusDiv.innerHTML = `<span style="color:red;">⚠️ ${fileType}-യുടെ പരമാവധി വലുപ്പം ${fileType === 'Photo' ? '2MB' : '10MB'} ആണ്.</span>`;
-             return;
-        }
-
-        const timestamp = Date.now();
-        // Separate storage path for videos and photos for clarity
-        const storagePath = `artifacts/${appId}/public/media/${currentUserId}/${fileType.toLowerCase()}/${timestamp}_${file.name}`;
-        const storageRef = ref(storage, storagePath);
-
-        statusDiv.innerHTML = `<span style="color:var(--accent);">⬆️ ${fileType} Uploading... Please wait.</span>`;
-        uploadButton.disabled = true;
-
-        try {
-            const snapshot = await uploadBytes(storageRef, file);
-            const downloadURL = await getDownloadURL(snapshot.ref);
-
-            // Use the determined collection name
-            const publicMediaRef = collection(db, `artifacts/${appId}/public/data/${firestoreCollectionName}`);
-            await addDoc(publicMediaRef, {
-                url: downloadURL,
-                userId: currentUserId,
-                userName: currentUserName, // Include user name for tracking
-                type: fileType.toLowerCase(),
-                timestamp: serverTimestamp(),
-                filename: file.name
-            });
-
-            statusDiv.innerHTML = `<span style="color:green; font-weight: bold;">✅ ${fileType} Successfully uploaded! Gallery will update shortly.</span>`;
-            fileInput.value = ''; 
-
-        } catch (error) {
-            console.error("Upload error:", error);
-            statusDiv.innerHTML = '<span style="color:red;">❌ Upload Failed: ' + error.message + '</span>';
-        } finally {
-            uploadButton.disabled = false;
-        }
-    }
-
-
-    // --- Listener Setup (Combined) ---
-    function setupListeners() {
-        if (!db || !isAuthReady) return;
-        setupGalleryListener(); 
-        setupVideosListener(); 
-        setupReviewsListener();
-    }
-    
-    // --- Gallery Data Logic (Photos) ---
-    function setupGalleryListener() {
-        if (!db || !isAuthReady) return;
-        
-        const loadingDiv = document.getElementById('gallery-loading');
-        
-        const publicPhotosRef = collection(db, `artifacts/${appId}/public/data/user_photos`);
-        const q = query(publicPhotosRef);
-
-        onSnapshot(q, (snapshot) => {
-            if(loadingDiv) loadingDiv.style.display = 'none';
-            uploadedImages = [];
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.url && data.userId) {
-                    uploadedImages.push(data.url);
-                }
-            });
-            renderGallery(); // Call combined render function
-        }, (error) => {
-            console.error("Error fetching photos: ", error);
-            if(loadingDiv) loadingDiv.innerHTML = 'Error loading community photos.';
-        });
-    }
-
-    // --- Video Data Logic (New) ---
-    function setupVideosListener() {
-        if (!db || !isAuthReady) return;
-        
-        const publicVideosRef = collection(db, `artifacts/${appId}/public/data/user_videos`);
-        const q = query(publicVideosRef);
-
-        onSnapshot(q, (snapshot) => {
-            uploadedVideos = [];
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.url && data.userId) {
-                    uploadedVideos.push(data.url);
-                }
-            });
-            renderGallery(); // Call combined render function
-        }, (error) => {
-            console.error("Error fetching videos: ", error);
-        });
-    }
-
-    // --- Combined Gallery Renderer ---
-    function renderGallery() {
-        const galleryGrid = document.getElementById('image-gallery-grid');
-        if (!galleryGrid) return;
-        
-        const staticImages = [
-            COMMON_AREA_PHOTO,
-            ROOM_INTERIOR_PHOTO,
-            BUILDING_PHOTO_2,
-            WORK_AREA_PHOTO,
-            BUILDING_PHOTO_1,
-            NEW_LOGO_FILENAME
-        ]; 
-        
-        // Combine all media, mapping videos to objects for type identification
-        const userMedia = [
-            ...uploadedImages.map(url => ({ url, type: 'image', isStatic: false })),
-            ...uploadedVideos.map(url => ({ url, type: 'video', isStatic: false })),
-            ...staticImages.map(url => ({ url, type: 'image', isStatic: true }))
-        ];
-        
-        // Shuffle the combined array for varied display
-        userMedia.sort(() => Math.random() - 0.5); 
-
-        galleryGrid.innerHTML = userMedia.map((media, index) => {
-            const fallbackText = media.isStatic ? 'Image' : (media.type === 'video' ? 'User Video' : 'User Photo');
-            
-            if (media.type === 'image') {
-                return `
-                    <img 
-                        class="gallery-img" 
-                        src="${media.url}" 
-                        onerror="this.onerror=null;this.src='https://placehold.co/180x180/FF6B6B/ffffff?text=${fallbackText}';" 
-                        alt="Hostel Photo ${index + 1}"
-                    >
-                `;
-            } else if (media.type === 'video') {
-                return `
-                    <div class="gallery-video-container">
-                        <video 
-                            class="gallery-img gallery-video" 
-                            src="${media.url}" 
-                            controls 
-                            preload="metadata"
-                            alt="Hostel Video ${index + 1}"
-                            onclick="this.paused ? this.play() : this.pause();"
-                            onerror="this.onerror=null; this.parentNode.innerHTML='<div class=small style=padding:10px;text-align:center;color:red;>Video Failed to Load.</div>';"
-                        >
-                            Your browser does not support the video tag.
-                        </video>
-                        <span class="video-overlay">▶️ VIDEO</span>
-                    </div>
-                `;
-            }
-            return '';
-        }).join('');
-    }
-    
-    // --- Review System Logic (Same as before) ---
-    function setupReviewsListener() {
-        if (!db || !isAuthReady) return;
-        
-        const reviewsRef = collection(db, `artifacts/${appId}/public/data/user_reviews`);
-        const q = query(reviewsRef, orderBy('timestamp', 'desc')); 
-
-        onSnapshot(q, (snapshot) => {
-            hostelReviews = [];
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.rating && data.name && data.reviewText) {
-                    hostelReviews.push({ id: doc.id, ...data });
-                }
-            });
-            renderReviews();
-        }, (error) => {
-            console.error("Error fetching reviews: ", error);
-        });
-    }
-    
-    function renderReviews() {
-        const summaryDiv = document.getElementById('review-summary-display');
-        const listDiv = document.getElementById('reviews-list');
-        
-        if (!summaryDiv || !listDiv) return;
-
-        if (hostelReviews.length === 0) {
-            summaryDiv.innerHTML = `<p class="small" style="text-align: center; color: var(--muted); margin: 0;">No reviews yet. Be the first!</p>`;
-            listDiv.innerHTML = '';
-            return;
-        }
-        
-        const totalRating = hostelReviews.reduce((sum, review) => sum + review.rating, 0);
-        const averageRating = (totalRating / hostelReviews.length).toFixed(1);
-
-        summaryDiv.innerHTML = `
-            <div class="review-summary">
-                <h3>${averageRating} <span style="font-size: 20px;">/ 5.0</span></h3>
-                <div class="review-stars-large">${renderStars(parseFloat(averageRating))}</div>
-                <p class="small" style="margin: 5px 0 0; color: var(--accent-dark); font-weight: 700;">(${hostelReviews.length} Verified Reviews)</p>
-            </div>
-        `;
-        
-        listDiv.innerHTML = hostelReviews.map(review => {
-            const date = review.timestamp ? new Date(review.timestamp.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
-            const safeName = review.name.length > 25 ? review.name.substring(0, 22) + '...' : review.name;
-            
-            return `
-                <div class="review-item">
-                    <div class="review-meta">
-                        <div class="review-author">${safeName}</div>
-                        <div class="review-stars" style="font-size: 14px; margin-left: 10px;">
-                            ${renderStars(review.rating)}
-                        </div>
-                    </div>
-                    <p class="review-text">${review.reviewText}</p>
-                    <p class="small" style="font-size: 12px; margin-top: 5px; color: var(--muted);">Reviewed on ${date}</p>
-                </div>
-            `;
-        }).join('');
-    }
-    
-    // Attach event listeners for the star widget
-    function setupRatingWidget() {
-        const widget = document.getElementById('rating-widget');
-        if (!widget) return;
-
-        widget.innerHTML = '<span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>';
-        const stars = widget.querySelectorAll('span');
-
-        stars.forEach((star, index) => {
-            star.addEventListener('click', () => {
-                selectedRating = index + 1;
-                updateStarDisplay(stars, selectedRating);
-            });
-        });
-    }
-    
-    function updateStarDisplay(stars, rating) {
-        stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.add('selected');
-            } else {
-                star.classList.remove('selected');
-            }
-        });
-    }
-
-    // Handle Review Form Submission
-    async function handleReviewSubmit(event) {
-        event.preventDefault();
-        
-        const name = document.getElementById('review-name').value.trim();
-        const phone = document.getElementById('review-phone').value.trim();
-        const reviewText = document.getElementById('review-text').value.trim();
-        const statusDiv = document.getElementById('review-status');
-        const submitButton = document.getElementById('review-submit-btn');
-        const phoneRegex = /^\d{10}$/;
-
-        if (!selectedRating) {
-            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ ദയവായി ഒരു റേറ്റിംഗ് തിരഞ്ഞെടുക്കുക.</span>';
-            return;
-        }
-        if (!name || !phone || !reviewText) {
-            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ എല്ലാ കോളങ്ങളും പൂരിപ്പിക്കുക.</span>';
-            return;
-        }
-        if (!phoneRegex.test(phone)) {
-            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ 10 അക്ക ഫോൺ നമ്പർ നൽകുക.</span>';
-            return;
-        }
-        
-        if (!isAuthReady || !currentUserId || !db) {
-            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">⚠️ Authentication error. Try refreshing.</span>';
-            return;
-        }
-        
-        statusDiv.innerHTML = '<span style="color:var(--secondary-accent);">⬆️ Submitting review...</span>';
-        submitButton.disabled = true;
-
-        try {
-            const reviewsRef = collection(db, `artifacts/${appId}/public/data/user_reviews`);
-            await addDoc(reviewsRef, {
-                rating: selectedRating,
-                name: name,
-                phone: phone, 
-                reviewText: reviewText,
-                userId: currentUserId,
-                userName: currentUserName, // Include user name for tracking
-                timestamp: serverTimestamp()
-            });
-
-            statusDiv.innerHTML = '<span style="color:var(--secondary-dark); font-weight: bold;">✅ Thank you for your review!</span>';
-            
-            // Clear form fields and reset rating
-            document.getElementById('review-name').value = '';
-            document.getElementById('review-phone').value = '';
-            document.getElementById('review-text').value = '';
-            selectedRating = 0;
-            updateStarDisplay(document.getElementById('rating-widget').querySelectorAll('span'), 0);
-
-        } catch (error) {
-            console.error("Review submission error:", error);
-            statusDiv.innerHTML = '<span style="color:var(--accent-dark);">❌ Submission Failed: ' + error.message + '</span>';
-        } finally {
-            submitButton.disabled = false;
-        }
-    }
-
-
-    // --- DOM Construction Functions ---
-
-    function injectStyles() {
-        const style = document.createElement('style');
-        style.textContent = APP_STYLES;
-        document.head.appendChild(style);
-    }
-
-    // Function to create the Welcome Overlay (UPDATED STYLE)
-    function createWelcomeOverlay() {
-        const overlay = document.createElement('div');
-        overlay.id = 'welcome-overlay';
-        overlay.innerHTML = '<div class="welcome-text" id="animated-welcome-text"></div>'; // Empty div for typing effect
-        return overlay;
-    }
-
-    function createHeader() {
-        const header = document.createElement('header');
-        header.innerHTML = `
-            <div class="container" style="padding: 0 18px;">
-                <div class="brand">
-                    <img 
-                        class="logo-img"
-                        src="${NEW_LOGO_FILENAME}"
-                        onerror="this.onerror=null;this.src='https://placehold.co/60x60/FF6B6B/ffffff?text=AR';" 
-                        alt="Amal Rahmania Ladies Hostel Logo"
-                    >
-                    <div>
-                        <h1>AMAL RAHMANIA</h1>
-                        <p class="lead">Safe, Comfortable, and Homely Living for Women</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        return header;
-    }
-    
-    function createReviewsDisplaySection() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'section-reviews-display';
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">⭐</span>ഹോസ്റ്റൽ അഭിപ്രായങ്ങൾ / Hostel Reviews</h2>
-            <div id="review-summary-display">
-                <!-- Average Rating Summary will be loaded here -->
-            </div>
-            <p class="small" style="font-weight: 600; color: var(--accent);">Recent Feedback:</p>
-            <div id="reviews-list">
-                <!-- Individual reviews will be loaded here -->
-            </div>
-        `;
-        return section;
-    }
-
-    function createHeroSection() {
-        const section = document.createElement('section');
-        section.className = 'card hero scroll-animate';
-        section.id = 'section-hero';
-        section.innerHTML = `
-            <div style="flex:1">
-                <h2>ഹോംലി ലിവിംഗ്, പ്രൊഫഷണൽ സൗകര്യങ്ങൾ</h2>
-                <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിനും പ്രൈവറ്റ് ബസ് സ്റ്റാൻഡിനും സമീപമുള്ള സ്ത്രീകൾക്കായുള്ള വിശ്വസ്തമായ ഹോസ്റ്റൽ. വിദ്യാർത്ഥിനികൾക്കും ജോലി ചെയ്യുന്നവർക്കും അനുയോജ്യമായ സുഖപ്രദമായ മുറികളും ശാന്തമായ അന്തരീക്ഷവും.</p>
-
-                <div style="margin-top:20px; font-weight: 800; color: var(--accent-dark); border-bottom: 2px solid var(--accent-light); padding-bottom: 10px;">
-                    💖 Premium Amenities Included:
-                </div>
-                <div class="facilities">
-                    <span class="chip">🚀 ഹൈ-സ്പീഡ് WIFI</span>
-                    <span class="chip">🧺 ഓട്ടോമാറ്റിക് വാഷിംഗ് മെഷീൻ</span>
-                    <span class="chip">🧊 ഫ്രിഡ്ജ് സൗകര്യം</span>
-                    <span class="chip">🍲 $3 \times$ ടൈംസ് ഹോം ഫുഡ്</span>
-                    <span class="chip">☕ $2 \times$ ടൈംസ് ചായ / പലഹാരം</span>
-                    <span class="chip">💧 RO പ്യൂരിഫൈഡ് വാട്ടർ</span>
-                </div>
-
-                <div class="cta">
-                    <a class="btn btn-primary" href="${WHATSAPP_LINK_MAIN}">💬 WhatsApp Enquiry (9946 71 6151)</a>
-                    <a class="btn btn-outline" href="${WHATSAPP_LINK_ALT}">📲 WhatsApp 9656 96 2786</a>
-                </div>
-            </div>
-            <img 
-                src="${BUILDING_PHOTO_1}" 
-                onerror="this.onerror=null;this.src='https://placehold.co/400x350/FF6B6B/FFFFFF?text=Hostel+Building+Photo';" 
-                alt="Hostel Exterior Building Photo"
-            >
-        `;
-        return section;
-    }
-
-    function createGallerySection() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'section-gallery';
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">📸/🎬</span> ഹോസ്റ്റൽ ഗാലറി & കമ്മ്യൂണിറ്റി മീഡിയ</h2>
-            <div id="gallery-loading" style="text-align: center; color: var(--muted); padding: 20px; font-size: 14px;">
-                Connecting to database and loading photos and videos...
-            </div>
-            <div class="gallery" id="image-gallery-grid">
-                <!-- Dynamic images and videos will be loaded here by renderGallery() -->
-            </div>
-            <p class="small text-center" style="margin-top: 20px; color: var(--accent-dark); font-weight: 700; border-top: 1px dashed var(--card-border); padding-top: 15px;">
-                നിങ്ങളുടെ ഹോസ്റ്റൽ ജീവിതം, ഞങ്ങളുടെ ക്യാമറയിൽ.
-            </p>
-        `;
-        return section;
-    }
-
-    function createPricingAndMealsSections() {
-        const div = document.createElement('div');
-        div.className = 'grid-mini scroll-animate';
-        div.id = 'section-pricing';
-        
-        // Use inline styles to enforce the 2-column grid or 1-column on small screens
-        const mediaQuery = window.matchMedia('(max-width: 768px)');
-        const gridStyle = mediaQuery.matches ? 
-            'display: grid; grid-template-columns: 1fr; gap: 20px; padding: 0; margin: 0;' :
-            'display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 0; margin: 0;';
-        div.style.cssText = gridStyle;
-
-        // Pricing Card
-        const pricingCard = document.createElement('section');
-        pricingCard.className = 'card';
-        pricingCard.style.cssText = 'margin:0; padding: 25px;';
-        pricingCard.innerHTML = `
-            <h2><span style="margin-right: 5px;">💰</span> റൂമുകളും വിലയും / Pricing</h2>
-            <p class="small">നിലവിൽ: ഒരു മുറിയിൽ 3 പേർക്ക് താമസിക്കാം. മാനേജ്‌മെൻ്റ് നിയമങ്ങൾക്കനുസരിച്ച് 4 പേർ വരെ ആകാം.</p>
-            <div class="price-box">
-                ₹6,500 <span style="font-size: 16px;">/ Per Month (All Inclusive)</span><br>
-                <span>സുരക്ഷാ നിക്ഷേപം (Deposit): ₹5,000</span>
-            </div>
-            <ul class="list small" style="margin-top: 25px;">
-                <li>✔️ വൈദ്യുതി, വെള്ളം, ഭക്ഷണ ചെലവുകൾ ഉൾപ്പെടെ.</li>
-                <li>✔️ യാതൊരുവിധ അധിക ചിലവുകളും ഇല്ല.</li>
-            </ul>
-        `;
-        div.appendChild(pricingCard);
-
-        // Meal Timings Card
-        const mealsCard = document.createElement('section');
-        mealsCard.className = 'card';
-        mealsCard.style.cssText = 'margin:0; padding: 25px;';
-        mealsCard.innerHTML = `
-            <h2><span style="margin-right: 5px;">⏰</span> പ്രധാന സമയക്രമം / Key Timings</h2>
-            <ul class="list small" style="list-style-type: none; padding-left: 0;">
-                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px;">
-                    <span style="font-weight: 700; color: var(--accent-dark);">🚪 ഔട്ട് പാസ് സമയം (Curfew):</span><br>
-                    <span style="font-size: 15px; color: var(--text);">രാത്രി $8$ മണിവരെ. കൃത്യമായി പാലിക്കുക.</span>
-                </li>
-                <li style="margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px;">
-                    <span style="font-weight: 700; color: var(--accent-dark);">🍽️ ഡിന്നർ:</span><br>
-                    <span style="font-size: 15px; color: var(--text);">$7\ \text{pm} - 8\ \text{pm}$ (കൃത്യ സമയത്ത് ഡൈനിംഗ് ഹാളിൽ)</span>
-                </li>
-                <li style="border-left: 3px solid var(--accent); padding-left: 10px;">
-                    <span style="font-weight: 700; color: var(--accent-dark);">💤 ലൈറ്റ് ഓഫ്:</span><br>
-                    <span style="font-size: 15px; color: var(--text);">റൂമുകളിൽ $10\ \text{pm}$ ന് ശേഷം ലൈറ്റ് ഓഫ് ചെയ്യേണ്ടതാണ്.</span>
-                </li>
-            </ul>
-            <p class="small" style="font-weight: bold; color: var(--secondary-accent); border-top: 1px dashed var(--card-border); padding-top: 15px;">
-                ശാന്തമായ അന്തരീക്ഷം എല്ലാവർക്കും ഉറപ്പാക്കുന്നു.
-            </p>
-        `;
-        div.appendChild(mealsCard);
-
-        return div;
-    }
-
-    function createRulesSection() {
-        const section = document.createElement('section');
-        section.className = 'card rules scroll-animate';
-        section.id = 'section-rules';
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">⚖️</span> ഹോസ്റ്റൽ നിബന്ധനകൾ / Core Rules</h2>
-            <ol id="hostel-rules-list">
-                <li>1: വാർഡൻ്റെ സമ്മതത്തോടെ മാത്രമേ ഹോസ്റ്റലിൽ നിന്നും പുറത്തു പോകാൻ പാടുള്ളൂ. രജിസ്റ്ററിൽ രേഖപ്പെടുത്തണം.</li>
-                <li>2: രാത്രി $8$ മണിക്ക് ശേഷം നിശബ്ദത പാലിക്കുക. അനുവദിച്ചിരിക്കുന്ന മുറികളിൽ മാത്രമേ ഉറങ്ങുവാൻ പാടുള്ളൂ.</li>
-                <li>3: മുറിയുടെയും കിടക്കയുടെയും വൃത്തി എല്ലാ റൂംമേറ്റുകളുടെയും വ്യക്തിപരമായ കടമകളാണ്.</li>
-                <li>4: റൂമുകളിൽ ലൈറ്റ് $10\ \text{pm}$ ന് ശേഷം ഓഫ് ചെയ്യേണ്ടതാണ്. പഠനത്തിനായി ഡൈനിങ് ഹാൾ ഉപയോഗിക്കുക.</li>
-                <li>5: മറ്റുള്ള വിദ്യാർത്ഥിനികൾക്ക് ശല്യമാകുന്ന യാതൊരുവിധ പ്രവർത്തനങ്ങളും (ഉച്ചത്തിലുള്ള സംസാരം, മൊബൈൽ ഉപയോഗം) ഒഴിവാക്കുക.</li>
-                <li>6: ഹോസ്റ്റൽ മുറികൾ അധികൃതർക്ക് എപ്പോൾ വേണമെങ്കിലും പരിശോധിക്കാനുള്ള അധികാരം ഉണ്ടായിരിക്കും.</li>
-                <li>7: ഫാൻ, ലൈറ്റ് തുടങ്ങിയവ ഉപയോഗത്തിന് ശേഷം ഓഫ് ചെയ്തിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക.</li>
-            </ol>
-            <p class="small" style="margin-top: 25px; font-weight: bold; border-top: 1px dashed var(--card-border); padding-top: 15px; color: var(--accent-dark);">
-                ഈ നിയമങ്ങൾ വിദ്യാർഥിനികളുടെ സുരക്ഷക്കും സൗകര്യത്തിനും വേണ്ടി മാത്രമുള്ളതാണ്.
-            </p>
-        `;
-        return section;
-    }
-    
-    // NEW: Authentication Status Card
-    function createAuthCard() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'auth-card';
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">🔑</span> Student Sign-In</h2>
-            <div id="auth-card-content">
-                <div style="text-align:center; padding: 20px;">
-                    <p class="small" style="color:var(--muted);">Loading authentication status...</p>
-                    <div class="loading-spinner" style="display:block;"></div>
-                </div>
-            </div>
-        `;
-        return section;
-    }
-    
-    function createReviewSubmissionCard() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'section-submit-review';
-
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">✍️</span> നിങ്ങളുടെ അഭിപ്രായം രേഖപ്പെടുത്തുക</h2>
-            <p class="small">ഹോസ്റ്റലിനെക്കുറിച്ചുള്ള നിങ്ങളുടെ അനുഭവം ഇവിടെ പങ്കുവെക്കാം. (5 Star Rating)</p>
-            <p class="user-name-display small" style="margin-bottom: 15px; color: var(--muted);"></p>
-
-            <form id="review-form">
-                <div class="rating-widget" id="rating-widget">
-                    <!-- Stars populated by JS -->
-                </div>
-                <input type="text" id="review-name" placeholder="നിങ്ങളുടെ പേര് (Name)" required>
-                <input type="tel" id="review-phone" placeholder="ഫോൺ നമ്പർ (10 digits)" required maxlength="10">
-                <textarea id="review-text" placeholder="നിങ്ങളുടെ സത്യസന്ധമായ അഭിപ്രായം ഇവിടെ എഴുതുക (Review)" rows="4" required></textarea>
+<!-- Apply light mode defaults and smooth transition for theme change -->
+<body class="antialiased bg-bg-light dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-500">
+
+    <!-- Language Selector, Time, & Header (Updated for Dark Mode) -->
+    <header class="bg-white dark:bg-gray-800 shadow-md dark:shadow-xl sticky top-0 z-10 transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-2">
+                <span class="text-3xl text-primary">🏡</span>
+                <span class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100" data-i18n="hostelName">Amal Rahmania Hostel</span>
+            </a>
+            <div class="flex items-center space-x-4">
+                <!-- Primary Contact Number -->
+                <a href="tel:9946716151" class="hidden md:flex items-center text-primary font-semibold hover:text-secondary transition duration-150 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7.056 12.671a17.295 17.295 0 0 0 4.27 4.27l1.01-.137a2.16 2.16 0 0 1 2.227.426l1.242 1.242a2.16 2.16 0 0 1 0 3.055l-1.042 1.042a2.16 2.16 0 0 1-1.527.633a20.088 20.088 0 0 1-10.74-10.74a2.16 2.16 0 0 1 .633-1.527l1.042-1.042a2.16 2.16 0 0 1 3.055 0l1.242 1.242a2.16 2.16 0 0 1 .426 2.227l-.137 1.01ZM18 10a8 8 0 0 0-8-8"/>
+                    </svg>
+                    <span data-i18n="primaryPhone">9946 71 6151</span>
+                </a>
                 
-                <button class="btn btn-primary" id="review-submit-btn" type="submit" style="width:100%;">
-                    Submit Review
-                </button>
-                <div id="review-status" class="small" style="margin-top: 10px; min-height: 20px;"></div>
-            </form>
-        `;
-        
-        setTimeout(() => {
-            const reviewForm = document.getElementById('review-form');
-            if (reviewForm) {
-                reviewForm.addEventListener('submit', handleReviewSubmit);
-            }
-            setupRatingWidget();
-        }, 100);
-        
-        return section;
-    }
-
-    function createChatCard() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'gemini-chat-card';
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">💬</span> ഹോസ്റ്റലിനെക്കുറിച്ച് ചോദിക്കാം</h2>
-            <p class="small">നിയമങ്ങൾ, സൗകര്യങ്ങൾ, ദിനചര്യ എന്നിവയെക്കുറിച്ച് അറിയുക. (Powered by Gemini)</p>
-            <div style="margin-top:12px;">
-                <input type="text" id="chat-input" placeholder="ഉദാഹരണം: കറന്റ് പോയാൽ ഇൻവെർട്ടർ ഉണ്ടോ?">
-                <button class="btn btn-primary" id="ask-button" type="button" style="width:100%;">
-                    ചോദ്യം ചോദിക്കൂ
-                </button>
+                <select id="language-select" onchange="switchLanguage(this.value)"
+                    class="p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg text-sm focus:ring-primary focus:border-primary transition duration-150 ease-in-out text-gray-900 dark:text-gray-100">
+                    <option value="en">English</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                </select>
+                <!-- Time display location -->
+                <div class="hidden sm:block text-sm text-gray-500 dark:text-gray-400" id="currentTime"></div>
             </div>
-            <div class="loading-spinner" id="loading-spinner"></div>
-            <div id="chat-output" style="background: var(--accent-light); border: 1px solid var(--chip-border); padding: 15px; border-radius: 10px;">
-                <p>നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്ത് 'ചോദ്യം ചോദിക്കൂ' ക്ലിക്കുചെയ്യുക.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-16">
+
+        <!-- Hero Section (Updated for Dark Mode) -->
+        <section id="hero" class="relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-16 lg:p-24 section-anim transition-colors duration-500">
+            <!-- Background gradient overlay, made less opaque in dark mode -->
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-80 dark:opacity-20 rounded-3xl transition-opacity duration-500"></div>
+            <div class="relative max-w-4xl mx-auto text-center">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight" data-i18n="heroTitle">
+                    Safe, Secure, Serene Living
+                </h1>
+                <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto" data-i18n="heroSubtitle">
+                    Your trusted residence for students and working women. Experience comfort, care, and community.
+                </p>
+                <a href="#contact" class="inline-block px-8 py-3 text-lg font-semibold text-white bg-whatsapp rounded-full shadow-lg hover:bg-green-600 transition duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 w-72 mx-auto" data-i18n="enrollNow">
+                    <!-- WhatsApp Icon SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span>Inquire Now on WhatsApp</span>
+                </a>
             </div>
-        `;
-        return section;
-    }
+        </section>
 
-    // Function to create the Media Upload Section (Updated to handle Photo and Video)
-    function createMediaUploadSection() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'section-upload';
-        section.style.display = 'none'; 
+        <!-- Features Section (Updated for Dark Mode) -->
+        <section id="features" class="section-anim">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mb-10" data-i18n="featuresTitle">
+                Why Choose Amal Rahmania?
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature Cards: bg-white dark:bg-gray-800 -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg card-glow flex flex-col items-center text-center transition-colors duration-500">
+                    <div class="text-4xl text-primary mb-4">🔒</div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100" data-i18n="feature1Title">24/7 Security & Warden</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm" data-i18n="feature1Desc">24/7 Warden and Security staff, CCTV Controlled Monitoring, and strict entry/exit protocols ensure complete safety.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg card-glow flex flex-col items-center text-center transition-colors duration-500">
+                    <div class="text-4xl text-secondary mb-4">🍽️</div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100" data-i18n="feature2Title">Comprehensive Meal Plan</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm" data-i18n="feature2Desc">Enjoy three wholesome meals, two servings of tea, and one snack daily, prepared in a hygienic kitchen.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg card-glow flex flex-col items-center text-center transition-colors duration-500">
+                    <div class="text-4xl text-primary mb-4">🧼</div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100" data-i18n="feature3Title">Clean & Spacious</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm" data-i18n="feature3Desc">Well-maintained rooms, common areas, and modern, clean washroom facilities.</p>
+                </div>
+            </div>
+        </section>
 
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">📷/🎬</span> കമ്മ്യൂണിറ്റി മീഡിയ പങ്കിടുക</h2>
-            <p class="small">ഹോസ്റ്റലിലെ മനോഹരമായ ചിത്രങ്ങളോ വീഡിയോകളോ അപ്‌ലോഡ് ചെയ്യാം (<span style="font-weight: 700; color: var(--accent-dark);">Photo max 2MB, Video max 10MB</span>).</p>
-            <p class="user-name-display small" style="margin-bottom: 15px; color: var(--muted);"></p>
+        <!-- Amenities Section (Updated for Dark Mode) -->
+        <section id="amenities" class="section-anim">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mb-10" data-i18n="amenitiesTitle">
+                What We Offer
+            </h2>
+            <!-- Amenities Container: bg-white dark:bg-gray-800 -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-6 text-center transition-colors duration-500">
+                
+                <div class="space-y-2">
+                    <div class="text-3xl text-primary">💧</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am1">Purified Drinking Water</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl text-secondary">📶</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am2">High-Speed Free Wi-Fi</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl text-primary">🧺</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am3">Washing Machine Access</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl text-secondary">❄️</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am4">Common Area Fridge</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl text-primary">📖</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am5">Dedicated Reading Area</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl text-secondary">🔌</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am6">Power Backup (Inverter)</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl text-primary">🚿</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am7">24/7 General Water Supply</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-3xl text-secondary">🚑</div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" data-i18n="am8">First Aid Access</p>
+                </div>
+            </div>
+        </section>
 
-            <!-- Input updated to accept images AND videos -->
-            <input type="file" id="media-upload-input" accept="image/*,video/*" style="width:100%; margin-top:10px; padding:8px; border:1px solid var(--input-border); border-radius:8px;">
+        <!-- Rules Section (Updated for Dark Mode) -->
+        <section id="rules" class="section-anim">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mb-10" data-i18n="rulesTitle">
+                Hostel Rules and Regulations
+            </h2>
+            <!-- Rules Container: bg-white dark:bg-gray-800 -->
+            <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 border-t-4 border-secondary/50 transition-colors duration-500">
+                <ol id="rules-list" class="list-decimal space-y-3 pl-5 text-gray-700 dark:text-gray-300 text-base">
+                    <!-- Rules are dynamically populated by JavaScript -->
+                </ol>
+                
+                <p id="rules-declaration" class="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm font-semibold text-primary italic text-center" data-i18n="rulesDeclaration">
+                    I hereby inform the hostel management that I am ready to comply with the above-mentioned provisions based on my understanding.
+                </p>
+            </div>
+        </section>
+
+        <!-- Location & Proximity Section (Updated for Dark Mode) -->
+        <section id="location" class="section-anim">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mb-10" data-i18n="locationTitle">
+                Prime Location & Accessibility
+            </h2>
             
-            <button class="btn btn-primary" id="upload-media-btn" type="button" style="width:100%; margin-top:12px;">
-                Upload Photo/Video to Gallery
-            </button>
-            <div id="upload-status" class="small" style="margin-top: 10px; min-height: 20px;"></div>
-        `;
-        
-        setTimeout(() => {
-            const uploadButton = document.getElementById('upload-media-btn');
-            if (uploadButton) {
-                uploadButton.addEventListener('click', handleMediaUpload); // Updated function name
-            }
-        }, 100);
-        
-        return section;
-    }
+            <!-- Location Info Box: bg-primary/10 dark:bg-primary/20 -->
+            <div class="max-w-4xl mx-auto bg-primary/10 dark:bg-primary/20 rounded-xl shadow-inner p-8 mb-8 text-center transition-colors duration-500">
+                <p class="text-lg text-gray-700 dark:text-gray-300 mb-6" data-i18n="locationDescription">
+                    Amal Rahmania is strategically located for easy access to major educational and transport hubs, ensuring convenience for students and professionals.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-8">
+                    <div class="flex items-center space-x-2 text-primary">
+                        <span class="text-2xl">🏥</span>
+                        <span class="font-semibold" data-i18n="locationKottayamMedicalCollege">Near Kottayam Medical College</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-secondary">
+                        <span class="text-2xl">🚌</span>
+                        <span class="font-semibold" data-i18n="locationPrivateBusStand">Walking distance to Private Bus Stand</span>
+                    </div>
+                </div>
+            </div>
 
-    function createContactCard() {
-        const CALL_NUMBER = WHATSAPP_NUMBER_MAIN; 
-        const CALL_LINK = `tel:${CALL_NUMBER}`;
+            <!-- Embedded Map -->
+            <div class="max-w-4xl mx-auto rounded-xl overflow-hidden shadow-2xl border-4 border-primary/20">
+                <div style="width: 100%">
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=9.628944,76.520111&z=15&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; position: absolute; top: 0; left: 0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Hostel Location Map"
+                            id="location-map">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
 
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'contact';
-        
-        // This form is for WhatsApp enquiry, not for submitting to Firestore
-        const form = document.createElement('form');
-        form.style.marginTop = '20px';
-        form.addEventListener('submit', handleFormSubmit);
+        </section>
 
-        form.innerHTML = `
-            <input type="text" id="contact-name" placeholder="Your Name" required>
-            <input type="tel" id="contact-phone" placeholder="Phone Number (10 digits)" required maxlength="10">
-            <textarea id="contact-message" placeholder="Message / Enquiry (Optional)" rows="3"></textarea>
-            <button class="btn btn-primary" id="contact-submit" type="submit" style="width:100%;">Send Enquiry via WhatsApp</button>
-            <p id="form-message" class="small" style="margin-top: 10px; font-weight: bold;"></p>
-        `;
+        <!-- Contact Section (Updated for Dark Mode) -->
+        <section id="contact" class="section-anim">
+            <!-- Contact Container: bg-white dark:bg-gray-800 -->
+            <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 border-t-4 border-primary/50 transition-colors duration-500">
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mb-8" data-i18n="contactTitle">
+                    Get in Touch via WhatsApp
+                </h2>
 
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">📞</span> അഡ്മിഷൻ / കോൺടാക്റ്റ്</h2>
+                <!-- Contact Details Block (Updated for Dark Mode) -->
+                <div class="flex justify-center flex-wrap gap-6 mb-10 text-center">
+                    <div class="p-4 rounded-xl bg-primary/5 dark:bg-primary/20">
+                        <p class="text-sm font-semibold text-primary" data-i18n="callUs">Call Us</p>
+                        <a href="tel:9946716151" class="text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-secondary transition duration-150 flex items-center justify-center space-x-1">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.056 12.671a17.295 17.295 0 0 0 4.27 4.27l1.01-.137a2.16 2.16 0 0 1 2.227.426l1.242 1.242a2.16 2.16 0 0 1 0 3.055l-1.042 1.042a2.16 2.16 0 0 1-1.527.633a20.088 20.088 0 0 1-10.74-10.74a2.16 2.16 0 0 1 .633-1.527l1.042-1.042a2.16 2.16 0 0 1 3.055 0l1.242 1.242a2.16 2.16 0 0 1 .426 2.227l-.137 1.01ZM18 10a8 8 0 0 0-8-8"/>
+                            </svg>
+                            <span data-i18n="primaryPhone">9946 71 6151</span>
+                        </a>
+                        <a href="tel:9656962786" class="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-secondary transition duration-150 block mt-1">
+                            <span data-i18n="secondaryPhone">9656 96 2786</span>
+                        </a>
+                    </div>
+                    <div class="p-4 rounded-xl bg-secondary/5 dark:bg-secondary/20 flex flex-col justify-center">
+                        <p class="text-sm font-semibold text-secondary" data-i18n="hostelLocation">Location</p>
+                        <p class="text-gray-900 dark:text-gray-100 font-bold">Kottayam, Kerala</p>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">Near Medical College</p>
+                    </div>
+                </div>
+
+                <p class="text-center text-gray-600 dark:text-gray-300 mb-8" data-i18n="contactSubtitle">
+                    Fill out the form below. When you click **Send**, a pre-filled message will open directly in WhatsApp.
+                </p>
+
+                <!-- Form Message Display -->
+                <div id="form-message" class="hidden p-4 rounded-lg mb-6 text-center font-medium transition duration-300">
+                    <!-- Message content goes here -->
+                </div>
+
+                <form id="contact-form" onsubmit="handleFormSubmission(event)" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="labelName">Full Name</label>
+                        <input type="text" id="name" name="name" required
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary transition duration-150 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="labelPhone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary transition duration-150 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="labelEmail">Email Address (Optional)</label>
+                        <input type="email" id="email" name="email"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary transition duration-150 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="labelMessage">Your Inquiry Message</label>
+                        <textarea id="message" name="message" rows="4" required
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary transition duration-150 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
+                    </div>
+                    <button type="submit"
+                        class="w-full px-6 py-3 text-lg font-semibold text-white bg-whatsapp rounded-lg shadow-md hover:bg-green-600 transition duration-300 transform hover:scale-[1.01] flex items-center justify-center space-x-2" data-i18n="submitButton">
+                        <!-- WhatsApp Icon SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <span data-i18n="submitButtonText">Send Inquiry on WhatsApp</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer (Updated for Dark Mode) -->
+    <footer class="mt-16 bg-gray-900 dark:bg-black text-white p-8 sm:p-12 transition-colors duration-500">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-4 md:space-y-0">
             
-            <div class="cta" style="margin-top: 10px; margin-bottom: 25px;">
-                <a class="btn btn-primary btn-call" href="${CALL_LINK}" style="width: 100%; font-size: 18px; padding: 15px 22px;">
-                    <span style="margin-right: 8px;">☎️</span> Call Now: ${CALL_NUMBER.substring(2).replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3')}
+            <div class="flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0 text-sm">
+                <p class="text-gray-400 dark:text-gray-500" data-i18n="footerAddress">Amal Rahmania Ladies Hostel | Kottayam, Kerala</p>
+                <a href="tel:9946716151" class="text-primary hover:text-white transition duration-150 font-medium">
+                    <span data-i18n="primaryPhone">9946 71 6151</span>
+                </a>
+                <a href="tel:9656962786" class="text-primary hover:text-white transition duration-150 font-medium">
+                    <span data-i18n="secondaryPhone">9656 96 2786</span>
                 </a>
             </div>
 
-            <p class="small">ഈ ഫോം ഉപയോഗിച്ച് WhatsApp വഴി വേഗത്തിൽ ബന്ധപ്പെടുക:</p>
-            
-            <div class="contact" style="margin-top:15px">
-                <a class="tel small" href="${WHATSAPP_LINK_MAIN}" style="font-weight: 700; color: var(--accent); display:block; margin-bottom: 5px;">💬 WhatsApp Main: 9946 71 6151</a>
-                <a class="tel small" href="${WHATSAPP_LINK_ALT}" style="font-weight: 700; color: var(--accent); display:block; margin-bottom: 15px;">💬 WhatsApp Alt: 9656 96 2786</a>
-            </div>
-        `;
-        section.appendChild(form);
-        return section;
-    }
-
-
-    function createLocationCard() {
-        const section = document.createElement('section');
-        section.className = 'card scroll-animate';
-        section.id = 'section-location';
-        
-        const mapEmbedHtml = `
-            <div class="map-container" style="position: relative; height: 0;">
-                <iframe 
-                    src="${GOOGLE_MAPS_EMBED_URL}" 
-                    allowfullscreen="" 
-                    loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade"
-                    title="Amal Rahmania Ladies Hostel Location">
-                </iframe>
-            </div>
-        `;
-
-        section.innerHTML = `
-            <h2><span style="margin-right: 5px;">📍</span> ലൊക്കേഷൻ / Location</h2>
-            <p class="small">കോട്ടയം മെഡിക്കൽ കോളേജിന് സമീപം, ഗാന്ധിനഗർ. മാപ്പിൽ ലൊക്കേഷൻ കാണാം.</p>
-            ${mapEmbedHtml}
-            <p class="small" style="margin-top:10px; font-weight: 700; text-align: center; color: var(--secondary-accent);">
-                GPS കോർഡിനേറ്റ്സ്: $9^\circ37'44.2"N\ 76^\circ31'12.4"E$
+            <p class="text-sm text-gray-400 dark:text-gray-500">
+                &copy; <span id="year"></span> <span data-i18n="footerRights">All Rights Reserved.</span>
             </p>
-        `;
-        return section;
-    }
+        </div>
+    </footer>
 
-    function createFooter() {
-        const footer = document.createElement('footer');
-        footer.innerHTML = '&copy; 2025 Amal Rahmania Ladies Hostel. All rights reserved. | Kottayam, Kerala';
-        return footer;
-    }
+    <script>
+        // --- DATA AND UTILITIES ---
 
-    // --- Main Rendering Function ---
-    function renderApp() {
-        injectStyles(); 
-        
-        const body = document.body;
+        // i18n Data (Remains the same as previous version)
+        const translations = {
+            en: {
+                pageTitle: "Amal Rahmania Ladies Hostel - Safe, Secure, Serene Living",
+                hostelName: "Amal Rahmania Hostel",
+                heroTitle: "Safe, Secure, Serene Living",
+                heroSubtitle: "Your trusted residence for students and working women. Experience comfort, care, and community.",
+                enrollNow: "Inquire Now on WhatsApp",
+                featuresTitle: "Why Choose Amal Rahmania?",
+                feature1Title: "24/7 Security & Warden",
+                feature1Desc: "24/7 Warden and Security staff, CCTV Controlled Monitoring, and strict entry/exit protocols ensure complete safety.",
+                feature2Title: "Comprehensive Meal Plan",
+                feature2Desc: "Enjoy three wholesome meals, two servings of tea, and one snack daily, prepared in a hygienic kitchen.",
+                feature3Title: "Clean & Spacious",
+                feature3Desc: "Well-maintained rooms, common areas, and modern, clean washroom facilities.",
+                amenitiesTitle: "What We Offer",
+                am1: "Purified Drinking Water", 
+                am2: "High-Speed Free Wi-Fi", 
+                am3: "Washing Machine Access",
+                am4: "Common Area Fridge", 
+                am5: "Dedicated Reading Area", 
+                am6: "Power Backup (Inverter)",
+                am7: "24/7 General Water Supply",
+                am8: "First Aid Access",
+                locationTitle: "Prime Location & Accessibility",
+                locationDescription: "Amal Rahmania is strategically located for easy access to major educational and transport hubs, ensuring convenience for students and professionals.",
+                locationKottayamMedicalCollege: "Near Kottayam Medical College",
+                locationPrivateBusStand: "Walking distance to Private Bus Stand",
+                callUs: "Call Us",
+                hostelLocation: "Location",
+                primaryPhone: "9946 71 6151",
+                secondaryPhone: "9656 96 2786",
+                rulesTitle: "Hostel Rules and Regulations",
+                rulesDeclaration: "I hereby inform the hostel management that I am ready to comply with the above-mentioned provisions based on my understanding.",
+                rulesList: [
+                    "You are allowed to leave the hostel only with the permission of the warden and must register it.",
+                    "The name and address of visitors must be recorded in the register.",
+                    "If the students experience any physical or mental discomfort, they must inform the warden immediately.",
+                    "Students must maintain silence after 8 pm. They are allowed to sleep only in the rooms that are allotted to them.",
+                    "The lights in the rooms must be turned off after 10 pm. The dining hall is the place to study.",
+                    "The cleanliness of the room and the cleanliness of the bed are the personal duties of all the roommates and they must perform them properly.",
+                    "The hostel authorities have the right to inspect the rooms at any time.",
+                    "Food is prepared according to the menu decided by the management.",
+                    "At present, two people are accommodated in a room. If more students come, it can be up to four people.",
+                    "All students should take care of the cleanliness of the surroundings including public places like bathrooms, toilets, corridors, dining halls etc.",
+                    "Students should deposit items like pads, napkins etc. in the designated places.",
+                    "Students who lock their rooms should leave the keys with the warden.",
+                    "They should ensure that no activities that may disturb other students are done.",
+                    "Hostel students should give importance to their own comfort and the comfort of others. Be careful not to talk loudly or use mobile phones in a way that disturbs others.",
+                    "Make sure that fans, lights etc. are turned off after use."
+                ],
+                contactTitle: "Get in Touch via WhatsApp",
+                contactSubtitle: "Fill out the form below. When you click **Send**, a pre-filled message will open directly in WhatsApp.",
+                labelName: "Full Name", labelPhone: "Phone Number", labelEmail: "Email Address (Optional)",
+                labelMessage: "Your Inquiry Message", 
+                submitButton: "Send Inquiry on WhatsApp", // Used for the button's text content
+                successMessage: () => `WhatsApp is opening now! Please confirm and send the pre-filled message to the Warden.`,
+                errorMessage: "Please fill out all required fields correctly (Name, Phone, Message).",
+                footerAddress: "Amal Rahmania Ladies Hostel | Kottayam, Kerala",
+                footerRights: "All Rights Reserved."
+            },
+            ml: {
+                pageTitle: "അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ - സുരക്ഷിതം, ശാന്തം, സൗകര്യപ്രദം",
+                hostelName: "അമൽ റഹ്മാനിയ ഹോസ്റ്റൽ",
+                heroTitle: "സുരക്ഷിതം, ശാന്തം, സൗകര്യപ്രദം",
+                heroSubtitle: "വിദ്യാർത്ഥികൾക്കും ജോലി ചെയ്യുന്ന സ്ത്രീകൾക്കുമുള്ള നിങ്ങളുടെ വിശ്വസ്ത താമസസ്ഥലം. സൗകര്യവും കരുതലും സമൂഹവും അനുഭവിക്കുക.",
+                enrollNow: "WhatsApp വഴി ഇപ്പോൾ അന്വേഷിക്കുക",
+                featuresTitle: "അമൽ റഹ്മാനിയയെ തിരഞ്ഞെടുക്കുന്നത് എന്തുകൊണ്ട്?",
+                feature1Title: "24/7 സുരക്ഷയും വാർഡനും",
+                feature1Desc: "24/7 വാർഡനും സുരക്ഷാ ജീവനക്കാരും, സിസിടിവി നിരീക്ഷണവും, കർശനമായ പ്രവേശന/പുറത്തുകടക്കൽ പ്രോട്ടോക്കോളുകളും പൂർണ്ണ സുരക്ഷ ഉറപ്പാക്കുന്നു.",
+                feature2Title: "വിശദമായ ഭക്ഷണ പദ്ധതി",
+                feature2Desc: "ശുചിത്വമുള്ള അടുക്കളയിൽ തയ്യാറാക്കിയ മൂന്ന് മുഴുവൻ ഭക്ഷണങ്ങളും, രണ്ട് തവണ ചായയും, ഒരു പലഹാരവും ദിവസവും ആസ്വദിക്കൂ.",
+                feature3Title: "വൃത്തിയുള്ളതും വിശാലവും",
+                feature3Desc: "നന്നായി പരിപാലിക്കുന്ന മുറികൾ, പൊതു ഇടങ്ങൾ, ആധുനികവും വൃത്തിയുള്ളതുമായ വാഷ്റൂം സൗകര്യങ്ങൾ.",
+                amenitiesTitle: "ഞങ്ങൾ വാഗ്ദാനം ചെയ്യുന്നത്",
+                am1: "ശുദ്ധീകരിച്ച കുടിവെള്ളം", 
+                am2: "ഹൈ-സ്പീഡ് സൗജന്യ വൈഫൈ", 
+                am3: "വാഷിംഗ് മെഷീൻ സൗകര്യം",
+                am4: "പൊതു സ്ഥലത്തെ ഫ്രിഡ്ജ്", 
+                am5: "പ്രത്യേക വായനാ ഇടം", 
+                am6: "പവർ ബാക്കപ്പ് (ഇൻവെർട്ടർ)",
+                am7: "24/7 പൊതു ജലവിതരണം",
+                am8: "പ്രഥമ ശുശ്രൂഷാ സൗകര്യം",
+                locationTitle: "പ്രധാന ലൊക്കേഷനും പ്രവേശനക്ഷമതയും",
+                locationDescription: "പ്രധാന വിദ്യാഭ്യാസ, ഗതാഗത കേന്ദ്രങ്ങളിലേക്ക് എളുപ്പത്തിൽ പ്രവേശനം ഉറപ്പാക്കുന്ന തരത്തിൽ അമൽ റഹ്മാനിയ ഹോസ്റ്റൽ തന്ത്രപരമായി സ്ഥിതിചെയ്യുന്നു.",
+                locationKottayamMedicalCollege: "കോട്ടയം മെഡിക്കൽ കോളേജിന് സമീപം",
+                locationPrivateBusStand: "പ്രൈവറ്റ് ബസ് സ്റ്റാൻഡിലേക്ക് നടക്കാവുന്ന ദൂരം",
+                callUs: "വിളിക്കുക",
+                hostelLocation: "സ്ഥലം",
+                primaryPhone: "9946 71 6151",
+                secondaryPhone: "9656 96 2786",
+                rulesTitle: "ഹോസ്റ്റൽ നിയമങ്ങളും വ്യവസ്ഥകളും",
+                rulesDeclaration: "മേൽപ്പറഞ്ഞ വ്യവസ്ഥകൾ എൻ്റെ ധാരണയുടെ അടിസ്ഥാനത്തിൽ പാലിക്കാൻ ഞാൻ തയ്യാറാണെന്ന് ഹോസ്റ്റൽ മാനേജ്‌മെൻ്റിനെ ഇതിനാൽ അറിയിക്കുന്നു.",
+                rulesList: [
+                    "വാർഡന്റെ അനുമതിയോടെ മാത്രമേ ഹോസ്റ്റൽ വിട്ട് പുറത്തുപോകാൻ അനുവാദമുള്ളൂ, അത് രജിസ്റ്ററിൽ രേഖപ്പെടുത്തണം.",
+                    "സന്ദർശകരുടെ പേരും വിലാസവും രജിസ്റ്ററിൽ രേഖപ്പെടുത്തണം.",
+                    "വിദ്യാർത്ഥികൾക്ക് എന്തെങ്കിലും ശാരീരികമോ മാനസികമോ ആയ ബുദ്ധിമുട്ടുകൾ ഉണ്ടായാൽ, അവർ ഉടൻ തന്നെ വാർഡനെ അറിയിക്കണം.",
+                    "രാത്രി 8 മണിക്ക് ശേഷം വിദ്യാർത്ഥികൾ നിശ്ശബ്ദത പാലിക്കണം. അനുവദിച്ച മുറികളിൽ മാത്രമേ അവർക്ക് ഉറങ്ങാൻ അനുവാദമുള്ളൂ.",
+                    "രാത്രി 10 മണിക്ക് ശേഷം മുറികളിലെ ലൈറ്റുകൾ അണയ്ക്കണം. ഡൈനിംഗ് ഹാളാണ് പഠിക്കാനുള്ള സ്ഥലം.",
+                    "മുറിയുടെ ശുചിത്വവും കിടക്കയുടെ ശുചിത്വവും എല്ലാ റൂംമേറ്റ്സിന്റെയും വ്യക്തിപരമായ കടമകളാണ്, അവ അവർ ശരിയായി നിർവഹിക്കണം.",
+                    "ഹോസ്റ്റൽ അധികാരികൾക്ക് ഏത് സമയത്തും മുറികൾ പരിശോധിക്കാൻ അവകാശമുണ്ട്.",
+                    "മാനേജ്മെന്റ് തീരുമാനിക്കുന്ന മെനു അനുസരിച്ചാണ് ഭക്ഷണം തയ്യാറാക്കുന്നത്.",
+                    "നിലവിൽ, ഒരു മുറിയിൽ രണ്ട് പേരെയാണ് ഉൾക്കൊള്ളുന്നത്. കൂടുതൽ വിദ്യാർത്ഥികൾ വന്നാൽ അത് നാല് പേർ വരെയാകാം.",
+                    "ബാത്ത്റൂമുകൾ, ടോയ്‌ലെറ്റുകൾ, ഇടനാഴികൾ, ഡൈനിംഗ് ഹാളുകൾ തുടങ്ങിയ പൊതുസ്ഥലങ്ങൾ ഉൾപ്പെടെയുള്ള പരിസരത്തിന്റെ ശുചിത്വം എല്ലാ വിദ്യാർത്ഥികളും ശ്രദ്ധിക്കണം.",
+                    "പാഡുകൾ, നാപ്കിനുകൾ തുടങ്ങിയ വസ്തുക്കൾ വിദ്യാർത്ഥികൾ നിശ്ചിത സ്ഥലങ്ങളിൽ നിക്ഷേപിക്കണം.",
+                    "മുറികൾ പൂട്ടുന്ന വിദ്യാർത്ഥികൾ താക്കോൽ വാർഡനെ ഏൽപ്പിക്കണം.",
+                    "മറ്റ് വിദ്യാർത്ഥികൾക്ക് ബുദ്ധിമുട്ടുണ്ടാക്കുന്ന പ്രവർത്തനങ്ങൾ ചെയ്യുന്നില്ലെന്ന് അവർ ഉറപ്പാക്കണം.",
+                    "ഹോസ്റ്റൽ വിദ്യാർത്ഥികൾ സ്വന്തം സൗകര്യത്തിനും മറ്റുള്ളവരുടെ സൗകര്യത്തിനും പ്രാധാന്യം നൽകണം. ഉച്ചത്തിൽ സംസാരിക്കുകയോ മൊബൈൽ ഫോണുകൾ മറ്റുള്ളവർക്ക് ബുദ്ധിമുട്ടുണ്ടാക്കുന്ന രീതിയിൽ ഉപയോഗിക്കുകയോ ചെയ്യാതിരിക്കാൻ ശ്രദ്ധിക്കണം.",
+                    "ഉപയോഗശേഷം ഫാനുകൾ, ലൈറ്റുകൾ തുടങ്ങിയവ ഓഫ് ചെയ്തിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക."
+                ],
+                contactTitle: "WhatsApp വഴി ബന്ധപ്പെടുക",
+                contactSubtitle: "താഴെയുള്ള ഫോം പൂരിപ്പിക്കുക. **അയക്കുക** ക്ലിക്കുചെയ്യുമ്പോൾ, ഒരു സന്ദേശം WhatsApp-ൽ നേരിട്ട് തുറക്കും.",
+                labelName: "മുഴുവൻ പേര്", labelPhone: "ഫോൺ നമ്പർ", labelEmail: "ഇമെയിൽ വിലാസം (ഓപ്ഷണൽ)",
+                labelMessage: "നിങ്ങളുടെ അന്വേഷണ സന്ദേശം", 
+                submitButton: "WhatsApp വഴി അന്വേഷണം അയയ്ക്കുക",
+                successMessage: () => `WhatsApp ഇപ്പോൾ തുറക്കുന്നു! പ്രീ-ഫിൽ ചെയ്ത സന്ദേശം വാർഡന് അയയ്ക്കുക.`,
+                errorMessage: "ആവശ്യമായ എല്ലാ ഫീൽഡുകളും ശരിയായി പൂരിപ്പിക്കുക (പേര്, ഫോൺ, സന്ദേശം).",
+                footerAddress: "അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ | കോട്ടയം, കേരളം",
+                footerRights: "എല്ലാ അവകാശങ്ങളും നിക്ഷിപ്തം."
+            },
+            ta: {
+                pageTitle: "அமல் ரஹ்மானியா மகளிர் விடுதி - பாதுகாப்பான, அமைதியான வாழ்க்கை",
+                hostelName: "அமல் ரஹ்மானியா விடுதி",
+                heroTitle: "பாதுகாப்பான, அமைதியான வாழ்க்கை",
+                heroSubtitle: "மாணவிகள் மற்றும் பணிபுரியும் பெண்களுக்கான உங்கள் நம்பகமான குடியிருப்பு. ஆறுதல், கவனிப்பு மற்றும் சமூகத்தை அனுபவியுங்கள்.",
+                enrollNow: "WhatsApp மூலம் இப்போது விசாரிக்கவும்",
+                featuresTitle: "அமல் ரஹ்மானியாவை ஏன் தேர்வு செய்ய வேண்டும்?",
+                feature1Title: "24/7 பாதுகாப்பு மற்றும் வார்டன்",
+                feature1Desc: "24/7 வார்டன் மற்றும் பாதுகாப்பு ஊழியர்கள், சிசிடிவி கட்டுப்படுத்தப்பட்ட கண்காணிப்பு மற்றும் கடுமையான நுழைவு/வெளியேறும் நெறிமுறைகள் முழுமையான பாதுகாப்பை உறுதி செய்கின்றன.",
+                feature2Title: "விரிவான உணவுத் திட்டம்",
+                feature2Desc: "சுகாதாரமான சமையலறையில் தயாரிக்கப்பட்ட மூன்று முழுமையான உணவுகள், இரண்டு முறை தேநீர் மற்றும் ஒரு சிற்றுண்டி ஆகியவற்றை தினமும் அனுபவிக்கவும்.",
+                feature3Title: "சுத்தமான மற்றும் விசாலமான",
+                feature3Desc: "நன்கு பராமரிக்கப்படும் அறைகள், பொதுவான பகுதிகள் மற்றும் நவீன, சுத்தமான குளியலறை வசதிகள்.",
+                amenitiesTitle: "நாங்கள் வழங்குவது",
+                am1: "சுத்திகரிக்கப்பட்ட குடிநீர்", 
+                am2: "அதிவேக இலவச வைஃபை", 
+                am3: "வாஷிங் மெஷின் அணுகல்",
+                am4: "பொதுப் பகுதி குளிர்சாதனப் பெட்டி", 
+                am5: "பிரத்யேக வாசிப்புப் பகுதி", 
+                am6: "பவர் பேக்கப் (இன்வெர்ட்டர்)",
+                am7: "24/7 பொது நீர் வழங்கல்",
+                am8: "முதலுதவி அணுகல்",
+                locationTitle: "பிரதான இருப்பிடம் மற்றும் அணுகல்",
+                locationDescription: "அமல் ரஹ்மானியா விடுதி, முக்கிய கல்வி மற்றும் போக்குவரத்து மையங்களுக்கு எளிதான அணுகலை உறுதிசெய்து, மாணவிகள் மற்றும் பணியாளர்களுக்கு வசதியை அளிக்கிறது.",
+                locationKottayamMedicalCollege: "கோட்டயம் மருத்துவக் கல்லூரி அருகில்",
+                locationPrivateBusStand: "தனியார் பேருந்து நிலையத்திற்கு நடந்து செல்லும் தூரம்",
+                callUs: "எங்களை அழைக்கவும்",
+                hostelLocation: "இருப்பிடம்",
+                primaryPhone: "9946 71 6151",
+                secondaryPhone: "9656 96 2786",
+                rulesTitle: "விடுதி விதிகள் மற்றும் ஒழுங்குமுறைகள்",
+                rulesDeclaration: "எனது புரிதலின் அடிப்படையில் மேலே குறிப்பிட்டுள்ள விதிகளுக்கு இணங்க நான் தயாராக உள்ளேன் என்பதை இதன்மூலம் விடுதி நிர்வாகத்திற்கு தெரிவிக்கிறேன்.",
+                rulesList: [
+                    "வார்டனின் அனுமதியுடன் மட்டுமே விடுதியை விட்டு வெளியேற அனுமதிக்கப்படுவீர்கள், அதை பதிவேட்டில் பதிவு செய்ய வேண்டும்.",
+                    "பார்வையாளர்களின் பெயரையும் முகவரியையும் பதிவேட்டில் பதிவு செய்ய வேண்டும்.",
+                    "மாணவிகளுக்கு ஏதேனும் உடல் அல்லது மன அசௌகரியம் ஏற்பட்டால், அவர்கள் உடனடியாக வார்டனுக்குத் தெரிவிக்க வேண்டும்.",
+                    "இரவு 8 மணிக்கு மேல் மாணவர்கள் அமைதி காக்க வேண்டும். அவர்களுக்கு ஒதுக்கப்பட்ட அறைகளில் மட்டுமே தூங்க அனுமதிக்கப்படுவார்கள்.",
+                    "இரவு 10 மணிக்கு மேல் அறைகளில் உள்ள விளக்குகளை அணைக்க வேண்டும். டைனிங் ஹால் படிக்க வேண்டிய இடமாகும்.",
+                    "அறையின் தூய்மை மற்றும் படுக்கையின் தூய்மை ஆகியவை அனைத்து அறை தோழிகளின் தனிப்பட்ட கடமையாகும், அவற்றை அவர்கள் சரியாக செய்ய வேண்டும்.",
+                    "விடுதி அதிகாரிகளுக்கு எந்த நேரத்திலும் அறைகளை ஆய்வு செய்ய உரிமை உண்டு.",
+                    "நிர்வாகம் தீர்மானிக்கும் மெனுவின் படி உணவு தயாரிக்கப்படுகிறது.",
+                    "தற்போது, ​​ஒரு அறையில் இரண்டு பேர் தங்க வைக்கப்பட்டுள்ளனர். கூடுதல் மாணவர்கள் வந்தால், அது நான்கு பேர் வரை இருக்கலாம்.",
+                    "குளியலறைகள், கழிப்பறைகள், நடைபாதைகள், உணவருந்தும் கூடங்கள் போன்ற பொது இடங்கள் உட்பட சுற்றுப்புறத்தின் தூய்மையை அனைத்து மாணவிகளும் கவனிக்க வேண்டும்.",
+                    "பேட்கள், நாப்கின்கள் போன்ற பொருட்களை மாணவர்கள் ஒதுக்கப்பட்ட இடங்களில் அப்புறப்படுத்த வேண்டும்.",
+                    "தங்கள் அறைகளைப் பூட்டும் மாணவர்கள் சாவிகளை வார்டனிடம் ஒப்படைக்க வேண்டும்.",
+                    "மற்ற மாணவிகளுக்கு இடையூறு விளைவிக்கும் செயல்கள் எதுவும் செய்யப்படவில்லை என்பதை அவர்கள் உறுதி செய்ய வேண்டும்.",
+                    "விடுதி மாணவிகள் தங்கள் சொந்த வசதிக்கும் மற்றவர்களின் வசதிக்கும் முக்கியத்துவம் கொடுக்க வேண்டும். சத்தமாகப் பேசுவதையோ அல்லது மொபைல் போன்களைப் பயன்படுத்துவதையோ தவிர்க்க வேண்டும்.",
+                    "பயன்படுத்திய பிறகு மின்விசிறிகள், விளக்குகள் போன்றவற்றை அணைக்கப்பட்டுள்ளதை உறுதிப்படுத்தவும்."
+                ],
+                contactTitle: "WhatsApp மூலம் தொடர்பில் இருங்கள்",
+                contactSubtitle: "கீழே உள்ள படிவத்தை நிரப்பவும். நீங்கள் **அனுப்பு** என்பதைக் கிளிக் செய்யும்போது, ​​முன்பே நிரப்பப்பட்ட செய்தி WhatsApp-ல் நேரடியாகத் திறக்கும்.",
+                labelName: "முழு பெயர்", labelPhone: "தொலைபேசி எண்", labelEmail: "மின்னஞ்சல் முகவரி (விரும்பினால்)",
+                labelMessage: "உங்கள் விசாரணைச் செய்தி", 
+                submitButton: "WhatsApp மூலம் விசாரணையை அனுப்பு",
+                successMessage: () => `WhatsApp இப்போது திறக்கிறது! முன் நிரப்பப்பட்ட செய்தியை வார்டனுக்கு உறுதிசெய்து அனுப்பவும்.`,
+                errorMessage: "தேவையான அனைத்து புலங்களையும் சரியாக நிரப்பவும் (பெயர், தொலைபேசி, செய்தி).",
+                footerAddress: "அமல் ரஹ்மானியா மகளிர் விடுதி | கோட்டயம், கேரளா",
+                footerRights: "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை."
+            },
+            hi: {
+                pageTitle: "अमल रहमानी देवियो का हॉस्टल - सुरक्षित, सुनिश्चित, शांत जीवन",
+                hostelName: "अमल रहमानी हॉस्टल",
+                heroTitle: "सुरक्षित, सुनिश्चित, शांत जीवन",
+                heroSubtitle: "छात्राओं और कामकाजी महिलाओं के लिए आपका विश्वसनीय निवास। आराम, देखभाल और समुदाय का अनुभव करें।",
+                enrollNow: "WhatsApp के माध्यम से अभी पूछताछ करें",
+                featuresTitle: "अमल रहमानी को क्यों चुनें?",
+                feature1Title: "24/7 सुरक्षा और वार्डन",
+                feature1Desc: "24/7 वार्डन और सुरक्षा कर्मचारी, सीसीटीवी नियंत्रित निगरानी, ​​और सख्त प्रवेश/निकास प्रोटोकॉल पूर्ण सुरक्षा सुनिश्चित करते हैं।",
+                feature2Title: "व्यापक भोजन योजना",
+                feature2Desc: "स्वच्छ रसोई में तैयार किए गए तीन पौष्टिक भोजन, दो बार चाय, और एक नाश्ता प्रतिदिन आनंद लें।",
+                feature3Title: "स्वच्छ और विशाल",
+                feature3Desc: "सुव्यवस्थित कमरे, सामान्य क्षेत्र, और आधुनिक, स्वच्छ वॉशरूम सुविधाएं।",
+                amenitiesTitle: "हम क्या प्रदान करते हैं",
+                am1: "शुद्ध पीने का पानी", 
+                am2: "हाई-स्पीड मुफ्त वाई-फाई", 
+                am3: "वॉशिंग मशीन की सुविधा",
+                am4: "सामान्य क्षेत्र फ्रिज", 
+                am5: "समर्पित अध्ययन क्षेत्र", 
+                am6: "पावर बैकअप (इन्वर्टर)",
+                am7: "24/7 सामान्य जल आपूर्ति",
+                am8: "प्राथमिक उपचार की सुविधा",
+                locationTitle: "मुख्य स्थान और पहुंच",
+                locationDescription: "अमल रहमानी छात्रों और पेशेवरों के लिए सुविधा सुनिश्चित करते हुए, प्रमुख शैक्षिक और परिवहन केंद्रों तक आसान पहुंच के लिए रणनीतिक रूप से स्थित है।",
+                locationKottayamMedicalCollege: "कोट्टायम मेडिकल कॉलेज के पास",
+                locationPrivateBusStand: "निजी बस स्टैंड से पैदल दूरी पर",
+                callUs: "हमें कॉल करें",
+                hostelLocation: "स्थान",
+                primaryPhone: "9946 71 6151",
+                secondaryPhone: "9656 96 2786",
+                rulesTitle: "हॉस्टल नियम और विनियम",
+                rulesDeclaration: "मैं इसके द्वारा हॉस्टल प्रबंधन को सूचित करती हूँ कि मैं अपनी समझ के आधार पर उपरोक्त प्रावधानों का पालन करने के लिए तैयार हूँ।",
+                rulesList: [
+                    "वार्डन की अनुमति से ही आपको हॉस्टल से बाहर जाने की अनुमति है और इसे रजिस्टर में दर्ज करना होगा।",
+                    "आगंतुकों का नाम और पता रजिस्टर में दर्ज किया जाना चाहिए।",
+                    "यदि छात्राओं को कोई शारीरिक या मानसिक परेशानी महसूस होती है, तो उन्हें तुरंत वार्डन को सूचित करना चाहिए।",
+                    "रात 8 बजे के बाद छात्रों को शांति बनाए रखनी चाहिए। उन्हें आवंटित कमरों में ही सोने की अनुमति है।",
+                    "रात 10 बजे के बाद कमरों की लाइट बंद कर देनी चाहिए। डाइनिंग हॉल अध्ययन करने की जगह है।",
+                    "कमरे की सफाई और बिस्तर की स्वच्छता सभी रूममेट्स का व्यक्तिगत कर्तव्य है और उन्हें इसे ठीक से निभाना चाहिए।",
+                    "हॉस्टल अधिकारियों को किसी भी समय कमरों का निरीक्षण करने का अधिकार है।",
+                    "भोजन प्रबंधन द्वारा तय किए गए मेनू के अनुसार तैयार किया जाता है।",
+                    "वर्तमान में, एक कमरे में दो लोगों को ठहराया जाता है। यदि अधिक छात्र आते हैं, तो यह चार लोगों तक हो सकता है।",
+                    "बाथरूम, शौचालय, गलियारे, डाइनिंग हॉल आदि जैसे सार्वजनिक स्थानों सहित आसपास की स्वच्छता का ध्यान रखना चाहिए।",
+                    "छात्रों को पैड, नैपकिन आदि जैसी वस्तुओं को निर्धारित स्थानों पर जमा करना चाहिए।",
+                    "जो छात्र अपने कमरों को बंद करते हैं, उन्हें चाबियां वार्डन के पास छोड़नी चाहिए।",
+                    "उन्हें यह सुनिश्चित करना चाहिए कि अन्य छात्रों को परेशान करने वाली कोई भी गतिविधि न की जाए।",
+                    "हॉस्टल की छात्राओं को अपने आराम के साथ-साथ दूसरों के आराम को भी महत्व देना चाहिए। जोर से बात करने या मोबाइल फोन का उपयोग करने से बचें जिससे दूसरों को परेशानी हो।",
+                    "उपयोग के बाद पंखे, लाइटें आदि बंद कर दिए गए हैं, यह सुनिश्चित करें।"
+                ],
+                contactTitle: "WhatsApp के माध्यम से संपर्क करें",
+                contactSubtitle: "नीचे दिया गया फॉर्म भरें। जब आप **भेजें** पर क्लिक करते हैं, तो एक पूर्व-भरे हुए संदेश के साथ WhatsApp सीधे खुल जाएगा।",
+                labelName: "पूरा नाम", labelPhone: "फ़ोन नंबर", labelEmail: "ईमेल पता (वैकल्पिक)",
+                labelMessage: "आपकी पूछताछ संदेश", 
+                submitButton: "WhatsApp पर पूछताछ भेजें",
+                successMessage: () => `WhatsApp अब खुल रहा है! कृपया पूर्व-भरे हुए संदेश की पुष्टि करें और वार्डन को भेजें।`,
+                errorMessage: "कृपया सभी आवश्यक फ़ील्ड सही ढंग से भरें (नाम, फ़ोन, संदेश)।",
+                footerAddress: "अमल रहमानी देवियो का हॉस्टल | कोट्टायम, केरल",
+                footerRights: "सभी अधिकार सुरक्षित हैं।"
+            }
+        };
 
-        // 1. Create Welcome Overlay (Appears first)
-        body.appendChild(createWelcomeOverlay());
-        
-        // 2. Initialize Firebase Services
-        initializeFirebase();
+        let currentLanguage = 'en';
 
-        // 3. Append Header
-        body.appendChild(createHeader());
+        // --- THEME LOGIC ---
 
-        // 4. Create Main Container
-        const main = document.createElement('main');
-        main.className = 'container';
-
-        // 5. Create Grid
-        const gridDiv = document.createElement('div');
-        gridDiv.className = 'grid';
-
-        // Left Column (Content)
-        const leftColumn = document.createElement('div');
-        leftColumn.style.cssText = 'display: flex; flex-direction: column; gap: 40px;'; 
-        
-        leftColumn.appendChild(createHeroSection());
-        leftColumn.appendChild(createReviewsDisplaySection()); 
-        leftColumn.appendChild(createPricingAndMealsSections());
-        leftColumn.appendChild(createRulesSection());
-        leftColumn.appendChild(createGallerySection()); // Gallery moved to bottom-left for visual flow
-        
-        gridDiv.appendChild(leftColumn);
-
-        // Right Column (Sidebar)
-        const rightColumn = document.createElement('div');
-        rightColumn.style.cssText = 'display: flex; flex-direction: column; gap: 30px;'; 
-        
-        rightColumn.appendChild(createAuthCard()); // NEW: Auth Status Card
-        rightColumn.appendChild(createContactCard());
-        rightColumn.appendChild(createLocationCard());
-        rightColumn.appendChild(createReviewSubmissionCard()); 
-        rightColumn.appendChild(createMediaUploadSection()); 
-        rightColumn.appendChild(createChatCard());
-        
-        gridDiv.appendChild(rightColumn);
-        main.appendChild(gridDiv);
-        body.appendChild(main);
-        
-        // 6. Append Footer
-        body.appendChild(createFooter());
-
-        // 7. Initialize post-DOM-creation scripts
-        initializeScripts();
-    }
-
-    // --- Contact Form Logic (Same as before) ---
-    function handleFormSubmit(event) {
-        event.preventDefault();
-        
-        const name = document.getElementById('contact-name').value.trim();
-        const phoneInput = document.getElementById('contact-phone');
-        const phone = phoneInput.value.trim();
-        const message = document.getElementById('contact-message').value.trim();
-        const formMessage = document.getElementById('form-message');
-        const phoneRegex = /^\d{10}$/;
-
-        if (!phoneInput || !formMessage) return;
-
-        if (!phoneRegex.test(phone)) {
-            phoneInput.classList.add('error');
-            formMessage.style.color = 'var(--accent-dark)';
-            formMessage.innerText = '⚠️ ദയവായി 10 അക്കമുള്ള ഫോൺ നമ്പർ നൽകുക.';
-            return;
+        /**
+         * Applies the 'dark' class to the HTML root element.
+         * @param {boolean} isDark - True to enable dark mode, false for light mode.
+         */
+        function applyTheme(isDark) {
+            const html = document.documentElement;
+            if (isDark) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
         }
 
-        phoneInput.classList.remove('error');
+        /**
+         * Checks system preference and sets up the listener for theme changes.
+         */
+        function initializeTheme() {
+            // Check for user's system preference for dark color scheme
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 
-        const waMessage = encodeURIComponent(`Amal Rahmania Hostel Enquiry\n\nName: ${name}\nPhone: ${phone}\nMessage: ${message}`);
-        const waLink = `https://wa.me/919946716151?text=${waMessage}`; 
+            // 1. Initial load check
+            applyTheme(prefersDark.matches);
 
-        window.open(waLink, '_blank');
+            // 2. Listener for system preference changes (automatic switch)
+            prefersDark.addEventListener('change', (e) => {
+                applyTheme(e.matches);
+            });
+        }
 
-        document.getElementById('contact-name').value = '';
-        document.getElementById('contact-phone').value = '';
-        document.getElementById('contact-message').value = '';
-        
-        formMessage.style.color = 'var(--secondary-dark)';
-        formMessage.innerText = '✅ WhatsApp തുറന്നിരിക്കുന്നു! ദയവായി മെസ്സേജ് അയക്കുക.';
-        
-        setTimeout(() => formMessage.innerText = '', 5000);
-    }
 
-    // --- Welcome Animation Logic (UPDATED) ---
-    function setupWelcomeAnimation() {
-        const overlay = document.getElementById('welcome-overlay');
-        const textElement = document.getElementById('animated-welcome-text');
-        const welcomeText = "Welcome to Amal Rahmania";
-        
-        if (!overlay || !textElement) return;
-        
-        // Start typing effect immediately
-        typeResponse(textElement, welcomeText, 70); // Slightly slower typing for effect
-        
-        let hasScrolled = false;
+        // --- I18N AND UTILITIES ---
 
-        // Function to hide the overlay
-        function hideOverlay() {
-            if (overlay.classList.contains('fade-out')) return; 
+        function applyTranslations() {
+            const lang = translations[currentLanguage];
 
-            overlay.classList.add('fade-out');
-            
-            setTimeout(() => {
-                if(overlay.parentNode) {
-                    overlay.parentNode.removeChild(overlay);
+            // 1. Translate static text elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (key === 'submitButton') {
+                    // Handle special case for the submit button text
+                    el.querySelector('span').textContent = lang.submitButton;
+                    return;
                 }
-            }, 1100);
+                if (typeof lang[key] === 'function') {
+                    return; // Skip functions
+                }
+                if (lang[key]) {
+                    el.textContent = lang[key];
+                }
+            });
             
-            // Cleanup listeners
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('touchmove', handleScroll);
-            clearTimeout(timeoutId);
-        }
-        
-        function handleScroll() {
-             if (!hasScrolled) {
-                hasScrolled = true;
-                hideOverlay();
-            }
-        }
-
-        // 1. Initial Timeout: Guarantee removal after 4 seconds (to allow typing to finish and pause)
-        const timeoutId = setTimeout(() => {
-            if (!hasScrolled) {
-                 hideOverlay();
-            }
-        }, 4000); 
-
-        // 2. Scroll and Touch Listeners: Hide immediately on user interaction
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('touchmove', handleScroll, { passive: true });
-    }
-
-    // --- Scroll Animation Logic (Same as before) ---
-    function checkVisibility() {
-        const elements = document.querySelectorAll('.scroll-animate');
-        elements.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            if (rect.top < window.innerHeight - 200) { // Check slightly higher for a smoother start
-                el.classList.add('is-visible');
-            }
-        });
-    }
-
-    // --- Gemini Chat Logic (Same as before) ---
-    function setupGeminiChat() {
-        const askButton = document.getElementById('ask-button');
-        const chatInput = document.getElementById('chat-input');
-        const chatOutput = document.getElementById('chat-output');
-        const loadingSpinner = document.getElementById('loading-spinner');
-
-        if (!askButton || !chatInput || !chatOutput || !loadingSpinner) return;
-
-        function getHostelContext() {
-            const rulesList = document.getElementById('hostel-rules-list');
-            const rules = rulesList ? Array.from(rulesList.querySelectorAll('li')).map(li => li.textContent.trim()).join('; ') : '';
+            // 2. Update title separately
+            document.getElementById('page-title').textContent = lang.pageTitle;
+            document.documentElement.lang = currentLanguage;
             
-            const facilities = Array.from(document.querySelectorAll('.facilities .chip')).map(span => span.textContent.trim()).join(', ');
-
-            const mealTimingsText = `
-                പ്രഭാത ഭക്ഷണം (Breakfast): 7 am - 8 am; 
-                ഉച്ചഭക്ഷണം (Lunch): 12 pm - 2 pm;
-                വൈകുന്നേരം ചായ (Evening Tea): 4 pm - 5 pm;
-                ഡിന്നർ (Dinner): 7 pm - 8 pm
-            `;
-
-            const outPassTime = "രാത്രി 8 മണിവരെ."; 
-
-            const context = `
-                ഹോസ്റ്റലിൻ്റെ പേര്: അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ.
-                സ്ഥലം: കോട്ടയം മെഡിക്കൽ കോളേജിനടുത്ത്.
-                റൂം കപ്പാസിറ്റി: നിലവിൽ ഒരു മുറിയിൽ 3 പേർക്കാണ് താമസം. വിദ്യാർത്ഥിനികൾ കൂടുതൽ വന്നാൽ 4 പേർ വരെ ആകാം.
-                വാടക: ₹6,500/മാസം, Deposit: ₹5,000.
-                സൗകര്യങ്ങൾ: ${facilities}.
-                ഭക്ഷണ സമയക്രമം: ${mealTimingsText}. ഔട്ട് പാസ് സമയം: ${outPassTime}.
-                ഹോസ്റ്റൽ നിയമങ്ങൾ: ${rules}
-            `;
-            return context;
+            // 3. Populate Rules List
+            const rulesListElement = document.getElementById('rules-list');
+            if (rulesListElement) {
+                rulesListElement.innerHTML = ''; // Clear existing rules
+                lang.rulesList.forEach(rule => {
+                    const li = document.createElement('li');
+                    li.textContent = rule;
+                    li.className = 'text-gray-700 dark:text-gray-300'; // Ensure rules list respects theme
+                    rulesListElement.appendChild(li);
+                });
+            }
         }
 
-        askButton.addEventListener('click', () => {
-            const userQuery = chatInput.value.trim();
-            if (!userQuery) {
-                typeResponse(chatOutput.querySelector('p') || chatOutput, "ദയവായി ഒരു ചോദ്യം ടൈപ്പ് ചെയ്യുക.", 20);
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            applyTranslations();
+        }
+
+        function handleFormSubmission(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const formMessage = document.getElementById('form-message');
+
+            if (!name || !phone || !message) {
+                const error = translations[currentLanguage].errorMessage;
+                formMessage.textContent = error;
+                formMessage.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+                formMessage.classList.add('bg-red-100', 'text-red-700', 'block');
                 return;
             }
 
-            const context = getHostelContext();
+            const recipientNumber = '919946716151';
+            const emailPart = email ? `\nEmail: ${email}` : '';
+            const inquiryMessage = `Hostel Inquiry - Amal Rahmania\n\nName: ${name}\nPhone: ${phone}${emailPart}\n\nMessage: ${message}`;
             
-            const systemPrompt = "നിങ്ങൾ അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റലിൻ്റെ സന്തോഷവതിയായ ഒരു കസ്റ്റമർ സർവീസ് അസിസ്റ്റന്റാണ്. നൽകിയിട്ടുള്ള വിവരങ്ങൾ മാത്രം ഉപയോഗിച്ച് മലയാളത്തിൽ മറുപടി നൽകുക. മറുപടിയിൽ ചോദ്യത്തെക്കുറിച്ച് പ്രതിപാദിക്കുകയും, ഹോസ്റ്റലിൽ താമസം തുടങ്ങാൻ അവരെ ക്ഷണിക്കുകയും ചെയ്യുക. വിവരങ്ങൾ ലഭ്യമല്ലെങ്കിൽ, 'കൂടുതൽ വിവരങ്ങൾ അറിയാൻ മാനേജ്‌മെൻ്റുമായി ബന്ധപ്പെടുക' എന്ന് പറയുക. മറുപടി സൗഹാർദ്ദപരവും സംക്ഷിപ്തവുമായിരിക്കണം.";
+            const encodedMessage = encodeURIComponent(inquiryMessage);
+            const whatsappUrl = `https://wa.me/${recipientNumber}?text=${encodedMessage}`;
+
+            window.open(whatsappUrl, '_blank');
+
+            const successText = translations[currentLanguage].successMessage();
             
-            const fullQuery = `Context: ${context} \n\nUser Question: ${userQuery}`;
+            formMessage.textContent = successText;
+            formMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+            formMessage.classList.add('bg-green-100', 'text-green-700', 'block');
 
-            chatOutput.innerHTML = '<p></p>'; 
-            const outputParagraph = chatOutput.querySelector('p');
+            form.reset(); 
 
-            loadingSpinner.style.display = 'block';
-            askButton.disabled = true;
+            setTimeout(() => {
+                formMessage.classList.add('hidden');
+            }, 5000);
+        }
 
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        function showTime() {
+            const now = new Date();
+            const istTime = now.toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata', 
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+            document.getElementById('currentTime').innerHTML = istTime + ' IST';
+        }
 
-            const payload = {
-                contents: [{ parts: [{ text: fullQuery }] }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-                generationConfig: {
-                    maxOutputTokens: 250, 
-                    temperature: 0.2, 
+        function checkScroll() {
+            const sections = document.querySelectorAll('.section-anim');
+            const triggerBottom = window.innerHeight * 0.8;
+
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                if (sectionTop < triggerBottom) {
+                    section.classList.add('show');
+                } else {
+                    section.classList.remove('show'); 
                 }
-            };
+            });
+        }
 
-            const maxRetries = 3;
-            let retryCount = 0;
+        // --- INITIALIZATION ---
 
-            async function callGeminiApi() {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+        window.onload = function() {
+            // Initialize Theme first
+            initializeTheme();
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
+            // Set current year in footer
+            document.getElementById('year').textContent = new Date().getFullYear();
 
-                    const result = await response.json();
-                    
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "മറുപടി ലഭ്യമായില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.";
-                    
-                    typeResponse(outputParagraph, text.trim());
-
-                } catch (error) {
-                    if (retryCount < maxRetries) {
-                        retryCount++;
-                        const delay = Math.pow(2, retryCount) * 1000; 
-                        setTimeout(callGeminiApi, delay);
-                    } else {
-                        outputParagraph.innerHTML = 'മറുപടി ലഭ്യമാക്കുന്നതിൽ പിശക് സംഭവിച്ചു. ദയവായി മാനേജ്‌മെൻ്റുമായി നേരിട്ട് ബന്ധപ്പെടുക.';
-                        outputParagraph.style.color = 'var(--accent-dark)';
-                    }
-                } finally {
-                    loadingSpinner.style.display = 'none';
-                    askButton.disabled = false;
-                    chatInput.value = ''; 
-                }
+            // Initialize language setting
+            const initialLang = document.getElementById('language-select').value;
+            if (initialLang && translations[initialLang]) {
+                currentLanguage = initialLang;
+            } else {
+                currentLanguage = 'en';
+                document.getElementById('language-select').value = 'en';
             }
-            callGeminiApi();
-        });
-    }
+            applyTranslations(); 
 
-    // --- Initialize all event listeners and post-DOM content ---
-    function initializeScripts() {
-        // Scroll Animation Listeners for content fade-in
-        window.addEventListener('load', checkVisibility);
-        window.addEventListener('scroll', checkVisibility);
-        window.addEventListener('resize', checkVisibility);
-        
-        // Setup Welcome Animation
-        setupWelcomeAnimation();
+            // Start time display
+            showTime();
+            setInterval(showTime, 1000);
 
-        // Set up Gemini Chat functionality
-        setupGeminiChat();
-        
-        checkVisibility();
-    }
-    
-    // Make these functions globally accessible for the onclick attributes in the UI
-    window.signInWithGoogle = signInWithGoogle;
-    window.handleSignOut = handleSignOut;
-    
-    // Execute the main rendering function when the document structure is loaded
-    document.addEventListener('DOMContentLoaded', renderApp);
+            // Set up scroll listener for animations
+            window.addEventListener('scroll', checkScroll);
+            checkScroll(); 
+        };
 
-  </script>
+        // Expose functions globally for HTML events
+        window.switchLanguage = switchLanguage;
+        window.handleFormSubmission = handleFormSubmission;
+    </script>
 </body>
 </html>
