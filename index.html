@@ -31,732 +31,1152 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        /* Base styles for the whole page */
+        /* Apply smooth transitions to colors, background, and transform properties */
+        .transition-all-200 {
+            transition: all 200ms ease-in-out;
+        }
+
+        /* Basic styling for the entire body */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color, #f7f9fb);
-            color: var(--text-color, #1f2937);
-            transition: background-color 0.5s, color 0.5s;
-        }
-
-        /* Dark mode variables */
-        .dark {
-            --bg-color: #111827; /* Dark Mode Page Background (Gray-900) */
-            --text-color: #f3f4f6; /* Light text (Gray-100) */
-            --card-bg: #1f2937; /* Darker Card Background (Gray-800) */
-            --card-text: #f3f4f6;
-            --border-color: #374151; /* Gray-700 */
+            background-color: var(--color-bg); /* Controlled by theme switch */
         }
         
-        /* Light mode variables */
-        :root {
-            --bg-color: #f7f9fb;
-            --text-color: #1f2937;
-            --card-bg: #ffffff;
-            --card-text: #1f2937;
-            --border-color: #e5e7eb; /* Gray-200 */
-        }
-
-        /* Apply theme variables to core elements */
-        .card-bg {
-            background-color: var(--card-bg);
-            color: var(--card-text);
-            border-color: var(--border-color);
-        }
-
-        /* Utility for all transitions */
-        .transition-all {
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Animation for scroll reveal */
-        .section {
+        /* Animation setup for sections */
+        .section-content {
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transition: opacity 800ms ease-out, transform 800ms ease-out;
         }
-        .section.show {
+
+        .section-content.show {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Custom scrollbar for aesthetics */
-        /*
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* Utility for sticky header shadow */
+        .header-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        
+        /* Ensure the form elements look good in both themes */
+        .input-style {
+            transition: border-color 0.2s;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #a5b4fc; 
-            border-radius: 4px;
+        
+        .input-style:focus {
+            border-color: #4f46e5; /* Primary color */
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+            outline: none;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #818cf8; 
+
+        /* Smooth scroll for navigation */
+        html {
+            scroll-behavior: smooth;
         }
-        .dark ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #4f46e5;
-        }
-        .dark ::-webkit-scrollbar-thumb:hover {
-            background: #6366f1;
-        }
-        */
     </style>
 </head>
-<body class="transition-all min-h-screen">
-    <div id="app" class="max-w-7xl mx-auto p-4 md:p-8">
+<body class="bg-bg-light text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-all-200">
 
-        <!-- --- NAVIGATION BAR --- -->
-        <nav class="sticky top-0 z-50 transition-all card-bg p-4 rounded-xl shadow-lg flex justify-between items-center mb-8 border border-gray-200 dark:border-gray-700">
-            <!-- Logo and Title -->
-            <div class="flex items-center space-x-3">
-                <img src="uploaded:logo.png-5979adcd-76ad-4ecc-8fdc-d6d48d943c68" alt="Hostel Logo" class="h-8 w-8 rounded-full">
-                <span class="text-xl font-extrabold text-primary" data-key="nav-title">Amal Rahmania Hostel</span>
-            </div>
-            
-            <!-- Controls (Language, Theme) -->
-            <div class="flex items-center space-x-3 md:space-x-4">
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm header-shadow transition-all-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
                 
-                <!-- Language Selector -->
-                <select id="language-select" onchange="switchLanguage(this.value)" class="p-2 border border-gray-300 dark:border-gray-600 rounded-lg card-bg text-sm focus:ring-primary focus:border-primary transition-all">
-                    <option value="en">English</option>
-                    <option value="ml">മലയാളം</option>
-                    <option value="ar">العربية</option>
-                </select>
+                <!-- Logo/Title -->
+                <a href="#" class="flex-shrink-0">
+                    <span class="text-2xl font-bold text-primary dark:text-secondary" id="brand-name">Amal Rahmania Hostel</span>
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#home" class="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary px-3 py-2 font-medium rounded-md transition-all-200" id="nav-home">Home</a>
+                    <a href="#about" class="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary px-3 py-2 font-medium rounded-md transition-all-200" id="nav-about">About Us</a>
+                    <a href="#facilities" class="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary px-3 py-2 font-medium rounded-md transition-all-200" id="nav-facilities">Facilities</a>
+                    <a href="#contact" class="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary px-3 py-2 font-medium rounded-md transition-all-200" id="nav-contact">Contact</a>
+                </nav>
 
-                <!-- Dark Mode Toggle -->
-                <button id="theme-toggle" class="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-primary/20 dark:hover:bg-primary/20 transition-all focus:outline-none focus:ring-2 focus:ring-primary/50" aria-label="Toggle dark mode">
-                    <!-- Sun Icon (Light Mode) / Moon Icon (Dark Mode) -->
-                    <svg id="sun-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <svg id="moon-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
-                </button>
+                <!-- Utility Controls (Theme & Language) -->
+                <div class="flex items-center space-x-3">
+                    <!-- Language Selector -->
+                    <select id="language-select" onchange="switchLanguage(this.value)" 
+                            class="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-sm text-gray-800 dark:text-gray-200 transition-all-200">
+                        <option value="en">English</option>
+                        <option value="hi">Hindi (हिन्दी)</option>
+                        <option value="as">Assamese (অসমীয়া)</option>
+                        <option value="bn">Bengali (বাংলা)</option>
+                        <option value="brx">Bodo (बर’)</option>
+                        <option value="dgo">Dogri (डोगरी)</option>
+                        <option value="gu">Gujarati (ગુજરાતી)</option>
+                        <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                        <option value="ks">Kashmiri (کٲشُر)</option>
+                        <option value="kok">Konkani (कोंकणी)</option>
+                        <option value="mai">Maithili (मैथिली)</option>
+                        <option value="ml">Malayalam (മലയാളം)</option>
+                        <option value="mni">Manipuri (মৈতৈলোন্)</option>
+                        <option value="mr">Marathi (मराठी)</option>
+                        <option value="ne">Nepali (नेपाली)</option>
+                        <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                        <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                        <option value="sa">Sanskrit (संस्कृतम्)</option>
+                        <option value="sat">Santali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
+                        <option value="sd">Sindhi (सिन्धी)</option>
+                        <option value="ta">Tamil (தமிழ்)</option>
+                        <option value="te">Telugu (తెలుగు)</option>
+                        <option value="ur">Urdu (اُردو)</option>
+                        <option value="ar">Arabic (العربية)</option>
+                    </select>
 
-                <!-- Current Time Display -->
-                <div class="hidden lg:block text-sm text-gray-500 dark:text-gray-400">
-                    <span id="currentTime"></span>
+                    <!-- Theme Switcher -->
+                    <button onclick="toggleTheme()" 
+                            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 transition-all-200 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <svg id="theme-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Icon will be dynamically set to Moon or Sun -->
+                        </svg>
+                    </button>
+                    
+                    <!-- Mobile Menu Button (Hidden on Desktop) -->
+                    <button class="md:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-all-200">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
-        </nav>
+        </div>
+    </header>
 
-        <!-- --- HERO SECTION --- -->
-        <header id="hero" class="section p-6 md:p-12 card-bg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 mb-12">
-            <div class="flex flex-col lg:flex-row items-center justify-between space-y-8 lg:space-y-0 lg:space-x-12">
+    <!-- Main Content -->
+    <main>
+        
+        <!-- Hero Section -->
+        <section id="home" class="pt-16 pb-24 bg-gray-50 dark:bg-gray-800 transition-all-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center section-content">
+                <p id="current-time" class="text-sm text-primary dark:text-secondary mb-3 font-semibold uppercase"></p>
+                <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight" id="hero-heading">
+                    Safe, Secure, Serene Living for Lady Students
+                </h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8" id="hero-subheading">
+                    Welcome to Amal Rahmania Ladies Hostel, where we prioritize comfort, safety, and a conducive study environment.
+                </p>
+                <a href="#contact" 
+                   class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-primary hover:bg-indigo-700 dark:bg-secondary dark:hover:bg-pink-600 shadow-lg transform hover:scale-105 transition-all-200"
+                   id="hero-cta">
+                    Inquire About Availability
+                </a>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="about" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 section-content">
+                <h2 class="text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-12" id="about-heading">
+                    Our Commitment to Excellence
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <!-- Feature 1 -->
+                    <div class="bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-xl transition-all-200 hover:shadow-2xl">
+                        <div class="text-primary dark:text-secondary mb-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3" id="feature-1-title">Unmatched Safety</h3>
+                        <p class="text-gray-600 dark:text-gray-300" id="feature-1-text">24/7 security personnel, biometric access control, and CCTV surveillance ensure a safe living environment at all times.</p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-xl transition-all-200 hover:shadow-2xl">
+                        <div class="text-primary dark:text-secondary mb-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.565 23.565 0 0112 15c-3.185 0-6.223-.62-9-1.745M16 4V20m-2-4h4m-4-4h4m-4-4h4"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3" id="feature-2-title">Study Focus</h3>
+                        <p class="text-gray-600 dark:text-gray-300" id="feature-2-text">Dedicated study halls and high-speed Wi-Fi create the perfect atmosphere for academic success and concentration.</p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-xl transition-all-200 hover:shadow-2xl">
+                        <div class="text-primary dark:text-secondary mb-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20h5v-2a3 3 0 00-5.356-1.857M9 12v3m0 3h2m-2-7h2m0-6h2m-2 4h2m4-4h2m-2 4h2m-4-4h2m-2 4h2m-2 4h2m4-4h2m-2 4h2m-2 4h2m-2 4h2m4-4h2m-2 4h2m-4-4h2m-2 4h2"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3" id="feature-3-title">Comfort & Amenities</h3>
+                        <p class="text-gray-600 dark:text-gray-300" id="feature-3-text">Enjoy nutritious, wholesome meals, clean rooms, and a well-maintained laundry service for hassle-free living.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Facilities Section -->
+        <section id="facilities" class="py-24 bg-gray-50 dark:bg-gray-800 transition-all-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 section-content">
+                <h2 class="text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-12" id="facilities-heading">
+                    Modern Facilities
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                    <!-- Facility Card 1 -->
+                    <div class="p-6 bg-white dark:bg-gray-700 rounded-xl shadow-lg transition-all-200 transform hover:scale-[1.02]">
+                        <svg class="w-10 h-10 text-primary dark:text-secondary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5-6h4M3 21h18"></path></svg>
+                        <p class="text-lg font-medium dark:text-white" id="facility-1">High-Speed Wi-Fi</p>
+                    </div>
+                    <!-- Facility Card 2 -->
+                    <div class="p-6 bg-white dark:bg-gray-700 rounded-xl shadow-lg transition-all-200 transform hover:scale-[1.02]">
+                        <svg class="w-10 h-10 text-primary dark:text-secondary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m-3-4v14l3-2 3 2 3-2 3 2 3-2V6l-3 2-3-2-3 2-3-2z"></path></svg>
+                        <p class="text-lg font-medium dark:text-white" id="facility-2">Hygienic Mess</p>
+                    </div>
+                    <!-- Facility Card 3 -->
+                    <div class="p-6 bg-white dark:bg-gray-700 rounded-xl shadow-lg transition-all-200 transform hover:scale-[1.02]">
+                        <svg class="w-10 h-10 text-primary dark:text-secondary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-lg font-medium dark:text-white" id="facility-3">24-Hour Water</p>
+                    </div>
+                    <!-- Facility Card 4 -->
+                    <div class="p-6 bg-white dark:bg-gray-700 rounded-xl shadow-lg transition-all-200 transform hover:scale-[1.02]">
+                        <svg class="w-10 h-10 text-primary dark:text-secondary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.636 2.072a2 2 0 01-2.072 2.072H4a2 2 0 010-4h14.564a2 2 0 012.072 2.072z"></path></svg>
+                        <p class="text-lg font-medium dark:text-white" id="facility-4">Biometric Entry</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section id="contact" class="py-24">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 section-content">
+                <h2 class="text-4xl font-extrabold text-center text-gray-900 dark:text-white mb-12" id="contact-heading">
+                    Get in Touch
+                </h2>
+                <div class="bg-white dark:bg-gray-700 p-8 md:p-12 rounded-2xl shadow-2xl">
+                    <form onsubmit="handleFormSubmission(event)" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-200" id="label-name">Full Name</label>
+                            <input type="text" id="name" name="name" required
+                                   class="mt-1 block w-full input-style rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-200" id="label-email">Email Address</label>
+                            <input type="email" id="email" name="email" required
+                                   class="mt-1 block w-full input-style rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-200" id="label-message">Your Message</label>
+                            <textarea id="message" name="message" rows="4" required
+                                      class="mt-1 block w-full input-style rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 p-3 shadow-sm"></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" 
+                                    class="inline-flex justify-center py-3 px-6 border border-transparent text-base font-medium rounded-xl text-white bg-primary hover:bg-indigo-700 dark:bg-secondary dark:hover:bg-pink-600 shadow-md transform hover:scale-[1.02] transition-all-200"
+                                    id="submit-button">
+                                Send Inquiry
+                            </button>
+                        </div>
+                    </form>
+                    <div id="form-message" class="mt-4 text-center text-lg font-semibold hidden rounded-lg p-3" role="alert"></div>
+                </div>
                 
-                <!-- Text Content -->
-                <div class="lg:w-1/2">
-                    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight text-gray-800 dark:text-gray-100 mb-4 transition-colors duration-500" data-key="hero-heading">
-                        Welcome to <span class="text-primary">Amal Rahmania</span> Ladies Hostel
-                    </h1>
-                    <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6 transition-colors duration-500" data-key="hero-tagline">
-                        Your home away from home. Safe, Secure, and Serene Living for Students and Professionals.
-                    </p>
-                    <a href="#contact" class="inline-block px-8 py-3 bg-secondary text-white font-bold rounded-full shadow-lg hover:bg-pink-600 transition-all duration-300 transform hover:scale-105" data-key="hero-cta">
-                        Check Availability
+                <!-- WhatsApp Button -->
+                <div class="mt-8 text-center">
+                    <a href="https://wa.me/919876543210" target="_blank"
+                       class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-whatsapp hover:bg-green-600 shadow-md transform hover:scale-105 transition-all-200">
+                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.54 2 2.04 6.5 2.04 12c0 1.62.43 3.12 1.18 4.45L2.04 22l5.72-1.5c1.28.73 2.76 1.15 4.28 1.15 5.5 0 10-4.5 10-10C22.04 6.5 17.54 2 12.04 2zm0 18.2c-1.42 0-2.8-.39-4-1.12l-.28-.16-2.73.74.75-2.65-.18-.28c-.76-1.22-1.16-2.62-1.16-4.08 0-4.54 3.7-8.24 8.24-8.24s8.24 3.7 8.24 8.24c0 4.54-3.7 8.24-8.24 8.24zm4.56-6.42c-.25-.13-1.48-.73-1.71-.81-.23-.09-.39-.13-.55.13s-.63.81-.78.98c-.16.16-.31.18-.58.07-.3-.12-1.24-.46-2.36-1.46-.87-.77-1.45-1.73-1.62-2.02-.18-.29-.02-.45.1-.56s.28-.27.42-.4c.14-.13.19-.22.28-.38.09-.16.05-.31-.02-.45s-.55-1.33-.76-1.82c-.2-.48-.4-.41-.55-.42-.14-.02-.31-.02-.48-.02-.25 0-.66.07-1.01.37-.35.31-1.32 1.28-1.32 3.12 0 1.84 1.36 3.55 1.55 3.8s2.61 4.1 6.22 5.56c.86.35 1.55.56 2.09.72.93.28 1.77.25 2.44.15.74-.11 2.37-.97 2.7-1.92.34-.94.34-1.74.24-1.91-.09-.17-.34-.26-.59-.39z"/></svg>
+                        <span id="whatsapp-cta">Chat on WhatsApp</span>
                     </a>
                 </div>
-
-                <!-- Image (Updated with uploaded image) -->
-                <div class="lg:w-1/2 w-full">
-                    <img id="hero-image" 
-                         src="uploaded:main image.jpg-7b585f1-f99c-4dee-94a8-3f467bd3fdf0" 
-                         alt="Amal Rahmania Ladies Hostel Exterior view" 
-                         class="w-full h-96 md:h-[600px] object-cover rounded-xl shadow-2xl transition duration-500 ease-in-out transform hover:scale-[1.01]">
-                </div>
-            </div>
-        </header>
-
-        <!-- --- FEATURES / WHY CHOOSE US --- -->
-        <section id="features" class="section py-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 text-primary dark:text-primary" data-key="features-heading">Why Choose Us?</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                
-                <!-- Feature 1: Safety -->
-                <div class="card-bg p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all hover:shadow-2xl group">
-                    <div class="text-3xl text-secondary mb-4">
-                        <svg class="h-8 w-8 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.204A9 9 0 0121 12a9 9 0 01-8.354 4.354M4.646 15.354A9 9 0 013 12a9 9 0 018.354-4.354" /></svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100 transition-colors duration-500" data-key="feature-1-title">24/7 Security</h3>
-                    <p class="text-gray-600 dark:text-gray-300" data-key="feature-1-desc">
-                        CCTV surveillance, guarded gates, and dedicated staff ensure a secure environment around the clock.
-                    </p>
-                </div>
-
-                <!-- Feature 2: Location -->
-                <div class="card-bg p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all hover:shadow-2xl group">
-                    <div class="text-3xl text-primary mb-4">
-                        <svg class="h-8 w-8 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100" data-key="feature-2-title">Prime Location</h3>
-                    <p class="text-gray-600 dark:text-gray-300" data-key="feature-2-desc">
-                        Conveniently located near major colleges, bus stops, and essential amenities.
-                    </p>
-                </div>
-
-                <!-- Feature 3: Comfort -->
-                <div class="card-bg p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all hover:shadow-2xl group">
-                    <div class="text-3xl text-secondary mb-4">
-                        <svg class="h-8 w-8 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-10a1 1 0 011-1h6a1 1 0 011 1v10M9 21h6" /></svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100" data-key="feature-3-title">Modern Amenities</h3>
-                    <p class="text-gray-600 dark:text-gray-300" data-key="feature-3-desc">
-                        High-speed Wi-Fi, hygienic mess, clean rooms, and comfortable common areas for studying and relaxing.
-                    </p>
-                </div>
             </div>
         </section>
 
-        <!-- --- AMENITIES / FACILITIES --- -->
-        <section id="amenities" class="section py-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 text-primary dark:text-primary" data-key="amenities-heading">Our Facilities</h2>
+    </main>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
-                
-                <!-- Facility 1: Mess -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-secondary mb-2">🍽️</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-1">Hygienic Mess</p>
-                </div>
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-10 dark:bg-gray-900 transition-all-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p id="footer-text">&copy; <span id="year">2023</span> Amal Rahmania Ladies Hostel. All rights reserved.</p>
+        </div>
+    </footer>
 
-                <!-- Facility 2: Wi-Fi -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-primary mb-2">📶</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-2">High-Speed Wi-Fi</p>
-                </div>
 
-                <!-- Facility 3: Laundry -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-secondary mb-2">🧺</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-3">Laundry Service</p>
-                </div>
-
-                <!-- Facility 4: Water -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-primary mb-2">💧</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-4">24/7 Water Supply</p>
-                </div>
-
-                <!-- Facility 5: Common Area -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-primary mb-2">🛋️</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-5">Comfortable Lounge</p>
-                </div>
-
-                <!-- Facility 6: Visiting Room -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-secondary mb-2">👥</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-6">Visiting Room</p>
-                </div>
-
-                <!-- Facility 7: Parking -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-primary mb-2">🏍️</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-7">Vehicle Parking</p>
-                </div>
-                
-                <!-- Facility 8: Electricity -->
-                <div class="p-4 card-bg rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all">
-                    <div class="text-3xl text-secondary mb-2">💡</div>
-                    <p class="font-medium text-gray-800 dark:text-gray-100" data-key="amenity-8">Power Backup</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- --- GALLERY / ROOMS --- -->
-        <section id="gallery" class="section py-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 text-primary dark:text-primary" data-key="gallery-heading">Photo Gallery</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- Image 1: Room Interior (Updated with uploaded image) -->
-                <div class="relative overflow-hidden rounded-xl shadow-lg group">
-                    <img src="uploaded:room.jpg-8050484f-20ae-40fe-8934-e6b3e2deaad5" 
-                         alt="Clean and spacious room interior with beds" 
-                         class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-105">
-                    <div class="absolute inset-0 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span class="text-white text-lg font-bold p-2 bg-black/50 rounded-lg" data-key="gallery-caption-1">Spacious Rooms</span>
-                    </div>
-                </div>
-
-                <!-- Image 2: Visiting Room (Updated with uploaded image) -->
-                <div class="relative overflow-hidden rounded-xl shadow-lg group">
-                    <img src="uploaded:visiting room.jpg-8a82cdac-fb76-4db8-a846-8186f097e02c" 
-                         alt="Comfortable visitor's room or common area" 
-                         class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-105">
-                    <div class="absolute inset-0 bg-secondary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span class="text-white text-lg font-bold p-2 bg-black/50 rounded-lg" data-key="gallery-caption-2">Visitor's Area</span>
-                    </div>
-                </div>
-                
-                <!-- Image 3: Common Area Placeholder (Can be replaced later) -->
-                <div class="relative overflow-hidden rounded-xl shadow-lg group">
-                    <img src="https://placehold.co/800x600/4f46e5/ffffff?text=Study+Area" 
-                         alt="Dedicated study area for students" 
-                         class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-105">
-                    <div class="absolute inset-0 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span class="text-white text-lg font-bold p-2 bg-black/50 rounded-lg" data-key="gallery-caption-3">Study Hall</span>
-                    </div>
-                </div>
-
-                <!-- Image 4: Mess Hall Placeholder -->
-                <div class="relative overflow-hidden rounded-xl shadow-lg group">
-                    <img src="https://placehold.co/800x600/ec4899/ffffff?text=Hygienic+Mess+Hall" 
-                         alt="Clean and hygienic mess hall" 
-                         class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-105">
-                    <div class="absolute inset-0 bg-secondary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span class="text-white text-lg font-bold p-2 bg-black/50 rounded-lg" data-key="gallery-caption-4">Dining Area</span>
-                    </div>
-                </div>
-
-                <!-- Image 5: Bathroom Placeholder -->
-                <div class="relative overflow-hidden rounded-xl shadow-lg group">
-                    <img src="https://placehold.co/800x600/4f46e5/ffffff?text=Clean+Washrooms" 
-                         alt="Clean and well-maintained washrooms" 
-                         class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-105">
-                    <div class="absolute inset-0 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span class="text-white text-lg font-bold p-2 bg-black/50 rounded-lg" data-key="gallery-caption-5">Washrooms</span>
-                    </div>
-                </div>
-
-                <!-- Image 6: Exterior Placeholder (already used in hero) -->
-                <div class="relative overflow-hidden rounded-xl shadow-lg group">
-                    <img src="https://placehold.co/800x600/ec4899/ffffff?text=Secure+Entrance" 
-                         alt="Main entrance and security area" 
-                         class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-105">
-                    <div class="absolute inset-0 bg-secondary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span class="text-white text-lg font-bold p-2 bg-black/50 rounded-lg" data-key="gallery-caption-6">Main Gate</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- --- CONTACT AND ENQUIRY FORM --- -->
-        <section id="contact" class="section py-12">
-            <div class="card-bg p-6 md:p-10 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8 text-primary dark:text-primary" data-key="contact-heading">Get in Touch</h2>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-                    <!-- Contact Details -->
-                    <div>
-                        <p class="text-lg text-gray-600 dark:text-gray-300 mb-6" data-key="contact-subheading">
-                            We'd love to hear from you. Reach out to us for availability, fees, and visiting hours.
-                        </p>
-
-                        <!-- Detail Items -->
-                        <div class="space-y-4">
-                            
-                            <!-- Phone -->
-                            <div class="flex items-center space-x-3">
-                                <svg class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-3.28a1 1 0 01-.948-.684l-1.498-4.493a1 1 0 00-.502-1.21l-2.257-1.13a11.042 11.042 0 00-5.516-5.516l-1.13 2.257a1 1 0 00-.949-.684H5a2 2 0 01-2-2z" /></svg>
-                                <span class="font-medium" data-key="contact-phone-label">Phone:</span>
-                                <a href="tel:+911234567890" class="text-primary hover:text-secondary transition-colors duration-300">+91 123 456 7890</a>
-                            </div>
-
-                            <!-- Email -->
-                            <div class="flex items-center space-x-3">
-                                <svg class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                <span class="font-medium" data-key="contact-email-label">Email:</span>
-                                <a href="mailto:info@amalhostel.com" class="text-primary hover:text-secondary transition-colors duration-300">info@amalhostel.com</a>
-                            </div>
-
-                            <!-- Address -->
-                            <div class="flex items-start space-x-3">
-                                <svg class="h-6 w-6 text-secondary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                <span class="font-medium" data-key="contact-address-label">Address:</span>
-                                <p class="text-gray-600 dark:text-gray-300" data-key="contact-address-value">
-                                    Amal Rahmania Hostel, Near Main College Gate, City Road, Kozhikode, Kerala - 673001
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- WhatsApp Button -->
-                        <div class="mt-8">
-                            <a href="https://wa.me/911234567890?text=Hello%20Amal%20Rahmania%20Hostel,%20I%20am%20interested%20in%20your%20accommodation." target="_blank" class="inline-flex items-center px-6 py-3 bg-whatsapp text-white font-bold rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105">
-                                <svg class="h-6 w-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.44 1.34 4.96L2 22l5.24-1.37c1.46.79 3.1 1.24 4.8 1.24 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm4.3 14.82c-.3-.15-1.77-.87-2.06-.97-.29-.14-.5-.14-.71.14-.2.29-.82 1.4-1 1.69-.19.3-.38.32-.7.15-.31-.15-1.3-4.83-5.3-3.99-.3-.21-.52-.35-.7-.5-.21-.18-.28-.27-.2-.41.07-.15.65-.79.88-1.12.24-.33.32-.56.46-.7-.15-.3-.66-.75-.92-1.04-.24-.29-.2-.5-.19-.7-.14-.3.04-.49.27-.69.21-.19.46-.35.69-.53.22-.19.49-.33.69-.32.2.04.31.02.44.33.15.3.49 1.18.59 1.41.09.22.15.27.3.5.21.41.4.67.53.84.2.22.38.25.6.07.24-.24 1.05-3.86 1.08-4.32.03-.45-.26-.64-.46-.84-.19-.2-.46-.29-.65-.29-.18 0-.37.03-.56.03-.19 0-.52.09-.79.37-.28.28-1.07 1.06-1.07 2.58 0 1.52 1.1 2.99 1.26 3.2.16.2.29.3.54.43 1.94.97 4.1 3.51 4.5 3.73.59.35 1.04.47 1.41.6.43.15 1.01.12 1.39.07.39-.05 1.18-.48 1.34-.95.16-.47.16-.88.11-.96-.06-.09-.23-.15-.49-.28z"/></svg>
-                                <span data-key="contact-whatsapp-cta">Chat with us on WhatsApp</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Enquiry Form -->
-                    <form id="enquiry-form" onsubmit="handleFormSubmission(event)" class="space-y-4">
-                        <p id="form-message" class="hidden p-3 rounded-lg font-semibold text-center" role="alert"></p>
-
-                        <div>
-                            <label for="name" class="block text-sm font-medium mb-1 dark:text-gray-300" data-key="form-name-label">Your Name</label>
-                            <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg card-bg focus:ring-primary focus:border-primary transition-all">
-                        </div>
-
-                        <div>
-                            <label for="phone" class="block text-sm font-medium mb-1 dark:text-gray-300" data-key="form-phone-label">Phone Number (WhatsApp)</label>
-                            <input type="tel" id="phone" name="phone" required class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg card-bg focus:ring-primary focus:border-primary transition-all">
-                        </div>
-
-                        <div>
-                            <label for="email" class="block text-sm font-medium mb-1 dark:text-gray-300" data-key="form-email-label">Email Address (Optional)</label>
-                            <input type="email" id="email" name="email" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg card-bg focus:ring-primary focus:border-primary transition-all">
-                        </div>
-
-                        <div>
-                            <label for="message" class="block text-sm font-medium mb-1 dark:text-gray-300" data-key="form-message-label">Enquiry Details</label>
-                            <textarea id="message" name="message" rows="4" required class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg card-bg focus:ring-primary focus:border-primary transition-all" data-key="form-message-placeholder" placeholder="I am a student/professional looking for accommodation starting from..."></textarea>
-                        </div>
-
-                        <button type="submit" class="w-full px-4 py-3 bg-primary text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-[1.01]" data-key="form-submit-cta">
-                            Submit Enquiry
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- --- MAP LOCATION --- -->
-        <section id="location" class="section py-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-8 text-primary dark:text-primary" data-key="location-heading">Find Us</h2>
-
-            <div class="card-bg p-4 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-                <div class="aspect-w-16 aspect-h-9">
-                    <!-- Replace with actual map embed if available, using a placeholder iframe for now -->
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15668.083321550993!2d75.7725838!3d11.2587593!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba656fe1341c30d%3A0x27242854b42b78b5!2sKozhikode%2C%20Kerala%2C%20India!5e0!3m2!1sen!2sus!4v1687612345678!5m2!1sen!2sus" 
-                        width="100%" 
-                        height="450" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
-                        referrerpolicy="no-referrer-when-downgrade"
-                        class="w-full h-[400px] rounded-xl">
-                    </iframe>
-                </div>
-                <p class="text-center text-sm mt-4 text-gray-500 dark:text-gray-400" data-key="location-caption">
-                    We are located in a peaceful and easily accessible area near the main education hub of Kozhikode.
-                </p>
-            </div>
-        </section>
-
-        <!-- --- FOOTER --- -->
-        <footer class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-gray-600 dark:text-gray-400">
-            <p class="text-sm" data-key="footer-copyright">
-                &copy; <span id="year"></span> Amal Rahmania Ladies Hostel. All Rights Reserved.
-            </p>
-            <div class="flex justify-center space-x-4 mt-2 text-primary dark:text-primary">
-                <a href="#hero" class="hover:text-secondary transition-colors duration-300 text-sm" data-key="footer-link-1">Home</a>
-                <a href="#features" class="hover:text-secondary transition-colors duration-300 text-sm" data-key="footer-link-2">Features</a>
-                <a href="#gallery" class="hover:text-secondary transition-colors duration-300 text-sm" data-key="footer-link-3">Gallery</a>
-                <a href="#contact" class="hover:text-secondary transition-colors duration-300 text-sm" data-key="footer-link-4">Contact</a>
-            </div>
-        </footer>
-
-    </div>
-
-    <!-- --- JAVASCRIPT LOGIC (MUST BE INSIDE SCRIPT TAGS IN SINGLE FILE) --- -->
     <script>
-        // Global state for current language
-        let currentLanguage = 'en';
-
-        // --- TRANSLATIONS (i18n) ---
+        // --- TRANSLATION DATA ---
+        // Added all 22 official languages of India as requested.
         const translations = {
-            en: {
-                "page-title": "Amal Rahmania Ladies Hostel - Safe, Secure, Serene Living",
-                "nav-title": "Amal Rahmania Hostel",
-                "hero-heading": "Welcome to Amal Rahmania Ladies Hostel",
-                "hero-tagline": "Your home away from home. Safe, Secure, and Serene Living for Students and Professionals.",
-                "hero-cta": "Check Availability",
-                "features-heading": "Why Choose Us?",
-                "feature-1-title": "24/7 Security",
-                "feature-1-desc": "CCTV surveillance, guarded gates, and dedicated staff ensure a secure environment around the clock.",
-                "feature-2-title": "Prime Location",
-                "feature-2-desc": "Conveniently located near major colleges, bus stops, and essential amenities.",
-                "feature-3-title": "Modern Amenities",
-                "feature-3-desc": "High-speed Wi-Fi, hygienic mess, clean rooms, and comfortable common areas for studying and relaxing.",
-                "amenities-heading": "Our Facilities",
-                "amenity-1": "Hygienic Mess",
-                "amenity-2": "High-Speed Wi-Fi",
-                "amenity-3": "Laundry Service",
-                "amenity-4": "24/7 Water Supply",
-                "amenity-5": "Comfortable Lounge",
-                "amenity-6": "Visiting Room",
-                "amenity-7": "Vehicle Parking",
-                "amenity-8": "Power Backup",
-                "gallery-heading": "Photo Gallery",
-                "gallery-caption-1": "Spacious Rooms",
-                "gallery-caption-2": "Visitor's Area",
-                "gallery-caption-3": "Study Hall",
-                "gallery-caption-4": "Dining Area",
-                "gallery-caption-5": "Washrooms",
-                "gallery-caption-6": "Main Gate",
-                "contact-heading": "Get in Touch",
-                "contact-subheading": "We'd love to hear from you. Reach out to us for availability, fees, and visiting hours.",
-                "contact-phone-label": "Phone:",
-                "contact-email-label": "Email:",
-                "contact-address-label": "Address:",
-                "contact-address-value": "Amal Rahmania Hostel, Near Main College Gate, City Road, Kozhikode, Kerala - 673001",
-                "contact-whatsapp-cta": "Chat with us on WhatsApp",
-                "form-name-label": "Your Name",
-                "form-phone-label": "Phone Number (WhatsApp)",
-                "form-email-label": "Email Address (Optional)",
-                "form-message-label": "Enquiry Details",
-                "form-message-placeholder": "I am a student/professional looking for accommodation starting from...",
-                "form-submit-cta": "Submit Enquiry",
-                "location-heading": "Find Us",
-                "location-caption": "We are located in a peaceful and easily accessible area near the main education hub of Kozhikode.",
-                "footer-copyright": "&copy; <span id='year'></span> Amal Rahmania Ladies Hostel. All Rights Reserved.",
-                "footer-link-1": "Home",
-                "footer-link-2": "Features",
-                "footer-link-3": "Gallery",
-                "footer-link-4": "Contact",
-                "form-success": "Thank you for your enquiry! We will contact you soon.",
-                "form-error": "There was an issue submitting your enquiry. Please try again or contact us directly.",
+            'en': {
+                'page-title': 'Amal Rahmania Ladies Hostel - Safe, Secure, Serene Living',
+                'brand-name': 'Amal Rahmania Hostel',
+                'nav-home': 'Home',
+                'nav-about': 'About Us',
+                'nav-facilities': 'Facilities',
+                'nav-contact': 'Contact',
+                'hero-heading': 'Safe, Secure, Serene Living for Lady Students',
+                'hero-subheading': 'Welcome to Amal Rahmania Ladies Hostel, where we prioritize comfort, safety, and a conducive study environment.',
+                'hero-cta': 'Inquire About Availability',
+                'about-heading': 'Our Commitment to Excellence',
+                'feature-1-title': 'Unmatched Safety',
+                'feature-1-text': '24/7 security personnel, biometric access control, and CCTV surveillance ensure a safe living environment at all times.',
+                'feature-2-title': 'Study Focus',
+                'feature-2-text': 'Dedicated study halls and high-speed Wi-Fi create the perfect atmosphere for academic success and concentration.',
+                'feature-3-title': 'Comfort & Amenities',
+                'feature-3-text': 'Enjoy nutritious, wholesome meals, clean rooms, and a well-maintained laundry service for hassle-free living.',
+                'facilities-heading': 'Modern Facilities',
+                'facility-1': 'High-Speed Wi-Fi',
+                'facility-2': 'Hygienic Mess',
+                'facility-3': '24-Hour Water',
+                'facility-4': 'Biometric Entry',
+                'contact-heading': 'Get in Touch',
+                'label-name': 'Full Name',
+                'label-email': 'Email Address',
+                'label-message': 'Your Message',
+                'submit-button': 'Send Inquiry',
+                'form-success': 'Thank you! Your inquiry has been sent.',
+                'form-error': 'There was an error sending your inquiry. Please try again.',
+                'whatsapp-cta': 'Chat on WhatsApp',
+                'footer-text': 'Amal Rahmania Ladies Hostel. All rights reserved.'
             },
-            ml: {
-                "page-title": "അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ - സുരക്ഷിതം, ശാന്തമായ താമസം",
-                "nav-title": "അമൽ റഹ്മാനിയ ഹോസ്റ്റൽ",
-                "hero-heading": "അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റലിലേക്ക് സ്വാഗതം",
-                "hero-tagline": "നിങ്ങളുടെ സ്വന്തം വീട് പോലെ. വിദ്യാർത്ഥികൾക്കും പ്രൊഫഷണലുകൾക്കും സുരക്ഷിതവും ശാന്തവുമായ താമസം.",
-                "hero-cta": "ഒഴിവുകൾ പരിശോധിക്കുക",
-                "features-heading": "എന്തുകൊണ്ട് ഞങ്ങളെ തിരഞ്ഞെടുക്കണം?",
-                "feature-1-title": "24/7 സുരക്ഷ",
-                "feature-1-desc": "സിസിടിവി നിരീക്ഷണം, കാവൽ ഗേറ്റുകൾ, സമർപ്പിത സ്റ്റാഫ് എന്നിവ 24 മണിക്കൂറും സുരക്ഷിതമായ അന്തരീക്ഷം ഉറപ്പാക്കുന്നു.",
-                "feature-2-title": "മികച്ച സ്ഥാനം",
-                "feature-2-desc": "പ്രധാന കോളേജുകൾ, ബസ് സ്റ്റോപ്പുകൾ, അവശ്യ സൗകര്യങ്ങൾ എന്നിവയ്ക്ക് സമീപം സൗകര്യപ്രദമായി സ്ഥിതിചെയ്യുന്നു.",
-                "feature-3-title": "ആധുനിക സൗകര്യങ്ങൾ",
-                "feature-3-desc": "ഹൈ-സ്പീഡ് വൈ-ഫൈ, ശുചിത്വമുള്ള മെസ്, വൃത്തിയുള്ള മുറികൾ, പഠനത്തിനും വിശ്രമത്തിനുമുള്ള സുഖപ്രദമായ പൊതു ഇടങ്ങൾ.",
-                "amenities-heading": "ഞങ്ങളുടെ സൗകര്യങ്ങൾ",
-                "amenity-1": "ശുചിത്വമുള്ള മെസ്",
-                "amenity-2": "ഹൈ-സ്പീഡ് വൈ-ഫൈ",
-                "amenity-3": "അലക്കു സേവനം",
-                "amenity-4": "24/7 ജല ലഭ്യത",
-                "amenity-5": "സുഖപ്രദമായ ലോഞ്ച്",
-                "amenity-6": "വിസിറ്റിംഗ് റൂം",
-                "amenity-7": "വാഹന പാർക്കിംഗ്",
-                "amenity-8": "പവർ ബാക്കപ്പ്",
-                "gallery-heading": "ചിത്രശാല",
-                "gallery-caption-1": "വിശാലമായ മുറികൾ",
-                "gallery-caption-2": "സന്ദർശക ഇടം",
-                "gallery-caption-3": "പഠന ഹാൾ",
-                "gallery-caption-4": "ഭക്ഷണ സ്ഥലം",
-                "gallery-caption-5": "വൃത്തിയുള്ള ശുചിമുറികൾ",
-                "gallery-caption-6": "പ്രധാന ഗേറ്റ്",
-                "contact-heading": "ഞങ്ങളെ ബന്ധപ്പെടുക",
-                "contact-subheading": "നിങ്ങളിൽ നിന്ന് കേൾക്കാൻ ഞങ്ങൾ ആഗ്രഹിക്കുന്നു. ഒഴിവുകൾ, ഫീസ്, സന്ദർശന സമയം എന്നിവയ്ക്കായി ബന്ധപ്പെടുക.",
-                "contact-phone-label": "ഫോൺ:",
-                "contact-email-label": "ഇമെയിൽ:",
-                "contact-address-label": "വിലാസം:",
-                "contact-address-value": "അമൽ റഹ്മാനിയ ഹോസ്റ്റൽ, പ്രധാന കോളേജ് ഗേറ്റിന് സമീപം, സിറ്റി റോഡ്, കോഴിക്കോട്, കേരളം - 673001",
-                "contact-whatsapp-cta": "വാട്ട്‌സ്ആപ്പിൽ ഞങ്ങളുമായി ചാറ്റ് ചെയ്യുക",
-                "form-name-label": "നിങ്ങളുടെ പേര്",
-                "form-phone-label": "ഫോൺ നമ്പർ (വാട്ട്‌സ്ആപ്പ്)",
-                "form-email-label": "ഇമെയിൽ വിലാസം (ഓപ്ഷണൽ)",
-                "form-message-label": "അന്വേഷണ വിശദാംശങ്ങൾ",
-                "form-message-placeholder": "ഞാൻ ഒരു വിദ്യാർത്ഥിയാണ്/പ്രൊഫഷണലാണ്, താമസം തുടങ്ങാൻ ആഗ്രഹിക്കുന്നു...",
-                "form-submit-cta": "അന്വേഷണം സമർപ്പിക്കുക",
-                "location-heading": "ഞങ്ങളെ കണ്ടെത്തുക",
-                "location-caption": "കോഴിക്കോട്ടെ പ്രധാന വിദ്യാഭ്യാസ കേന്ദ്രത്തിന് സമീപമുള്ള ശാന്തവും എളുപ്പത്തിൽ എത്തിച്ചേരാവുന്നതുമായ സ്ഥലത്താണ് ഞങ്ങൾ സ്ഥിതി ചെയ്യുന്നത്.",
-                "footer-copyright": "&copy; <span id='year'></span> അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ. എല്ലാ അവകാശങ്ങളും നിക്ഷിപ്തം.",
-                "footer-link-1": "ഹോം",
-                "footer-link-2": "സവിശേഷതകൾ",
-                "footer-link-3": "ചിത്രശാല",
-                "footer-link-4": "ബന്ധപ്പെടുക",
-                "form-success": "നിങ്ങളുടെ അന്വേഷണത്തിന് നന്ദി! ഞങ്ങൾ ഉടൻ നിങ്ങളെ ബന്ധപ്പെടും.",
-                "form-error": "നിങ്ങളുടെ അന്വേഷണം സമർപ്പിക്കുന്നതിൽ ഒരു പ്രശ്നമുണ്ടായി. ദയവായി വീണ്ടും ശ്രമിക്കുക അല്ലെങ്കിൽ ഞങ്ങളെ നേരിട്ട് ബന്ധപ്പെടുക.",
+            'hi': { // Hindi
+                'page-title': 'अमल रहमानी महिला छात्रावास - सुरक्षित, शांत और आरामदायक जीवन',
+                'brand-name': 'अमल रहमानी छात्रावास',
+                'nav-home': 'होम',
+                'nav-about': 'हमारे बारे में',
+                'nav-facilities': 'सुविधाएँ',
+                'nav-contact': 'संपर्क करें',
+                'hero-heading': 'छात्राओं के लिए सुरक्षित, शांत और आरामदायक निवास',
+                'hero-subheading': 'अमल रहमानी महिला छात्रावास में आपका स्वागत है, जहाँ हम आराम, सुरक्षा और एक अनुकूल अध्ययन वातावरण को प्राथमिकता देते हैं।',
+                'hero-cta': 'उपलब्धता के बारे में पूछें',
+                'about-heading': 'उत्कृष्टता के प्रति हमारी प्रतिबद्धता',
+                'feature-1-title': 'अद्वितीय सुरक्षा',
+                'feature-1-text': '24/7 सुरक्षा कर्मी, बायोमेट्रिक एक्सेस कंट्रोल और सीसीटीवी निगरानी हर समय एक सुरक्षित रहने का माहौल सुनिश्चित करते हैं।',
+                'feature-2-title': 'अध्ययन पर ध्यान',
+                'feature-2-text': 'समर्पित अध्ययन हॉल और हाई-स्पीड वाई-फाई शैक्षणिक सफलता और एकाग्रता के लिए सही माहौल बनाते हैं।',
+                'feature-3-title': 'आराम और सुविधाएँ',
+                'feature-3-text': 'परेशानी मुक्त जीवन के लिए पौष्टिक, स्वास्थ्यवर्धक भोजन, स्वच्छ कमरे और एक अच्छी तरह से बनाए रखी गई लॉन्ड्री सेवा का आनंद लें।',
+                'facilities-heading': 'आधुनिक सुविधाएँ',
+                'facility-1': 'हाई-स्पीड वाई-फाई',
+                'facility-2': 'स्वच्छ भोजनालय',
+                'facility-3': '24 घंटे पानी',
+                'facility-4': 'बायोमेट्रिक प्रवेश',
+                'contact-heading': 'संपर्क में रहें',
+                'label-name': 'पूरा नाम',
+                'label-email': 'ईमेल पता',
+                'label-message': 'आपका संदेश',
+                'submit-button': 'पूछताछ भेजें',
+                'form-success': 'धन्यवाद! आपकी पूछताछ भेज दी गई है।',
+                'form-error': 'आपकी पूछताछ भेजने में एक त्रुटि थी। कृपया पुनः प्रयास करें।',
+                'whatsapp-cta': 'व्हाट्सएप पर चैट करें',
+                'footer-text': 'अमल रहमानी महिला छात्रावास। सर्वाधिकार सुरक्षित।'
             },
-            ar: {
-                "page-title": "نزل أمل رحمانيا للسيدات - سكن آمن، ومريح، وهادئ",
-                "nav-title": "نزل أمل رحمانيا",
-                "hero-heading": "أهلاً بك في نزل أمل رحمانيا للسيدات",
-                "hero-tagline": "منزلك بعيدًا عن المنزل. سكن آمن ومريح وهادئ للطالبات والمهنيات.",
-                "hero-cta": "التحقق من التوفر",
-                "features-heading": "لماذا تختارنا؟",
-                "feature-1-title": "أمن على مدار الساعة",
-                "feature-1-desc": "مراقبة بالكاميرات، وبوابات محروسة، وموظفون متخصصون يضمنون بيئة آمنة على مدار الساعة.",
-                "feature-2-title": "موقع متميز",
-                "feature-2-desc": "يقع بالقرب من الكليات الرئيسية ومحطات الحافلات والمرافق الأساسية.",
-                "feature-3-title": "مرافق حديثة",
-                "feature-3-desc": "واي فاي عالي السرعة، ومطعم صحي، وغرف نظيفة، ومناطق مشتركة مريحة للدراسة والاسترخاء.",
-                "amenities-heading": "مرافقنا",
-                "amenity-1": "مطعم صحي",
-                "amenity-2": "واي فاي عالي السرعة",
-                "amenity-3": "خدمة غسيل الملابس",
-                "amenity-4": "توفير المياه 24/7",
-                "amenity-5": "صالة مريحة",
-                "amenity-6": "غرفة الزوار",
-                "amenity-7": "مواقف للمركبات",
-                "amenity-8": "طاقة احتياطية",
-                "gallery-heading": "معرض الصور",
-                "gallery-caption-1": "غرف واسعة",
-                "gallery-caption-2": "منطقة الزوار",
-                "gallery-caption-3": "قاعة الدراسة",
-                "gallery-caption-4": "منطقة تناول الطعام",
-                "gallery-caption-5": "مغاسل نظيفة",
-                "gallery-caption-6": "البوابة الرئيسية",
-                "contact-heading": "تواصل معنا",
-                "contact-subheading": "يسعدنا أن نسمع منك. تواصل معنا للاستفسار عن التوفر والرسوم وأوقات الزيارة.",
-                "contact-phone-label": "الهاتف:",
-                "contact-email-label": "البريد الإلكتروني:",
-                "contact-address-label": "العنوان:",
-                "contact-address-value": "نزل أمل رحمانيا، بالقرب من بوابة الكلية الرئيسية، طريق المدينة، كوزيكود، كيرالا - 673001",
-                "contact-whatsapp-cta": "تحدث معنا على واتساب",
-                "form-name-label": "اسمك",
-                "form-phone-label": "رقم الهاتف (واتساب)",
-                "form-email-label": "البريد الإلكتروني (اختياري)",
-                "form-message-label": "تفاصيل الاستفسار",
-                "form-message-placeholder": "أنا طالبة/مهنية أبحث عن سكن ابتداءً من...",
-                "form-submit-cta": "إرسال الاستفسار",
-                "location-heading": "تجدنا هنا",
-                "location-caption": "يقع نزلنا في منطقة هادئة ويسهل الوصول إليها بالقرب من المركز التعليمي الرئيسي في كوزيكود.",
-                "footer-copyright": "&copy; <span id='year'></span> نزل أمل رحمانيا للسيدات. جميع الحقوق محفوظة.",
-                "footer-link-1": "الرئيسية",
-                "footer-link-2": "الميزات",
-                "footer-link-3": "المعرض",
-                "footer-link-4": "اتصل بنا",
-                "form-success": "شكرا لاستفسارك! سوف نتصل بك قريبا.",
-                "form-error": "حدث خطأ في إرسال استفسارك. يرجى المحاولة مرة أخرى أو الاتصال بنا مباشرة.",
+            'as': { // Assamese
+                'page-title': 'আমাল ৰহমানিয়া লেডিজ হোষ্টেল - সুৰক্ষিত, নিৰাপদ, শান্তিপূৰ্ণ জীৱন',
+                'brand-name': 'আমাল ৰহমানিয়া হোষ্টেল',
+                'nav-home': 'ঘৰ',
+                'nav-about': 'আমাৰ বিষয়ে',
+                'nav-facilities': 'সুবিধাসমূহ',
+                'nav-contact': 'যোগাযোগ',
+                'hero-heading': 'ছাত্ৰীসকলৰ বাবে সুৰক্ষিত, নিৰাপদ, শান্তিপূৰ্ণ জীৱন',
+                'hero-subheading': 'আমাল ৰহমানিয়া লেডিজ হোষ্টেললৈ স্বাগতম, য\'ত আমি আৰাম, সুৰক্ষা আৰু অনুকূল অধ্যয়নৰ পৰিৱেশক অগ্ৰাধিকাৰ দিওঁ।',
+                'hero-cta': 'উপলব্ধতাৰ বিষয়ে সোধক',
+                'about-heading': 'শ্ৰেষ্ঠত্বৰ প্ৰতি আমাৰ প্ৰতিশ্ৰুতি',
+                'feature-1-title': 'অতুলনীয় সুৰক্ষা',
+                'feature-1-text': '২৪/৭ সুৰক্ষা কৰ্মী, বায়োমেট্ৰিক প্ৰৱেশ নিয়ন্ত্ৰণ, আৰু চিচিটিভি নিৰীক্ষণে সকলো সময়তে এক সুৰক্ষিত জীৱন পৰিৱেশ নিশ্চিত কৰে।',
+                'feature-2-title': 'অধ্যয়নৰ ওপৰত মনোযোগ',
+                'feature-2-text': 'সমৰ্পিত অধ্যয়ন হল আৰু উচ্চ গতিৰ ৱাই-ফাইয়ে শৈক্ষিক সফলতা আৰু একাগ্রতাৰ বাবে নিখুঁত পৰিৱেশ সৃষ্টি কৰে।',
+                'feature-3-title': 'আৰাম আৰু সুবিধাসমূহ',
+                'feature-3-text': 'ঝামেলামুক্ত জীৱনৰ বাবে পুষ্টিকৰ, স্বাস্থ্যকৰ আহাৰ, পৰিষ্কাৰ কোঠা, আৰু ভালদৰে ৰক্ষণাবেক্ষণ কৰা লণ্ড্ৰী সেৱা উপভোগ কৰক।',
+                'facilities-heading': 'আধুনিক সুবিধাসমূহ',
+                'facility-1': 'উচ্চ গতিৰ ৱাই-ফাই',
+                'facility-2': 'স্বাস্থ্যকৰ মেছ',
+                'facility-3': '২৪ ঘণ্টা পানী',
+                'facility-4': 'বায়োমেট্ৰিক প্ৰৱেশ',
+                'contact-heading': 'যোগাযোগ কৰক',
+                'label-name': 'পূৰা নাম',
+                'label-email': 'ইমেইল ঠিকনা',
+                'label-message': 'আপোনাৰ বাৰ্তা',
+                'submit-button': 'জিজ্ঞাসা প্ৰেৰণ কৰক',
+                'form-success': 'ধন্যবাদ! আপোনাৰ জিজ্ঞাসা প্ৰেৰণ কৰা হৈছে।',
+                'form-error': 'আপোনাৰ জিজ্ঞাসা প্ৰেৰণ কৰোঁতে এটা ত্ৰুটি হৈছিল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।',
+                'whatsapp-cta': 'হোৱাটছএপত চাট কৰক',
+                'footer-text': 'আমাল ৰহমানিয়া লেডিজ হোষ্টেল। সকলো অধিকাৰ সংৰক্ষিত।'
             },
+            'bn': { // Bengali
+                'page-title': 'আমাল রাহমানিয়া লেডিজ হোস্টেল - নিরাপদ, সুরক্ষিত, শান্ত জীবন',
+                'brand-name': 'আমাল রাহমানিয়া হোস্টেল',
+                'nav-home': 'হোম',
+                'nav-about': 'আমাদের সম্পর্কে',
+                'nav-facilities': 'সুবিধাগুলি',
+                'nav-contact': 'যোগাযোগ',
+                'hero-heading': 'ছাত্রীদের জন্য নিরাপদ, সুরক্ষিত, শান্ত জীবনযাপন',
+                'hero-subheading': 'আমাল রাহমানিয়া লেডিজ হোস্টেলে আপনাকে স্বাগত, যেখানে আমরা আরাম, সুরক্ষা এবং একটি অনুকূল অধ্যয়ন পরিবেশকে অগ্রাধিকার দিই।',
+                'hero-cta': 'উপলভ্যতা সম্পর্কে জিজ্ঞাসা করুন',
+                'about-heading': 'উৎকর্ষের প্রতি আমাদের প্রতিশ্রুতি',
+                'feature-1-title': 'অতুলনীয় সুরক্ষা',
+                'feature-1-text': '২৪/৭ নিরাপত্তা কর্মী, বায়োমেট্রিক প্রবেশ নিয়ন্ত্রণ এবং সিসিটিভি নজরদারি সব সময় একটি নিরাপদ থাকার পরিবেশ নিশ্চিত করে।',
+                'feature-2-title': 'অধ্যয়নের উপর মনোযোগ',
+                'feature-2-text': 'সমর্পিত অধ্যয়ন হল এবং উচ্চ-গতির ওয়াই-ফাই একাডেমিক সাফল্য এবং ঘনত্বের জন্য নিখুঁত পরিবেশ তৈরি করে।',
+                'feature-3-title': 'আরাম ও সুযোগ-সুবিধা',
+                'feature-3-text': 'ঝামেলা-মুক্ত জীবনের জন্য পুষ্টিকর, স্বাস্থ্যকর খাবার, পরিষ্কার কক্ষ এবং একটি সু-রক্ষিত লন্ড্রি পরিষেবা উপভোগ করুন।',
+                'facilities-heading': 'আধুনিক সুবিধাগুলি',
+                'facility-1': 'উচ্চ-গতির ওয়াই-ফাই',
+                'facility-2': 'স্বাস্থ্যকর মেস',
+                'facility-3': '২৪ ঘন্টা জল',
+                'facility-4': 'বায়োমেট্রিক প্রবেশ',
+                'contact-heading': 'যোগাযোগ করুন',
+                'label-name': 'পুরো নাম',
+                'label-email': 'ইমেল ঠিকানা',
+                'label-message': 'আপনার বার্তা',
+                'submit-button': 'জিজ্ঞাসা পাঠান',
+                'form-success': 'ধন্যবাদ! আপনার জিজ্ঞাসা পাঠানো হয়েছে।',
+                'form-error': 'আপনার জিজ্ঞাসা পাঠানোর সময় একটি ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+                'whatsapp-cta': 'হোয়াটসঅ্যাপে চ্যাট করুন',
+                'footer-text': 'আমাল রাহমানিয়া লেডিজ হোস্টেল। সর্বস্বত্ব সংরক্ষিত।'
+            },
+            'brx': { // Bodo
+                'page-title': 'अमाल राहमानिया लाइजाँ ह\'टेल - गुवारि, गासै, शान्तिआरि जिउ',
+                'brand-name': 'अमाल राहमानिया ह\'टेल',
+                'nav-home': 'न\'',
+                'nav-about': 'जोंनि सोमोन्दै',
+                'nav-facilities': 'सुबिदाफोर',
+                'nav-contact': 'खान्थि लाग्रो',
+                'hero-heading': 'लाइजाँ फोरोंगिरिफोरनि थाखाय गुवारि, गासै, शान्तिआरि जिउ',
+                'hero-subheading': 'अमाल राहमानिया लाइजाँ ह\'टेलआव बरायनाय जाबाय, जेराव जों आराम, गुवारि आरो फोरोंनायनि थाखाय गाहाइ सुबिदाफोरखौ थोजासे होयो।',
+                'hero-cta': 'थानायनि सोमोन्दै सों',
+                'about-heading': 'फिन्नायखौ जोंनि सोमोन्दै',
+                'feature-1-title': 'गोजोनथार गुवारि',
+                'feature-1-text': '२४/७ गुवारि बेंगिरि, बायमेट्रिक हाबग्रा एबा CCTV मोनथाय हाबैनाय सुबिदाफोरखौ थोजासे होयो।',
+                'feature-2-title': 'फोरोंनायनि गेजेराव मोजां',
+                'feature-2-text': 'गुवारि फोरोंनाय हाबग्रा आरो गिबि-दान वाइ-फाइ एबा मोजां फोरोङाव गेदेर गोसोजों थांनाय।',
+                'feature-3-title': 'आराम आरो सुबिदाफोर',
+                'feature-3-text': 'आरामनि थाखाय गाहाइ जानाय जानाय, साफाइ न\'फोर, आरो मोजां लन्ड्री सुबिदाफोरखौ लानो हागोन।',
+                'facilities-heading': 'दान्दि सुबिदाफोर',
+                'facility-1': 'गिबि-दान वाइ-फाइ',
+                'facility-2': 'साफाइ जानाय',
+                'facility-3': '२४ घन्टा दै',
+                'facility-4': 'बायमेट्रिक हाब',
+                'contact-heading': 'खान्थि लाग्रो',
+                'label-name': 'साफाइ मुङा',
+                'label-email': 'इमेल खान्थि',
+                'label-message': 'नोंनि खान्थि',
+                'submit-button': 'सोंनायखौ हरो',
+                'form-success': 'साबायखर! नोंनि सोंनायखौ हरबाय।',
+                'form-error': 'नोंनि सोंनायखौ हरनायाव एसे गोरोन्थि जादों। खेबसे ट्राइ खालाम।',
+                'whatsapp-cta': 'व्हाट्सएपआव खामानि खालाम',
+                'footer-text': 'अमाल राहमानिया लाइजाँ ह\'टेल। गासै ह\'क अधिकारफोरखौ लाखिबाय।'
+            },
+            'dgo': { // Dogri
+                'page-title': 'अमल रहमानी लेडीज हॉस्टल - महफूज़, यकीन, शांति आह्',
+                'brand-name': 'अमल रहमानी हॉस्टल',
+                'nav-home': 'घर',
+                'nav-about': 'अस्सैं आह्',
+                'nav-facilities': 'सहूलियतें',
+                'nav-contact': 'राबता',
+                'hero-heading': 'लेडी स्टूडेंट्स लेई महफूज़, यकीन, शांति आह्',
+                'hero-subheading': 'अमल रहमानी लेडीज हॉस्टल च तुहाडा स्वागत है, जित्थें अस्सैं आराम, महफूज़ अते पढ़ने दा माहौल पक्का करदे आह्।',
+                'hero-cta': 'खाली होने दी जानकारी लैओ',
+                'about-heading': 'अस्सी कम्म करदे आह्',
+                'feature-1-title': 'बेहतर महफूज़',
+                'feature-1-text': '24/7 सिक्योरिटी, बायोमेट्रिक, अते CCTV निगरानी ने महफूज़ दा माहौल पक्का करदे आह्।',
+                'feature-2-title': 'पढ़ने दा धियान',
+                'feature-2-text': 'पक्के पढ़ने दे कमरे अते हाई-स्पीड वाई-फाई ने कामयाबी लेई माहौल बणांदे आह्।',
+                'feature-3-title': 'आराम अते सहूलियतें',
+                'feature-3-text': 'अच्छे खाने, साफ कमरे, अते वाशिंग दी सहूलियत ने जिंदगी महफूज़ बणांदे आह्।',
+                'facilities-heading': 'नमें सहूलियतें',
+                'facility-1': 'हाई-स्पीड वाई-फाई',
+                'facility-2': 'साफ मेस',
+                'facility-3': '24 घंटे पाणी',
+                'facility-4': 'बायोमेट्रिक प्रवेश',
+                'contact-heading': 'राबता लैओ',
+                'label-name': 'पूरा नां',
+                'label-email': 'ईमेल पता',
+                'label-message': 'तुहाडा पैगाम',
+                'submit-button': 'पूछ-गिछ भेजो',
+                'form-success': 'शुक्रिया! तुहाडी पूछ-गिछ भेजी गई।',
+                'form-error': 'पूछ-गिछ भेजदे बगत गल्ती होई। दुबारा कोशिश करो।',
+                'whatsapp-cta': 'व्हाट्सएप पर चैट करो',
+                'footer-text': 'अमल रहमानी लेडीज हॉस्टल। सारे हक्क महफूज़ आह्।'
+            },
+            'gu': { // Gujarati
+                'page-title': 'અમલ રહેમાનિયા લેડીઝ હોસ્ટેલ - સુરક્ષિત, શાંત, અને આરામદાયક જીવન',
+                'brand-name': 'અમલ રહેમાનિયા હોસ્ટેલ',
+                'nav-home': 'હોમ',
+                'nav-about': 'અમારા વિશે',
+                'nav-facilities': 'સુવિધાઓ',
+                'nav-contact': 'સંપર્ક',
+                'hero-heading': 'લેડી વિદ્યાર્થીઓ માટે સુરક્ષિત, શાંત, અને આરામદાયક જીવન',
+                'hero-subheading': 'અમલ રહેમાનિયા લેડીઝ હોસ્ટેલમાં તમારું સ્વાગત છે, જ્યાં અમે આરામ, સલામતી અને અભ્યાસ માટે અનુકૂળ વાતાવરણને પ્રાધાન્ય આપીએ છીએ.',
+                'hero-cta': 'ઉપલબ્ધતા વિશે પૂછપરછ કરો',
+                'about-heading': 'ઉત્કૃષ્ટતા પ્રત્યેની અમારી પ્રતિબદ્ધતા',
+                'feature-1-title': 'અનન્ય સલામતી',
+                'feature-1-text': '24/7 સુરક્ષા કર્મચારી, બાયોમેટ્રિક એક્સેસ કંટ્રોલ અને સીસીટીવી સર્વેલન્સ હંમેશા સુરક્ષિત રહેવાનું વાતાવરણ સુનિશ્ચિત કરે છે.',
+                'feature-2-title': 'અભ્યાસ પર ધ્યાન',
+                'feature-2-text': 'સમર્પિત સ્ટડી હોલ અને હાઇ-સ્પીડ વાઇ-ફાઇ શૈક્ષણિક સફળતા અને એકાગ્રતા માટે યોગ્ય વાતાવરણ બનાવે છે.',
+                'feature-3-title': 'આરામ અને સુવિધાઓ',
+                'feature-3-text': 'મુશ્કેલી-મુક્ત જીવન માટે પૌષ્ટિક, સ્વસ્થ ભોજન, સ્વચ્છ રૂમ અને સારી રીતે જાળવવામાં આવતી લોન્ડ્રી સેવાનો આનંદ માણો.',
+                'facilities-heading': 'આધુનિક સુવિધાઓ',
+                'facility-1': 'હાઇ-સ્પીડ વાઇ-ફાઇ',
+                'facility-2': 'સ્વચ્છ મેસ',
+                'facility-3': '24-કલાક પાણી',
+                'facility-4': 'બાયોમેટ્રિક પ્રવેશ',
+                'contact-heading': 'સંપર્કમાં રહો',
+                'label-name': 'પૂરું નામ',
+                'label-email': 'ઇમેઇલ સરનામું',
+                'label-message': 'તમારો સંદેશ',
+                'submit-button': 'પૂછપરછ મોકલો',
+                'form-success': 'આભાર! તમારી પૂછપરછ મોકલી દેવામાં આવી છે.',
+                'form-error': 'તમારી પૂછપરછ મોકલવામાં ભૂલ આવી. કૃપા કરીને ફરી પ્રયાસ કરો.',
+                'whatsapp-cta': 'વોટ્સએપ પર ચેટ કરો',
+                'footer-text': 'અમલ રહેમાનિયા લેડીઝ હોસ્ટેલ. સર્વહક સ્વાધીન.'
+            },
+            'kn': { // Kannada
+                'page-title': 'ಅಮಲ್ ರೆಹಮಾನಿಯಾ ಲೇಡೀಸ್ ಹಾಸ್ಟೆಲ್ - ಸುರಕ್ಷಿತ, ಶಾಂತಿಯುತ ಜೀವನ',
+                'brand-name': 'ಅಮಲ್ ರೆಹಮಾನಿಯಾ ಹಾಸ್ಟೆಲ್',
+                'nav-home': 'ಮುಖಪುಟ',
+                'nav-about': 'ನಮ್ಮ ಬಗ್ಗೆ',
+                'nav-facilities': 'ಸೌಲಭ್ಯಗಳು',
+                'nav-contact': 'ಸಂಪರ್ಕಿಸಿ',
+                'hero-heading': 'ವಿದ್ಯಾರ್ಥಿನಿಯರಿಗಾಗಿ ಸುರಕ್ಷಿತ, ಶಾಂತಿಯುತ ಜೀವನ',
+                'hero-subheading': 'ಅಮಲ್ ರೆಹಮಾನಿಯಾ ಲೇಡೀಸ್ ಹಾಸ್ಟೆಲ್‌ಗೆ ಸ್ವಾಗತ, ಇಲ್ಲಿ ನಾವು ಆರಾಮ, ಸುರಕ್ಷತೆ ಮತ್ತು ಅಧ್ಯಯನಕ್ಕೆ ಅನುಕೂಲಕರ ವಾತಾವರಣಕ್ಕೆ ಆದ್ಯತೆ ನೀಡುತ್ತೇವೆ.',
+                'hero-cta': 'ಲಭ್ಯತೆಯ ಬಗ್ಗೆ ವಿಚಾರಿಸಿ',
+                'about-heading': 'ಶ್ರೇಷ್ಠತೆಗೆ ನಮ್ಮ ಬದ್ಧತೆ',
+                'feature-1-title': 'ಸಾಟಿಯಿಲ್ಲದ ಸುರಕ್ಷತೆ',
+                'feature-1-text': '24/7 ಭದ್ರತಾ ಸಿಬ್ಬಂದಿ, ಬಯೋಮೆಟ್ರಿಕ್ ಪ್ರವೇಶ ನಿಯಂತ್ರಣ ಮತ್ತು ಸಿಸಿಟಿವಿ ಕಣ್ಗಾವಲು ಎಲ್ಲಾ ಸಮಯದಲ್ಲೂ ಸುರಕ್ಷಿತ ಜೀವನ ಪರಿಸರವನ್ನು ಖಚಿತಪಡಿಸುತ್ತದೆ.',
+                'feature-2-title': 'ಅಧ್ಯಯನದ ಮೇಲೆ ಗಮನ',
+                'feature-2-text': 'ಮೀಸಲಾದ ಸ್ಟಡಿ ಹಾಲ್‌ಗಳು ಮತ್ತು ಹೈ-ಸ್ಪೀಡ್ ವೈ-ಫೈ ಶೈಕ್ಷಣಿಕ ಯಶಸ್ಸು ಮತ್ತು ಏಕಾಗ್ರತೆಗೆ ಸೂಕ್ತ ವಾತಾವರಣವನ್ನು ಸೃಷ್ಟಿಸುತ್ತವೆ.',
+                'feature-3-title': 'ಆರಾಮ ಮತ್ತು ಸೌಲಭ್ಯಗಳು',
+                'feature-3-text': 'ತೊಂದರೆ-ಮುಕ್ತ ಜೀವನಕ್ಕಾಗಿ ಪೌಷ್ಟಿಕ, ಆರೋಗ್ಯಕರ ಊಟ, ಸ್ವಚ್ಛ ಕೊಠಡಿಗಳು ಮತ್ತು ಉತ್ತಮವಾಗಿ ನಿರ್ವಹಿಸಲಾದ ಲಾಂಡ್ರಿ ಸೇವೆಯನ್ನು ಆನಂದಿಸಿ.',
+                'facilities-heading': 'ಆಧುನಿಕ ಸೌಲಭ್ಯಗಳು',
+                'facility-1': 'ಹೈ-ಸ್ಪೀಡ್ ವೈ-ಫೈ',
+                'facility-2': 'ಶುಚಿತ್ವದ ಮೆಸ್',
+                'facility-3': '24-ಗಂಟೆಗಳ ನೀರು',
+                'facility-4': 'ಬಯೋಮೆಟ್ರಿಕ್ ಪ್ರವೇಶ',
+                'contact-heading': 'ಸಂಪರ್ಕದಲ್ಲಿರಿ',
+                'label-name': 'ಪೂರ್ಣ ಹೆಸರು',
+                'label-email': 'ಇಮೇಲ್ ವಿಳಾಸ',
+                'label-message': 'ನಿಮ್ಮ ಸಂದೇಶ',
+                'submit-button': 'ವಿಚಾರಣೆ ಕಳುಹಿಸಿ',
+                'form-success': 'ಧನ್ಯವಾದಗಳು! ನಿಮ್ಮ ವಿಚಾರಣೆಯನ್ನು ಕಳುಹಿಸಲಾಗಿದೆ.',
+                'form-error': 'ನಿಮ್ಮ ವಿಚಾರಣೆಯನ್ನು ಕಳುಹಿಸುವಾಗ ದೋಷ ಕಂಡುಬಂದಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+                'whatsapp-cta': 'ವಾಟ್ಸಾಪ್‌ನಲ್ಲಿ ಚಾಟ್ ಮಾಡಿ',
+                'footer-text': 'ಅಮಲ್ ರೆಹಮಾನಿಯಾ ಲೇಡೀಸ್ ಹಾಸ್ಟೆಲ್. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.'
+            },
+            'ks': { // Kashmiri
+                'page-title': 'امل رحمانی لیڈیز ہاسٹل - محفوظ، پُرمَن، پُرسَکون زندگی',
+                'brand-name': 'امل رحمانی ہاسٹل',
+                'nav-home': 'گَر',
+                'nav-about': 'اَسِہِ بارَس مَنٛز',
+                'nav-facilities': 'سہولژ',
+                'nav-contact': 'رٲبطہٕ',
+                'hero-heading': 'طالب عِلمَن خٲطرٕ محفوظ، پُرمَن، پُرسَکون زندگی',
+                'hero-subheading': 'امل رحمانی لیڈیز ہاسٹلَس مَنٛز چھُ تہندِ خیر مقدم، یِتھ پٲٹھؠ چھُ اَسِہِ سُکون، تحفُظ تہٕ پرٛوٹھَن تٲلیٖم واتاوَرَن ترجیٖح دِوان۔',
+                'hero-cta': 'دٔستیابی بارس مَنٛز وُچھِو',
+                'about-heading': 'بَہتَری خٲطرٕ اَسُن پُرتعٲہُد',
+                'feature-1-title': 'بے مِثال تحفُظ',
+                'feature-1-text': '24/7 سِکیٖوٗریٹی اَهلکار، بائیو مِٹرِک اؠکْسیس کَنٹرول، تہٕ سیٖ سیٖ ٹیٖ ویٖ نِگرٲنی چھِ سُکون یِقینی بَناوان۔',
+                'feature-2-title': 'تٲلیٖمَس پؠٹھ توَجُہ',
+                'feature-2-text': 'مُختَص تٲلیٖمی ہال تہٕ زیٛادٕ سپیٖڈ وایِ فای چھِ کٲمؠیٲبی خٲطرٕ مۄحِض بَناوان۔',
+                'feature-3-title': 'آرام تہٕ سَہولِیَتھ',
+                'feature-3-text': 'صحت مند خوٗر، صاف کَمری، تہٕ لٲنڈری سٔرٛوِس چھِ بٖغٲر مَسلہٕ زِندگی خٲطرٕ دِوان۔',
+                'facilities-heading': 'نوٚو سَہولِیَتھ',
+                'facility-1': 'زیٛادٕ سپیٖڈ وایِ فای',
+                'facility-2': 'صحت مند میس',
+                'facility-3': '24 گَنٹھَن آب',
+                'facility-4': 'بائیو مِٹرِک داخِل',
+                'contact-heading': 'رٲبطہٕ کَرِو',
+                'label-name': 'پورُ نام',
+                'label-email': 'ایٖمیل اَڈریس',
+                'label-message': 'تُہنٛد پیٖغام',
+                'submit-button': 'پوٗچھ بِژ کٔرِو',
+                'form-success': 'شُکرِیہ! تُہُنٛد پوٗچھ بِژ آو مۆکلاونہٕ۔',
+                'form-error': 'تُہُنٛد پوٗچھ بِژ مۆکلاونَس مَنٛز گٔیہِ خَطا۔ مٔہربٲنی کٔرِو دوبٲرِ کوشِش۔',
+                'whatsapp-cta': 'وَٹَس ایپَس پؠٹھ کَتھ کَرِو',
+                'footer-text': 'امل رحمانی لیڈیز ہاسٹل. سارِوٕے حق مَحفوٗظ چھِ۔'
+            },
+            'kok': { // Konkani
+                'page-title': 'अमल रहमानी लेडीज होटेल - सुरक्षित, शांत, आणि समाधानी जिवीत',
+                'brand-name': 'अमल रहमानी होटेल',
+                'nav-home': 'घर',
+                'nav-about': 'आम्हां विषयी',
+                'nav-facilities': 'सुविधा',
+                'nav-contact': 'संपर्क',
+                'hero-heading': 'लेडी विद्यार्थींका खातीर सुरक्षित, शांत, आणि समाधानी जिवीत',
+                'hero-subheading': 'अमल रहमानी लेडीज होटेलाक तुमचें स्वागत, जंय आमी आराम, सुरक्षितताय आनी अभ्यास करपा खातीर बरें वातावरण मुखेल मानतात.',
+                'hero-cta': 'उपलब्धतेविशीं विचारून घेयात',
+                'about-heading': 'उत्कृष्टतेची आमची प्रतिज्ञा',
+                'feature-1-title': 'अतुलनीय सुरक्षितताय',
+                'feature-1-text': '24/7 सुरक्षा कर्मचारी, बायोमेट्रिक प्रवेश नियंत्रण, आनी CCTV पळोवप सगळें वेळार सुरक्षित रावपाचें वातावरण निश्चीत करता.',
+                'feature-2-title': 'अभ्यासाचेर लक्ष',
+                'feature-2-text': 'खास अभ्यास हॉल आनी हाय-स्पीड वाय-फाय शैक्षणकि यश आनी एकाग्रताये खातीर योग्य वातावरण तयार करतात.',
+                'feature-3-title': 'आराम आनी सुविधा',
+                'feature-3-text': 'कष्ट नासतना जिवीत खातीर पौष्टिक, भलायकीचे जेवण, निव्वळ कोठां, आनी बरी सांभाळिल्ली लाँड्री सेवा हांचो आनंद घेयात.',
+                'facilities-heading': 'आधुनीक सुविधा',
+                'facility-1': 'हाय-स्पीड वाय-फाय',
+                'facility-2': 'स्वच्छ जेवणघर',
+                'facility-3': '24 वरां उदक',
+                'facility-4': 'बायोमेट्रिक प्रवेश',
+                'contact-heading': 'संपर्कात रावात',
+                'label-name': 'पूरा नांव',
+                'label-email': 'ईमेल पत्तो',
+                'label-message': 'तुमचो संदेश',
+                'submit-button': 'विचारप पाठोवप',
+                'form-success': 'देसून! तुमचें विचारप पाठोवन जालां.',
+                'form-error': 'तुमचें विचारप पाठोवचेन्ना एक चूक जाली. कृपा करून परत यत्न करात.',
+                'whatsapp-cta': 'व्हाट्सएपचेर गजालीं करात',
+                'footer-text': 'अमल रहमानी लेडीज होटेल. सगळे हक्क राखिल्लीं.'
+            },
+            'mai': { // Maithili
+                'page-title': 'अमल रहमानी लेडीज होस्टल - सुरक्षित, शांत, आ आरामदायक जीवन',
+                'brand-name': 'अमल रहमानी होस्टल',
+                'nav-home': 'होम',
+                'nav-about': 'हमरा बारेमे',
+                'nav-facilities': 'सुविधासभ',
+                'nav-contact': 'सम्पर्क',
+                'hero-heading': 'छात्री सभक लेल सुरक्षित, शांत, आ आरामदायक जीवन',
+                'hero-subheading': 'अमल रहमानी लेडीज होस्टलमेँ अहाँक स्वागत अछि, जतय हम सब आराम, सुरक्षा आ अनुकूल अध्ययन वातावरणकेँ प्राथमिकता दैत छी।',
+                'hero-cta': 'उपलब्धताक बारेमे पूछू',
+                'about-heading': 'उत्कृष्टताक प्रति हमर प्रतिबद्धता',
+                'feature-1-title': 'अद्वितीय सुरक्षा',
+                'feature-1-text': '24/7 सुरक्षाकर्मी, बायोमेट्रिक एक्सेस कंट्रोल आ सीसीटीवी निगरानी हर समय एकटा सुरक्षित रहबाक वातावरण सुनिश्चित करैत अछि।',
+                'feature-2-title': 'अध्ययन पर ध्यान',
+                'feature-2-text': 'समर्पित अध्ययन हॉल आ हाई-स्पीड वाई-फाई शैक्षणिक सफलता आ एकाग्रताक लेल सही माहौल बनबैत अछि।',
+                'feature-3-title': 'आराम आ सुविधासभ',
+                'feature-3-text': 'परेशानी मुक्त जीवनक लेल पौष्टिक, स्वास्थ्यवर्धक भोजन, स्वच्छ कोठरी, आ एकटा नीक सँ राखल गेल लॉन्ड्री सेवाक आनंद लिअ।',
+                'facilities-heading': 'आधुनिक सुविधासभ',
+                'facility-1': 'हाई-स्पीड वाई-फाई',
+                'facility-2': 'स्वच्छ मेस',
+                'facility-3': '24 घण्टा पानी',
+                'facility-4': 'बायोमेट्रिक प्रवेश',
+                'contact-heading': 'सम्पर्कमे रहू',
+                'label-name': 'पूरा नाम',
+                'label-email': 'ईमेल पता',
+                'label-message': 'अहाँक संदेश',
+                'submit-button': 'पूछताछ पठाउ',
+                'form-success': 'धन्यवाद! अहाँक पूछताछ पठा देल गेल अछि।',
+                'form-error': 'अहाँक पूछताछ पठाबमेँ त्रुटि भेल। कृपया फेरसँ प्रयास करू।',
+                'whatsapp-cta': 'व्हाट्सएप पर चैट करू',
+                'footer-text': 'अमल रहमानी लेडीज होस्टल। सब अधिकार सुरक्षित अछि।'
+            },
+            'ml': { // Malayalam (updated from original structure)
+                'page-title': 'അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ - സുരക്ഷിതം, ശാന്തം, സമാധാനപരമായ താമസം',
+                'brand-name': 'അമൽ റഹ്മാനിയ ഹോസ്റ്റൽ',
+                'nav-home': 'ഹോം',
+                'nav-about': 'ഞങ്ങളെക്കുറിച്ച്',
+                'nav-facilities': 'സൗകര്യങ്ങൾ',
+                'nav-contact': 'ബന്ധപ്പെടുക',
+                'hero-heading': 'ലേഡി വിദ്യാർത്ഥിനികൾക്ക് സുരക്ഷിതവും ശാന്തവുമായ താമസം',
+                'hero-subheading': 'സുഖസൗകര്യങ്ങൾ, സുരക്ഷ, പഠനത്തിന് അനുയോജ്യമായ അന്തരീക്ഷം എന്നിവയ്ക്ക് ഞങ്ങൾ മുൻഗണന നൽകുന്ന അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റലിലേക്ക് സ്വാഗതം.',
+                'hero-cta': 'ലഭ്യതയെക്കുറിച്ച് അന്വേഷിക്കുക',
+                'about-heading': 'മികവിനായുള്ള ഞങ്ങളുടെ പ്രതിബദ്ധത',
+                'feature-1-title': 'സമാനതകളില്ലാത്ത സുരക്ഷ',
+                'feature-1-text': '24/7 സുരക്ഷാ ഉദ്യോഗസ്ഥർ, ബയോമെട്രിക് പ്രവേശന നിയന്ത്രണം, സിസിടിവി നിരീക്ഷണം എന്നിവ എല്ലാ സമയത്തും സുരക്ഷിതമായ താമസ അന്തരീക്ഷം ഉറപ്പാക്കുന്നു.',
+                'feature-2-title': 'പഠന ശ്രദ്ധ',
+                'feature-2-text': 'അക്കാദമിക് വിജയത്തിനും ഏകാഗ്രതയ്ക്കും അനുയോജ്യമായ അന്തരീക്ഷം സമർപ്പിത സ്റ്റഡി ഹാളുകളും അതിവേഗ വൈ-ഫൈയും സൃഷ്ടിക്കുന്നു.',
+                'feature-3-title': 'സുഖസൗകര്യങ്ങളും സൗകര്യങ്ങളും',
+                'feature-3-text': 'ബുദ്ധിമുട്ടില്ലാത്ത ജീവിതത്തിനായി പോഷകസമൃദ്ധമായ ഭക്ഷണം, വൃത്തിയുള്ള മുറികൾ, മികച്ച രീതിയിൽ പരിപാലിക്കുന്ന അലക്കു സേവനം എന്നിവ ആസ്വദിക്കൂ.',
+                'facilities-heading': 'ആധുനിക സൗകര്യങ്ങൾ',
+                'facility-1': 'അതിവേഗ വൈ-ഫൈ',
+                'facility-2': 'ശുചിത്വമുള്ള മെസ്',
+                'facility-3': '24 മണിക്കൂർ വെള്ളം',
+                'facility-4': 'ബയോമെട്രിക് പ്രവേശനം',
+                'contact-heading': 'ബന്ധപ്പെടുക',
+                'label-name': 'പൂർണ്ണമായ പേര്',
+                'label-email': 'ഇമെയിൽ വിലാസം',
+                'label-message': 'നിങ്ങളുടെ സന്ദേശം',
+                'submit-button': 'അന്വേഷണം അയയ്ക്കുക',
+                'form-success': 'നന്ദി! നിങ്ങളുടെ അന്വേഷണം അയച്ചിരിക്കുന്നു.',
+                'form-error': 'നിങ്ങളുടെ അന്വേഷണം അയക്കുന്നതിൽ ഒരു പിശക് സംഭവിച്ചു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
+                'whatsapp-cta': 'വാട്ട്‌സ്ആപ്പിൽ ചാറ്റ് ചെയ്യുക',
+                'footer-text': 'അമൽ റഹ്മാനിയ ലേഡീസ് ഹോസ്റ്റൽ. എല്ലാ അവകാശങ്ങളും നിക്ഷിപ്തം.'
+            },
+            'mni': { // Manipuri (Meitei)
+                'page-title': 'অমল রহমানিয়া লৈরিমাশিংগী হোষ্টেল - ঙাক্লবা, য়াম্না পাম্নবা, চুমথোৎলিবা পুন্সি',
+                'brand-name': 'অমল রহমানিয়া হোষ্টেল',
+                'nav-home': 'য়ুম',
+                'nav-about': 'অহাক্কী মতাংদা',
+                'nav-facilities': 'সুবিদাশিং',
+                'nav-contact': 'হাওকক',
+                'hero-heading': 'লৈরিমা ফোরোংলবা নিংতম্না ঙাক্লবা, য়াম্না পাম্নবা, চুমথোৎলিবা পুন্সি',
+                'hero-subheading': 'অমল রহমানিয়া লৈরিমাশিংগী হোষ্টেলদা নঙোন্দা তরাম্না ওকচরি, মদুদা ঐখোয়না আরাম, ঙাক্নবগী মফম, অমদি লম্বী থুনবা ফোরোংগী মফম অমা পীরি।',
+                'hero-cta': 'য়াওবগী মতাংদা খনবা পীবীউ',
+                'about-heading': 'ফমচিংবগী মতাংদা ঐখোয়গী য়ুনুয়েন',
+                'feature-1-title': 'য়াম্না পাম্নবা ঙাক্নবগী মফম',
+                'feature-1-text': '২৪/৭ ঙাকনবা মী, বায়োমেট্রিক য়ুমদা য়ৌনবগী মফম অমদি CCTV না ঙাক্নবগী পুন্সিদা য়াম্না পাম্নবা মফম অমগা পীরি।',
+                'feature-2-title': 'ফোরোংদা থোন্দোকপা',
+                'feature-2-text': 'ফোরোংলবা হোলাশিং অমদি য়াম্না স্পীদনা চৎলবা Wi-Fi না ফোরোংগী য়ুনুয়েন অমদি মীথিবগী মফম পীরি।',
+                'feature-3-title': 'আরাম অমদি সুবিদাশিং',
+                'feature-3-text': 'য়াম্না ফজবা, ফনা চাউবা মতম, সফাবা য়ুমশিং, অমদি ফাওবা লাওনবগী সার্ভিস না খুদোংচাবা পুন্সি পীরি।',
+                'facilities-heading': 'লমদমগী সুবিদাশিং',
+                'facility-1': 'য়াম্না স্পীদনা চৎলবা Wi-Fi',
+                'facility-2': 'ফজবা মেস',
+                'facility-3': '২৪ ঘন্টা ঈ',
+                'facility-4': 'বায়োমেট্রিক য়ুমদা য়ৌনবা',
+                'contact-heading': 'হাওকক পীবীউ',
+                'label-name': 'মপুং ফাবা মমিং',
+                'label-email': 'ইমেইল এড্রেস',
+                'label-message': 'নঙোন্দগী পাম্নবা',
+                'submit-button': 'খনবা পীবীউ',
+                'form-success': 'থাগৎচরি! নঙোন্দগী পাম্নবা পীরক্লবসি।',
+                'form-error': 'নঙোন্দগী পাম্নবা পীরকপদা এদদা য়াম্না গোলোং লোয়সিল্লি। অমুক হিংনবা ট্রাই তৌবীউ।',
+                'whatsapp-cta': 'হোয়াটসঅ্যাপদা চাইরুক তৌবীউ',
+                'footer-text': 'অমল রহমানিয়া লৈরিমাশিংগী হোষ্টেল। হক য়াম্না পাম্নবা।'
+            },
+            'mr': { // Marathi
+                'page-title': 'अमल रहमानी लेडीज हॉस्टेल - सुरक्षित, शांत, आणि समाधानी जीवन',
+                'brand-name': 'अमल रहमानी हॉस्टेल',
+                'nav-home': 'मुख्यपृष्ठ',
+                'nav-about': 'आमच्याबद्दल',
+                'nav-facilities': 'सुविधा',
+                'nav-contact': 'संपर्क',
+                'hero-heading': 'विद्यार्थिनींसाठी सुरक्षित, शांत आणि समाधानी जीवन',
+                'hero-subheading': 'अमल रहमानी लेडीज हॉस्टेलमध्ये आपले स्वागत आहे, जिथे आम्ही आराम, सुरक्षितता आणि अभ्यासासाठी योग्य वातावरणाला प्राधान्य देतो.',
+                'hero-cta': 'उपलब्धतेबद्दल चौकशी करा',
+                'about-heading': 'उत्कृष्टतेसाठी आमची वचनबद्धता',
+                'feature-1-title': 'अद्वितीय सुरक्षितता',
+                'feature-1-text': '24/7 सुरक्षा कर्मचारी, बायोमेट्रिक प्रवेश नियंत्रण आणि CCTV पाळत नेहमी सुरक्षित राहण्याचे वातावरण सुनिश्चित करते.',
+                'feature-2-title': 'अभ्यासावर लक्ष केंद्रित',
+                'feature-2-text': 'समर्पित अभ्यास कक्ष आणि हाय-स्पीड वाय-फाय शैक्षणिक यश आणि एकाग्रतेसाठी योग्य वातावरण निर्माण करतात.',
+                'feature-3-title': 'आराम आणि सुविधा',
+                'feature-3-text': 'त्रासमुक्त जीवनासाठी पौष्टिक, आरोग्यदायी जेवण, स्वच्छ खोल्या आणि चांगल्या प्रकारे देखभाल केलेली लॉन्ड्री सेवा यांचा आनंद घ्या.',
+                'facilities-heading': 'आधुनिक सुविधा',
+                'facility-1': 'हाय-स्पीड वाय-फाय',
+                'facility-2': 'स्वच्छ मेस',
+                'facility-3': '24 तास पाणी',
+                'facility-4': 'बायोमेट्रिक प्रवेश',
+                'contact-heading': 'संपर्कात रहा',
+                'label-name': 'पूर्ण नाव',
+                'label-email': 'ईमेल पत्ता',
+                'label-message': 'तुमचा संदेश',
+                'submit-button': 'चौकशी पाठवा',
+                'form-success': 'धन्यवाद! तुमची चौकशी पाठवली गेली आहे.',
+                'form-error': 'तुमची चौकशी पाठवताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.',
+                'whatsapp-cta': 'व्हाट्सएपवर चॅट करा',
+                'footer-text': 'अमल रहमानी लेडीज हॉस्टेल. सर्व हक्क राखीव.'
+            },
+            'ne': { // Nepali
+                'page-title': 'अमल रहमानी लेडीज होस्टल - सुरक्षित, शान्त, र शान्तिपूर्ण जीवन',
+                'brand-name': 'अमल रहमानी होस्टल',
+                'nav-home': 'गृहपृष्ठ',
+                'nav-about': 'हाम्रो बारेमा',
+                'nav-facilities': 'सुविधाहरू',
+                'nav-contact': 'सम्पर्क',
+                'hero-heading': 'महिला विद्यार्थीहरूका लागि सुरक्षित, शान्त, र शान्तिपूर्ण जीवन',
+                'hero-subheading': 'अमल रहमानी लेडीज होस्टलमा तपाईंलाई स्वागत छ, जहाँ हामी आराम, सुरक्षा, र अनुकूल अध्ययन वातावरणलाई प्राथमिकता दिन्छौं।',
+                'hero-cta': 'उपलब्धताको बारेमा सोधपुछ गर्नुहोस्',
+                'about-heading': 'उत्कृष्टता प्रति हाम्रो प्रतिबद्धता',
+                'feature-1-title': 'अतुलनीय सुरक्षा',
+                'feature-1-text': '24/7 सुरक्षाकर्मी, बायोमेट्रिक पहुँच नियन्त्रण, र CCTV निगरानीले सधैं सुरक्षित जीवन वातावरण सुनिश्चित गर्दछ।',
+                'feature-2-title': 'अध्ययनमा ध्यान केन्द्रित',
+                'feature-2-text': 'समर्पित अध्ययन हलहरू र उच्च गतिको Wi-Fi ले शैक्षिक सफलता र एकाग्रताको लागि उत्तम वातावरण सिर्जना गर्दछ।',
+                'feature-3-title': 'आराम र सुविधाहरू',
+                'feature-3-text': 'झन्झटमुक्त जीवनको लागि पौष्टिक, स्वस्थकर भोजन, सफा कोठाहरू, र राम्रोसँग मर्मत गरिएको लाउन्ड्री सेवाको आनन्द लिनुहोस्।',
+                'facilities-heading': 'आधुनिक सुविधाहरू',
+                'facility-1': 'उच्च गतिको Wi-Fi',
+                'facility-2': 'स्वच्छ मेस',
+                'facility-3': '24-घण्टा पानी',
+                'facility-4': 'बायोमेट्रिक प्रवेश',
+                'contact-heading': 'सम्पर्कमा रहनुहोस्',
+                'label-name': 'पूरा नाम',
+                'label-email': 'इमेल ठेगाना',
+                'label-message': 'तपाईंको सन्देश',
+                'submit-button': 'सोधपुछ पठाउनुहोस्',
+                'form-success': 'धन्यवाद! तपाईंको सोधपुछ पठाइएको छ।',
+                'form-error': 'तपाईंको सोधपुछ पठाउँदा त्रुटि भयो। कृपया फेरि प्रयास गर्नुहोस्।',
+                'whatsapp-cta': 'व्हाट्सएपमा च्याट गर्नुहोस्',
+                'footer-text': 'अमल रहमानी लेडीज होस्टल। सबै अधिकार सुरक्षित छन्।'
+            },
+            'or': { // Odia
+                'page-title': 'ଅମଲ ରାହମାନିଆ ଲେଡିଜ ହଷ୍ଟେଲ - ସୁରକ୍ଷିତ, ନିରାପଦ, ଶାନ୍ତ ଜୀବନ',
+                'brand-name': 'ଅମଲ ରାହମାନିଆ ହଷ୍ଟେଲ',
+                'nav-home': 'ମୁଖ୍ୟ ପୃଷ୍ଠା',
+                'nav-about': 'ଆମ ବିଷୟରେ',
+                'nav-facilities': 'ସୁବିଧା',
+                'nav-contact': 'ଯୋଗାଯୋଗ',
+                'hero-heading': 'ମହିଳା ଛାତ୍ରୀମାନଙ୍କ ପାଇଁ ସୁରକ୍ଷିତ, ନିରାପଦ, ଶାନ୍ତ ଜୀବନ',
+                'hero-subheading': 'ଅମଲ ରାହମାନିଆ ଲେଡିଜ ହଷ୍ଟେଲକୁ ଆପଣଙ୍କୁ ସ୍ୱାଗତ, ଯେଉଁଠାରେ ଆମେ ଆରାମ, ସୁରକ୍ଷା ଏବଂ ଅଧ୍ୟୟନ ପାଇଁ ଅନୁକୂଳ ପରିବେଶକୁ ପ୍ରାଧାନ୍ୟ ଦେଉ।',
+                'hero-cta': 'ଉପଲବ୍ଧତା ବିଷୟରେ ପଚାରନ୍ତୁ',
+                'about-heading': 'ଉତ୍କର୍ଷ ପାଇଁ ଆମର ପ୍ରତିବଦ୍ଧତା',
+                'feature-1-title': 'ଅତୁଳନୀୟ ସୁରକ୍ଷା',
+                'feature-1-text': '24/7 ସୁରକ୍ଷା କର୍ମଚାରୀ, ବାୟୋମେଟ୍ରିକ୍ ପ୍ରବେଶ ନିୟନ୍ତ୍ରଣ ଏବଂ CCTV ନିରୀକ୍ଷଣ ସବୁ ସମୟରେ ଏକ ସୁରକ୍ଷିତ ବାସସ୍ଥାନ ନିଶ୍ଚିତ କରେ।',
+                'feature-2-title': 'ଅଧ୍ୟୟନ ଉପରେ ଧ୍ୟାନ',
+                'feature-2-text': 'ଉତ୍ସର୍ଗୀକୃତ ଷ୍ଟଡି ହଲ୍ ଏବଂ ହାଇ-ସ୍ପିଡ୍ ୱାଇ-ଫାଇ ଏକାଡେମିକ୍ ସଫଳତା ଏବଂ ଏକାଗ୍ରତା ପାଇଁ ସଠିକ୍ ବାତାବରଣ ସୃଷ୍ଟି କରେ।',
+                'feature-3-title': 'ଆରାମ ଏବଂ ସୁବିଧା',
+                'feature-3-text': 'ଅସୁବିଧାମୁକ୍ତ ଜୀବନ ପାଇଁ ପୁଷ୍ଟିକର, ସ୍ୱାସ୍ଥ୍ୟକର ଖାଦ୍ୟ, ପରିଷ୍କାର ରୁମ୍ ଏବଂ ଏକ ଭଲ ଭାବରେ ରକ୍ଷଣାବେକ୍ଷଣ କରାଯାଇଥିବା ଲଣ୍ଡ୍ରି ସେବା ଉପଭୋଗ କରନ୍ତୁ।',
+                'facilities-heading': 'ଆଧୁନିକ ସୁବିଧା',
+                'facility-1': 'ହାଇ-ସ୍ପିଡ୍ ୱାଇ-ଫାଇ',
+                'facility-2': 'ସ୍ୱଚ୍ଛ ମେସ୍',
+                'facility-3': '24 ଘଣ୍ଟା ଜଳ',
+                'facility-4': 'ବାୟୋମେଟ୍ରିକ୍ ପ୍ରବେଶ',
+                'contact-heading': 'ଯୋଗାଯୋଗ କରନ୍ତୁ',
+                'label-name': 'ପୂରା ନାମ',
+                'label-email': 'ଇମେଲ୍ ଠିକଣା',
+                'label-message': 'ଆପଣଙ୍କ ବାର୍ତ୍ତା',
+                'submit-button': 'ଅନୁସନ୍ଧାନ ପଠାନ୍ତୁ',
+                'form-success': 'ଧନ୍ୟବାଦ! ଆପଣଙ୍କ ଅନୁସନ୍ଧାନ ପଠାଯାଇଛି।',
+                'form-error': 'ଆପଣଙ୍କ ଅନୁସନ୍ଧାନ ପଠାଇବାରେ ଏକ ତ୍ରୁଟି ଥିଲା। ଦୟାକରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ।',
+                'whatsapp-cta': 'ୱାଟ୍ସଆପରେ ଚାଟ୍ କରନ୍ତୁ',
+                'footer-text': 'ଅମଲ ରାହମାନିଆ ଲେଡିଜ ହଷ୍ଟେଲ୍. ସମସ୍ତ ଅଧିକାର ସଂରକ୍ଷିତ।'
+            },
+            'pa': { // Punjabi
+                'page-title': 'ਅਮਲ ਰਹਿਮਾਨੀਆ ਲੇਡੀਜ਼ ਹੋਸਟਲ - ਸੁਰੱਖਿਅਤ, ਸ਼ਾਂਤ, ਸੁਖਾਵਾਂ ਜੀਵਨ',
+                'brand-name': 'ਅਮਲ ਰਹਿਮਾਨੀਆ ਹੋਸਟਲ',
+                'nav-home': 'ਘਰ',
+                'nav-about': 'ਸਾਡੇ ਬਾਰੇ',
+                'nav-facilities': 'ਸੁਵਿਧਾਵਾਂ',
+                'nav-contact': 'ਸੰਪਰਕ',
+                'hero-heading': 'ਲੇਡੀ ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਸੁਰੱਖਿਅਤ, ਸ਼ਾਂਤ, ਸੁਖਾਵਾਂ ਜੀਵਨ',
+                'hero-subheading': 'ਅਮਲ ਰਹਿਮਾਨੀਆ ਲੇਡੀਜ਼ ਹੋਸਟਲ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ, ਜਿੱਥੇ ਅਸੀਂ ਆਰਾਮ, ਸੁਰੱਖਿਆ, ਅਤੇ ਪੜ੍ਹਾਈ ਲਈ ਢੁਕਵੇਂ ਮਾਹੌਲ ਨੂੰ ਪਹਿਲ ਦਿੰਦੇ ਹਾਂ।',
+                'hero-cta': 'ਉਪਲਬਧਤਾ ਬਾਰੇ ਪੁੱਛੋ',
+                'about-heading': 'ਉੱਤਮਤਾ ਪ੍ਰਤੀ ਸਾਡੀ ਵਚਨਬੱਧਤਾ',
+                'feature-1-title': 'ਅਨਮੋਲ ਸੁਰੱਖਿਆ',
+                'feature-1-text': '24/7 ਸੁਰੱਖਿਆ ਕਰਮਚਾਰੀ, ਬਾਇਓਮੀਟ੍ਰਿਕ ਪਹੁੰਚ ਨਿਯੰਤਰਣ, ਅਤੇ CCTV ਨਿਗਰਾਨੀ ਹਰ ਸਮੇਂ ਇੱਕ ਸੁਰੱਖਿਅਤ ਰਹਿਣ ਵਾਲਾ ਮਾਹੌਲ ਯਕੀਨੀ ਬਣਾਉਂਦੇ ਹਨ।',
+                'feature-2-title': 'ਅਧਿਐਨ \'ਤੇ ਧਿਆਨ',
+                'feature-2-text': 'ਸਮਰਪਿਤ ਅਧਿਐਨ ਹਾਲ ਅਤੇ ਹਾਈ-ਸਪੀਡ ਵਾਈ-ਫਾਈ ਅਕਾਦਮਿਕ ਸਫਲਤਾ ਅਤੇ ਇਕਾਗਰਤਾ ਲਈ ਸੰਪੂਰਨ ਮਾਹੌਲ ਬਣਾਉਂਦੇ ਹਨ।',
+                'feature-3-title': 'ਆਰਾਮ ਅਤੇ ਸੁਵਿਧਾਵਾਂ',
+                'feature-3-text': 'ਮੁਸ਼ਕਲ ਰਹਿਤ ਜੀਵਨ ਲਈ ਪੌਸ਼ਟਿਕ, ਸਿਹਤਮੰਦ ਭੋਜਨ, ਸਾਫ਼ ਕਮਰੇ, ਅਤੇ ਇੱਕ ਚੰਗੀ ਤਰ੍ਹਾਂ ਸਾਂਭ-ਸੰਭਾਲ ਵਾਲੀ ਲਾਂਡਰੀ ਸੇਵਾ ਦਾ ਆਨੰਦ ਮਾਣੋ।',
+                'facilities-heading': 'ਆਧੁਨਿਕ ਸੁਵਿਧਾਵਾਂ',
+                'facility-1': 'ਹਾਈ-ਸਪੀਡ ਵਾਈ-ਫਾਈ',
+                'facility-2': 'ਸਫਾਈ ਵਾਲਾ ਮੈਸ',
+                'facility-3': '24-ਘੰਟੇ ਪਾਣੀ',
+                'facility-4': 'ਬਾਇਓਮੀਟ੍ਰਿਕ ਐਂਟਰੀ',
+                'contact-heading': 'ਸੰਪਰਕ ਵਿੱਚ ਰਹੋ',
+                'label-name': 'ਪੂਰਾ ਨਾਮ',
+                'label-email': 'ਈਮੇਲ ਪਤਾ',
+                'label-message': 'ਤੁਹਾਡਾ ਸੁਨੇਹਾ',
+                'submit-button': 'ਪੁੱਛ-ਗਿੱਛ ਭੇਜੋ',
+                'form-success': 'ਧੰਨਵਾਦ! ਤੁਹਾਡੀ ਪੁੱਛ-ਗਿੱਛ ਭੇਜ ਦਿੱਤੀ ਗਈ ਹੈ।',
+                'form-error': 'ਤੁਹਾਡੀ ਪੁੱਛ-ਗਿੱਛ ਭੇਜਣ ਵਿੱਚ ਇੱਕ ਗਲਤੀ ਆਈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+                'whatsapp-cta': 'ਵਟਸਐਪ \'ਤੇ ਗੱਲਬਾਤ ਕਰੋ',
+                'footer-text': 'ਅਮਲ ਰਹਿਮਾਨੀਆ ਲੇਡੀਜ਼ ਹੋਸਟਲ। ਸਾਰੇ ਹੱਕ ਰਾਖਵੇਂ ਹਨ।'
+            },
+            'sa': { // Sanskrit
+                'page-title': 'अमल रहमानी महिला छात्रावासः - सुरक्षितं, शान्तं, प्रशान्तं जीवनम्',
+                'brand-name': 'अमल रहमानी छात्रावासः',
+                'nav-home': 'गृहम्',
+                'nav-about': 'अस्माकं विषये',
+                'nav-facilities': 'सुविधाः',
+                'nav-contact': 'सम्पर्कः',
+                'hero-heading': 'महिलाछात्राणां कृते सुरक्षितं, शान्तं, प्रशान्तं च जीवनम्',
+                'hero-subheading': 'अमल रहमानी महिलाछात्रावासे भवतां स्वागतम् अस्ति, यत्र वयं सुखं, सुरक्षां, अध्ययनार्थं अनुकूलं च वातावरणं प्राथमिकतां दद्मः।',
+                'hero-cta': 'उपलब्धताविषये पृच्छतु',
+                'about-heading': 'उत्कृष्टतायै अस्माकं प्रतिबद्धता',
+                'feature-1-title': 'अतुलनीया सुरक्षा',
+                'feature-1-text': '24/7 सुरक्षाकर्मिणः, बायोमेट्रिक-प्रवेश-नियन्त्रणं, CCTV-निरीक्षणं च सर्वदा सुरक्षितं निवास-वातावरणं सुनिश्चितं करोति।',
+                'feature-2-title': 'अध्ययन-केन्द्रम्',
+                'feature-2-text': 'समर्पिताः अध्ययन-कक्षाः उच्च-वेगस्य Wi-Fi च शैक्षणिक-सफलतायै एकाग्रतायै च उत्तमं वातावरणं रचयन्ति।',
+                'feature-3-title': 'सुखं सुविधाः च',
+                'feature-3-text': 'समस्यारहित-जीवनस्य कृते पौष्टिकम्, स्वास्थ्यकरं च भोजनं, स्वच्छ-कक्षान्, सुव्यवस्थितं च वस्त्रप्रक्षालन-सेवाम् आनन्दयतु।',
+                'facilities-heading': 'आधुनिकसुविधाः',
+                'facility-1': 'उच्च-वेगस्य Wi-Fi',
+                'facility-2': 'स्वच्छं भोजनालयम्',
+                'facility-3': '24 घण्टा जलम्',
+                'facility-4': 'बायोमेट्रिक प्रवेशः',
+                'contact-heading': 'सम्पर्के तिष्ठतु',
+                'label-name': 'पूर्णं नाम',
+                'label-email': 'ईमेल-पत्रालयः',
+                'label-message': 'भवतः सन्देशः',
+                'submit-button': 'पृच्छां प्रेषयतु',
+                'form-success': 'धन्यवाद! भवतः पृच्छा प्रेषिता अस्ति।',
+                'form-error': 'भवतः पृच्छां प्रेषयितुं त्रुटिः आसीत्। कृपया पुनः प्रयत्नं करोतु।',
+                'whatsapp-cta': 'व्हाट्सएप-माध्यमेन वार्तालापं करोतु',
+                'footer-text': 'अमल रहमानी महिला छात्रावासः। सर्वे अधिकाराः सुरक्षिताः।'
+            },
+            'sat': { // Santali
+                'page-title': 'ᱟᱢᱟᱞ ᱨᱟᱦᱢᱟᱱᱤᱭᱟ ᱜᱚᱜᱚ ᱦᱚᱥᱴᱮᱞ - ᱵᱷᱚᱨᱚᱥᱟ ᱟ, ᱥᱟᱱᱛᱤ ᱟ, ᱢᱚᱱᱫᱤᱨ ᱡᱤᱣᱤᱱ',
+                'brand-name': 'ᱟᱢᱟᱞ ᱨᱟᱦᱢᱟᱱᱤᱭᱟ ᱦᱚᱥᱴᱮᱞ',
+                'nav-home': 'ᱚᱲᱟᱜ',
+                'nav-about': 'ᱟᱞᱮ ᱵᱟᱵᱚᱛ',
+                'nav-facilities': 'ᱥᱩᱵᱤᱫᱷᱟ',
+                'nav-contact': 'ᱥᱚᱢᱯᱚᱨᱠ',
+                'hero-heading': 'ᱜᱚᱜᱚ ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱠᱚ ᱞᱟᱹᱜᱤᱫ ᱵᱷᱚᱨᱚᱥᱟ ᱟ, ᱥᱟᱱᱛᱤ ᱟ, ᱢᱚᱱᱫᱤᱨ ᱡᱤᱣᱤᱱ',
+                'hero-subheading': 'ᱟᱢᱟᱞ ᱨᱟᱦᱢᱟᱱᱤᱭᱟ ᱜᱚᱜᱚ ᱦᱚᱥᱴᱮᱞ ᱨᱮ ᱥᱣᱟᱜᱚତ ᱟ, ᱡᱟᱦᱟᱸ ᱨᱮ ᱟᱞᱮ ᱟᱨᱟᱢ, ᱵᱷᱚᱨᱚᱥᱟ ᱟ, ᱟᱨ ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱞᱟᱹᱜᱤᱫ ᱢᱚᱱᱫିᱨ ᱡାᱭଗା ᱠᱚ ᱯᱩᱭᱞᱩ ᱮᱢᱟᱜ ᱠᱟᱱᱟ।',
+                'hero-cta': 'ᱵᱷᱚᱨᱚᱥᱟ ᱞᱟᱹᱜᱤᱫ ᱠᱷᱚᱡ ᱟ',
+                'about-heading': 'ᱟᱞᱮ ᱟ ᱠᱟᱹᱢᱤ',
+                'feature-1-title': 'ᱵᱷᱚᱨᱚᱥᱟ ᱟ ᱵᱟᱹᱧᱪᱟᱣ',
+                'feature-1-text': '24/7 ᱥᱮᱠᱩᱭᱨᱤᱴᱤ ᱠᱚ, ᱵᱟᱭᱚᱢᱮᱴᱨᱤᱠ ᱜᱷᱟᱹᱴᱤ, ᱟᱨ CCTV ᱵᱷᱚᱨᱚᱥᱟ ᱟ ᱡᱟᱭᱜᱟ ᱨᱮ ᱡᱤᱣᱤᱱ ᱵᱟᱹᱧᱪᱟᱣ ᱞᱟᱹᱜᱤᱫ ᱠᱟᱹᱢᱤ ᱟ᱾',
+                'feature-2-title': 'ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱨᱮ ᱢᱚᱱ',
+                'feature-2-text': 'ᱯᱟᱹᱴᱷᱩᱣᱟᱹ ᱞᱟᱹᱜᱤᱫ ᱵᱚᱨᱚ ᱦᱚᱞ ᱠᱚ ᱟᱨ ᱦᱟᱭ-ᱥᱯᱤᱰ ᱣᱟᱭ-ᱯᱷᱟᱭ ᱠᱚ ᱥᱤᱠᱷᱟ ᱨᱮ ᱥᱚଫᱚᱞᱚ ᱟᱭᱩᱜ ᱞᱟᱹᱜᱤᱫ ᱡାᱭᱜᱟ ᱠᱚ ᱵᱮᱱᱟᱣ ᱟ᱾',
+                'feature-3-title': 'ᱟᱨᱟᱢ ᱟᱨ ᱥᱩᱵᱤᱫᱷᱟ',
+                'feature-3-text': 'ᱢᱚᱱᱫିᱨ ᱡᱤᱣᱤᱱ ᱞᱟᱹᱜᱤᱫ ᱢᱚᱱᱫିᱨ ᱡᱚᱢ, ᱥᱟᱯᱷᱟ ᱚᱲᱟᱜ, ᱟᱨ ᱵᱮᱥ ᱛᱮ ᱢᱮᱱᱴᱮᱱ ᱞᱚᱸᱰᱨᱤ ᱥᱩᱵିᱫᱷᱟ ᱠᱚ ᱧᱟᱢ ᱟ᱾',
+                'facilities-heading': 'ᱱᱟᱣᱟ ᱥᱩᱵᱤᱫᱷᱟ',
+                'facility-1': 'ᱦᱟᱭ-ᱥᱯᱤᱰ ᱣᱟᱭ-ᱯᱷᱟᱭ',
+                'facility-2': 'ᱥାᱯᱷᱟ ᱢେସ୍',
+                'facility-3': '24 ᱜᱷᱚᱱᱴᱟ ᱫᱟᱜ',
+                'facility-4': 'ᱵᱟᱭᱚᱢᱮᱴᱨᱤᱠ ᱜᱷାᱹᱴᱤ',
+                'contact-heading': 'ᱥᱚᱢᱯᱚᱨᱠ ᱨᱮ ᱛᱟᱦᱮᱱ ᱢᱮ',
+                'label-name': 'ᱯᱩᱨᱟᱹ ᱧᱩᱛᱩᱢ',
+                'label-email': 'ᱤᱢᱮᱞ ᱴᱷᱤᱠᱚᱱା',
+                'label-message': 'ᱟᱢ ᱟ ᱠᱷᱚᱡ',
+                'submit-button': 'ᱠᱷᱚᱡ ᱟ ᱵᱷᱮᱡᱟᱣ ᱢᱮ',
+                'form-success': 'ᱥᱟᱨᱦᱟᱣ! ᱟᱢ ᱟ ᱠᱷᱚᱡ ᱟ ᱵᱷᱮᱡᱟᱣ ᱟᱠᱟᱱᱟ᱾',
+                'form-error': 'ᱟᱢ ᱟ ᱠᱷᱚᱡ ᱟ ᱵᱷᱮᱡᱟᱣ ᱨᱮ ᱜᱚᱞᱛᱤ ᱦᱩᱭ ᱮᱱᱟ᱾ ᱫᱚᱦᱲᱟ ᱠᱩᱨᱩᱢᱩᱴᱩ ᱢᱮ᱾',
+                'whatsapp-cta': 'ᱣᱟᱴᱥᱟᱯ ᱨᱮ ᱪᱮᱴ ᱢᱮ',
+                'footer-text': 'ᱟᱢᱟᱞ ᱨᱟᱦᱢᱟᱱᱤᱭᱟ ᱜᱚᱜᱚ ᱦᱚᱥᱴᱮᱞ. ᱡᱚᱛᱚ ᱦᱚᱠ ᱠᱚ ᱵᱟᱹᱧᱪାᱣ ᱟᱠᱟᱱᱟ᱾'
+            },
+            'sd': { // Sindhi
+                'page-title': 'اَمل رَحمانِيَا ليڊيز ھاسٽل - مَحفُوظ، پُر اَمن، پُرسَكُون زندگِي',
+                'brand-name': 'اَمل رَحمانِيَا ھاسٽل',
+                'nav-home': 'گَهر',
+                'nav-about': 'اسان بابت',
+                'nav-facilities': 'سھُولَتُون',
+                'nav-contact': 'رَابِطو',
+                'hero-heading': 'عورت شاگردن لاء مَحفُوظ، پُر اَمن، پُرسَكُون زندگِي',
+                'hero-subheading': 'اَمل رَحمانِيَا ليڊيز ھاسٽل ۾ اوھان کي ڀليڪار، جِتي اسان آرام، سُورَڪَشا، ۽ سُٺو تعليمي ماحول ترجيح ڏيون ٿا.',
+                'hero-cta': 'دَستِيابِي بابت پُوڇا ڳاڇا ڪيو',
+                'about-heading': 'بهترين لاءِ اسان جي عزم',
+                'feature-1-title': 'ڀرپور سُورَڪَشا',
+                'feature-1-text': '24/7 سيڪيورٽي اسٽاف، بايو ميٽرِڪ داخلا ڪنٽرول، ۽ سي سي ٽِي وِي نِگرَانِي هر وقت هڪ محفوظ رهڻ جو ماحول يقيني بڻائي ٿي.',
+                'feature-2-title': 'تعليم تي ڌيان',
+                'feature-2-text': 'مختص ڪيل اسٽڊي هال ۽ هاءِ-اسپيڊ وائي فائي تعليمي ڪاميابي ۽ ڌيان لاءِ صحيح ماحول ٺاهيندا آهن.',
+                'feature-3-title': 'آرام ۽ سھُولَتُون',
+                'feature-3-text': 'آرامده زندگِي لاءِ صحتمند، سُٺو کاڌو، صاف ڪمرا، ۽ هڪ سٺي نموني سان سنڀاليل لانڊري سروس جو مزو وٺو.',
+                'facilities-heading': 'جديد سھُولَتُون',
+                'facility-1': 'هاءِ-اسپيڊ وائي فائي',
+                'facility-2': 'صحيح ميس',
+                'facility-3': '24 ڪلاڪ پاڻي',
+                'facility-4': 'بايو ميٽرِڪ داخلا',
+                'contact-heading': 'رابطي ۾ رھو',
+                'label-name': 'پُورو نالو',
+                'label-email': 'اي ميل ايڊريس',
+                'label-message': 'اوھان جو پَيغام',
+                'submit-button': 'پُوڇا ڳاڇا موڪليو',
+                'form-success': 'مهرباني! اوھان جي پُوڇا ڳاڇا موڪلي وئي آهي.',
+                'form-error': 'اوھان جي پُوڇا ڳاڇا موڪلڻ ۾ هڪ غلطي ٿي وئي. مھربانِي ڪري ٻيهر ڪوشش ڪيو.',
+                'whatsapp-cta': 'واٽس ايپ تي چيٽ ڪيو',
+                'footer-text': 'اَمل رَحمانِيَا ليڊيز ھاسٽل. سڀ حق محفوظ آهن.'
+            },
+            'ta': { // Tamil
+                'page-title': 'அமால் ரஹ்மானியா மகளிர் விடுதி - பாதுகாப்பான, அமைதியான, நிம்மதியான வாழ்க்கை',
+                'brand-name': 'அமால் ரஹ்மானியா விடுதி',
+                'nav-home': 'முகப்பு',
+                'nav-about': 'எங்களைப் பற்றி',
+                'nav-facilities': 'வசதிகள்',
+                'nav-contact': 'தொடர்பு',
+                'hero-heading': 'பெண் மாணவர்களுக்கான பாதுகாப்பான, அமைதியான, நிம்மதியான வாழ்க்கை',
+                'hero-subheading': 'அமால் ரஹ்மானியா மகளிர் விடுதிக்கு உங்களை வரவேற்கிறோம், இங்கு நாங்கள் வசதி, பாதுகாப்பு மற்றும் பயனுள்ள படிப்பு சூழலுக்கு முன்னுரிமை அளிக்கிறோம்.',
+                'hero-cta': 'கிடைக்கும்தன்மை குறித்து விசாரிக்கவும்',
+                'about-heading': 'சிறப்புக்கான எங்கள் உறுதிப்பாடு',
+                'feature-1-title': 'ஒப்பற்ற பாதுகாப்பு',
+                'feature-1-text': '24/7 பாதுகாப்புப் பணியாளர்கள், பயோமெட்ரிக் அணுகல் கட்டுப்பாடு மற்றும் CCTV கண்காணிப்பு ஆகியவை எல்லா நேரங்களிலும் பாதுகாப்பான வாழ்க்கைச் சூழலை உறுதி செய்கின்றன.',
+                'feature-2-title': 'படிப்பு கவனம்',
+                'feature-2-text': 'பிரத்யேக படிப்பு அறைகள் மற்றும் அதிவேக வைஃபை ஆகியவை கல்வி வெற்றி மற்றும் செறிவுக்கு சரியான சூழலை உருவாக்குகின்றன.',
+                'feature-3-title': 'வசதி மற்றும் சலுகைகள்',
+                'feature-3-text': 'சிரமமில்லாத வாழ்க்கைக்கு சத்தான, ஆரோக்கியமான உணவு, சுத்தமான அறைகள் மற்றும் நன்கு பராமரிக்கப்படும் சலவை சேவையை அனுபவிக்கவும்.',
+                'facilities-heading': 'நவீன வசதிகள்',
+                'facility-1': 'அதிவேக வைஃபை',
+                'facility-2': 'சுகாதாரமான உணவுக்கூடம்',
+                'facility-3': '24 மணி நேர நீர்',
+                'facility-4': 'பயோமெட்ரிக் நுழைவு',
+                'contact-heading': 'தொடர்பில் இருங்கள்',
+                'label-name': 'முழுப் பெயர்',
+                'label-email': 'மின்னஞ்சல் முகவரி',
+                'label-message': 'உங்கள் செய்தி',
+                'submit-button': 'விசாரணையை அனுப்பவும்',
+                'form-success': 'நன்றி! உங்கள் விசாரணை அனுப்பப்பட்டுள்ளது.',
+                'form-error': 'உங்கள் விசாரணையை அனுப்புவதில் பிழை ஏற்பட்டது. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.',
+                'whatsapp-cta': 'வாட்ஸ்அப்பில் அரட்டையடிக்கவும்',
+                'footer-text': 'அமால் ரஹ்மானியா மகளிர் விடுதி. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.'
+            },
+            'te': { // Telugu
+                'page-title': 'అమల్ రెహమానియా లేడీస్ హాస్టల్ - సురక్షితమైన, ప్రశాంతమైన జీవనం',
+                'brand-name': 'అమల్ రెహమానియా హాస్టల్',
+                'nav-home': 'హోమ్',
+                'nav-about': 'మా గురించి',
+                'nav-facilities': 'సౌకర్యాలు',
+                'nav-contact': 'సంప్రదించండి',
+                'hero-heading': 'లేడీ విద్యార్థినుల కోసం సురక్షితమైన, ప్రశాంతమైన జీవనం',
+                'hero-subheading': 'అమల్ రెహమానియా లేడీస్ హాస్టల్‌కు స్వాగతం, ఇక్కడ మేము సౌలభ్యం, భద్రత మరియు చదువుకు అనుకూలమైన వాతావరణానికి ప్రాధాన్యత ఇస్తాము.',
+                'hero-cta': 'లభ్యత గురించి విచారించండి',
+                'about-heading': 'శ్రేష్ఠతకు మా నిబద్ధత',
+                'feature-1-title': 'సాటిలేని భద్రత',
+                'feature-1-text': '24/7 భద్రతా సిబ్బంది, బయోమెట్రిక్ యాక్సెస్ నియంత్రణ మరియు CCTV నిఘా అన్ని సమయాలలో సురక్షితమైన నివాస వాతావరణాన్ని నిర్ధారిస్తాయి.',
+                'feature-2-title': 'చదువుపై దృష్టి',
+                'feature-2-text': 'అంకితమైన స్టడీ హాల్స్ మరియు హై-స్పీడ్ వై-ఫై విద్యావిషయక విజయం మరియు ఏకాగ్రతకు సరైన వాతావరణాన్ని సృష్టిస్తాయి.',
+                'feature-3-title': 'సౌలభ్యం మరియు సౌకర్యాలు',
+                'feature-3-text': 'ఎటువంటి ఇబ్బంది లేని జీవనం కోసం పోషకమైన, ఆరోగ్యకరమైన భోజనం, శుభ్రమైన గదులు మరియు చక్కగా నిర్వహించబడే లాండ్రీ సేవను ఆస్వాదించండి.',
+                'facilities-heading': 'ఆధునిక సౌకర్యాలు',
+                'facility-1': 'హై-స్పీడ్ వై-ఫై',
+                'facility-2': 'పరిశుభ్రమైన మెస్',
+                'facility-3': '24 గంటల నీరు',
+                'facility-4': 'బయోమెట్రిక్ ప్రవేశం',
+                'contact-heading': 'సంప్రదించండి',
+                'label-name': 'పూర్తి పేరు',
+                'label-email': 'ఇమెయిల్ చిరునామా',
+                'label-message': 'మీ సందేశం',
+                'submit-button': 'విచారణ పంపండి',
+                'form-success': 'ధన్యవాదాలు! మీ విచారణ పంపబడింది.',
+                'form-error': 'మీ విచారణను పంపడంలో లోపం జరిగింది. దయచేసి మళ్ళీ ప్రయత్నించండి.',
+                'whatsapp-cta': 'వాట్సాప్‌లో చాట్ చేయండి',
+                'footer-text': 'అమల్ రెహమానియా లేడీస్ హాస్టల్. అన్ని హక్కులు ప్రత్యేకించబడ్డాయి.'
+            },
+            'ur': { // Urdu
+                'page-title': 'امل رحمانیہ لیڈیز ہاسٹل - محفوظ، پُرسکون، پُراَمن رہائش',
+                'brand-name': 'امل رحمانیہ ہاسٹل',
+                'nav-home': 'ہوم',
+                'nav-about': 'ہمارے بارے میں',
+                'nav-facilities': 'سہولیات',
+                'nav-contact': 'رابطہ',
+                'hero-heading': 'طالب علم خواتین کے لیے محفوظ، پُرسکون، پُراَمن رہائش',
+                'hero-subheading': 'امل رحمانیہ لیڈیز ہاسٹل میں خوش آمدید، جہاں ہم آرام، تحفظ، اور تعلیم کے لیے سازگار ماحول کو ترجیح دیتے ہیں۔',
+                'hero-cta': 'دستیابی کے بارے میں پوچھ گچھ کریں',
+                'about-heading': 'بہتری کے لیے ہمارا عزم',
+                'feature-1-title': 'بے مثال تحفظ',
+                'feature-1-text': '24/7 سیکیورٹی اہلکار، بائیو میٹرک رسائی کنٹرول، اور سی سی ٹی وی نگرانی ہر وقت ایک محفوظ رہائشی ماحول کو یقینی بناتی ہے۔',
+                'feature-2-title': 'مطالعہ پر توجہ',
+                'feature-2-text': 'مختص اسٹڈی ہال اور تیز رفتار وائی فائی تعلیمی کامیابی اور ارتکاز کے لیے بہترین ماحول پیدا کرتے ہیں۔',
+                'feature-3-title': 'آرام اور سہولیات',
+                'feature-3-text': 'پریشانی سے پاک زندگی کے لیے غذائیت سے بھرپور، صحت مند کھانا، صاف کمرے، اور اچھی طرح سے دیکھ بھال کی گئی لانڈری سروس کا لطف اٹھائیں۔',
+                'facilities-heading': 'جدید سہولیات',
+                'facility-1': 'تیز رفتار وائی فائی',
+                'facility-2': 'صحت بخش میس',
+                'facility-3': '24 گھنٹے پانی',
+                'facility-4': 'بائیو میٹرک انٹری',
+                'contact-heading': 'رابطہ میں رہیں',
+                'label-name': 'پورا نام',
+                'label-email': 'ای میل ایڈریس',
+                'label-message': 'آپ کا پیغام',
+                'submit-button': 'پوچھ گچھ بھیجیں',
+                'form-success': 'شکریہ! آپ کی پوچھ گچھ بھیج دی گئی ہے۔',
+                'form-error': 'آپ کی پوچھ گچھ بھیجنے میں ایک خرابی پیش آئی۔ براہ کرم دوبارہ کوشش کریں۔',
+                'whatsapp-cta': 'واٹس ایپ پر چیٹ کریں',
+                'footer-text': 'امل رحمانیہ لیڈیز ہاسٹل. تمام حقوق محفوظ ہیں۔'
+            },
+            // The following are included for completeness of the 22 scheduled languages,
+            // using the same placeholder structure as other languages.
+            'bodo': {
+                'page-title': 'Bodo Page Title', 'brand-name': 'Amal Rahmania Hostel (Bodo)', 'nav-home': 'Home', 'nav-about': 'About Us', 'nav-facilities': 'Facilities', 'nav-contact': 'Contact', 'hero-heading': 'Safe, Secure, Serene Living for Lady Students (Bodo)', 'hero-subheading': 'Welcome to Amal Rahmania Ladies Hostel, where we prioritize comfort, safety, and a conducive study environment (Bodo).', 'hero-cta': 'Inquire About Availability', 'about-heading': 'Our Commitment to Excellence', 'feature-1-title': 'Unmatched Safety', 'feature-1-text': '24/7 security personnel, biometric access control, and CCTV surveillance ensure a safe living environment at all times (Bodo).', 'feature-2-title': 'Study Focus', 'feature-2-text': 'Dedicated study halls and high-speed Wi-Fi create the perfect atmosphere for academic success and concentration (Bodo).', 'feature-3-title': 'Comfort & Amenities', 'feature-3-text': 'Enjoy nutritious, wholesome meals, clean rooms, and a well-maintained laundry service for hassle-free living (Bodo).', 'facilities-heading': 'Modern Facilities', 'facility-1': 'High-Speed Wi-Fi', 'facility-2': 'Hygienic Mess', 'facility-3': '24-Hour Water', 'facility-4': 'Biometric Entry', 'contact-heading': 'Get in Touch', 'label-name': 'Full Name', 'label-email': 'Email Address', 'label-message': 'Your Message', 'submit-button': 'Send Inquiry', 'form-success': 'Thank you! Your inquiry has been sent.', 'form-error': 'There was an error sending your inquiry. Please try again.', 'whatsapp-cta': 'Chat on WhatsApp', 'footer-text': 'Amal Rahmania Ladies Hostel. All rights reserved.'
+            },
+            'dgr': {
+                'page-title': 'Dogri Page Title', 'brand-name': 'Amal Rahmania Hostel (Dogri)', 'nav-home': 'Home', 'nav-about': 'About Us', 'nav-facilities': 'Facilities', 'nav-contact': 'Contact', 'hero-heading': 'Safe, Secure, Serene Living for Lady Students (Dogri)', 'hero-subheading': 'Welcome to Amal Rahmania Ladies Hostel, where we prioritize comfort, safety, and a conducive study environment (Dogri).', 'hero-cta': 'Inquire About Availability', 'about-heading': 'Our Commitment to Excellence', 'feature-1-title': 'Unmatched Safety', 'feature-1-text': '24/7 security personnel, biometric access control, and CCTV surveillance ensure a safe living environment at all times (Dogri).', 'feature-2-title': 'Study Focus', 'feature-2-text': 'Dedicated study halls and high-speed Wi-Fi create the perfect atmosphere for academic success and concentration (Dogri).', 'feature-3-title': 'Comfort & Amenities', 'feature-3-text': 'Enjoy nutritious, wholesome meals, clean rooms, and a well-maintained laundry service for hassle-free living (Dogri).', 'facilities-heading': 'Modern Facilities', 'facility-1': 'High-Speed Wi-Fi', 'facility-2': 'Hygienic Mess', 'facility-3': '24-Hour Water', 'facility-4': 'Biometric Entry', 'contact-heading': 'Get in Touch', 'label-name': 'Full Name', 'label-email': 'Email Address', 'label-message': 'Your Message', 'submit-button': 'Send Inquiry', 'form-success': 'Thank you! Your inquiry has been sent.', 'form-error': 'There was an error sending your inquiry. Please try again.', 'whatsapp-cta': 'Chat on WhatsApp', 'footer-text': 'Amal Rahmania Ladies Hostel. All rights reserved.'
+            },
+            'kok': {
+                'page-title': 'Konkani Page Title', 'brand-name': 'Amal Rahmania Hostel (Konkani)', 'nav-home': 'Home', 'nav-about': 'About Us', 'nav-facilities': 'Facilities', 'nav-contact': 'Contact', 'hero-heading': 'Safe, Secure, Serene Living for Lady Students (Konkani)', 'hero-subheading': 'Welcome to Amal Rahmania Ladies Hostel, where we prioritize comfort, safety, and a conducive study environment (Konkani).', 'hero-cta': 'Inquire About Availability', 'about-heading': 'Our Commitment to Excellence', 'feature-1-title': 'Unmatched Safety', 'feature-1-text': '24/7 security personnel, biometric access control, and CCTV surveillance ensure a safe living environment at all times (Konkani).', 'feature-2-title': 'Study Focus', 'feature-2-text': 'Dedicated study halls and high-speed Wi-Fi create the perfect atmosphere for academic success and concentration (Konkani).', 'feature-3-title': 'Comfort & Amenities', 'feature-3-text': 'Enjoy nutritious, wholesome meals, clean rooms, and a well-maintained laundry service for hassle-free living (Konkani).', 'facilities-heading': 'Modern Facilities', 'facility-1': 'High-Speed Wi-Fi', 'facility-2': 'Hygienic Mess', 'facility-3': '24-Hour Water', 'facility-4': 'Biometric Entry', 'contact-heading': 'Get in Touch', 'label-name': 'Full Name', 'label-email': 'Email Address', 'label-message': 'Your Message', 'submit-button': 'Send Inquiry', 'form-success': 'Thank you! Your inquiry has been sent.', 'form-error': 'There was an error sending your inquiry. Please try again.', 'whatsapp-cta': 'Chat on WhatsApp', 'footer-text': 'Amal Rahmania Ladies Hostel. All rights reserved.'
+            },
+            'mni': {
+                'page-title': 'Manipuri Page Title', 'brand-name': 'Amal Rahmania Hostel (Manipuri)', 'nav-home': 'Home', 'nav-about': 'About Us', 'nav-facilities': 'Facilities', 'nav-contact': 'Contact', 'hero-heading': 'Safe, Secure, Serene Living for Lady Students (Manipuri)', 'hero-subheading': 'Welcome to Amal Rahmania Ladies Hostel, where we prioritize comfort, safety, and a conducive study environment (Manipuri).', 'hero-cta': 'Inquire About Availability', 'about-heading': 'Our Commitment to Excellence', 'feature-1-title': 'Unmatched Safety', 'feature-1-text': '24/7 security personnel, biometric access control, and CCTV surveillance ensure a safe living environment at all times (Manipuri).', 'feature-2-title': 'Study Focus', 'feature-2-text': 'Dedicated study halls and high-speed Wi-Fi create the perfect atmosphere for academic success and concentration (Manipuri).', 'feature-3-title': 'Comfort & Amenities', 'feature-3-text': 'Enjoy nutritious, wholesome meals, clean rooms, and a well-maintained laundry service for hassle-free living (Manipuri).', 'facilities-heading': 'Modern Facilities', 'facility-1': 'High-Speed Wi-Fi', 'facility-2': 'Hygienic Mess', 'facility-3': '24-Hour Water', 'facility-4': 'Biometric Entry', 'contact-heading': 'Get in Touch', 'label-name': 'Full Name', 'label-email': 'Email Address', 'label-message': 'Your Message', 'submit-button': 'Send Inquiry', 'form-success': 'Thank you! Your inquiry has been sent.', 'form-error': 'There was an error sending your inquiry. Please try again.', 'whatsapp-cta': 'Chat on WhatsApp', 'footer-text': 'Amal Rahmania Ladies Hostel. All rights reserved.'
+            },
+            'sat': {
+                'page-title': 'Santali Page Title', 'brand-name': 'Amal Rahmania Hostel (Santali)', 'nav-home': 'Home', 'nav-about': 'About Us', 'nav-facilities': 'Facilities', 'nav-contact': 'Contact', 'hero-heading': 'Safe, Secure, Serene Living for Lady Students (Santali)', 'hero-subheading': 'Welcome to Amal Rahmania Ladies Hostel, where we prioritize comfort, safety, and a conducive study environment (Santali).', 'hero-cta': 'Inquire About Availability', 'about-heading': 'Our Commitment to Excellence', 'feature-1-title': 'Unmatched Safety', 'feature-1-text': '24/7 security personnel, biometric access control, and CCTV surveillance ensure a safe living environment at all times (Santali).', 'feature-2-title': 'Study Focus', 'feature-2-text': 'Dedicated study halls and high-speed Wi-Fi create the perfect atmosphere for academic success and concentration (Santali).', 'feature-3-title': 'Comfort & Amenities', 'feature-3-text': 'Enjoy nutritious, wholesome meals, clean rooms, and a well-maintained laundry service for hassle-free living (Santali).', 'facilities-heading': 'Modern Facilities', 'facility-1': 'High-Speed Wi-Fi', 'facility-2': 'Hygienic Mess', 'facility-3': '24-Hour Water', 'facility-4': 'Biometric Entry', 'contact-heading': 'Get in Touch', 'label-name': 'Full Name', 'label-email': 'Email Address', 'label-message': 'Your Message', 'submit-button': 'Send Inquiry', 'form-success': 'Thank you! Your inquiry has been sent.', 'form-error': 'There was an error sending your inquiry. Please try again.', 'whatsapp-cta': 'Chat on WhatsApp', 'footer-text': 'Amal Rahmania Ladies Hostel. All rights reserved.'
+            },
+            // The following language was present in the original file, not an official Indian language, but kept for compatibility.
+            'ar': {
+                'page-title': 'نزل آمال رحمانية للسيدات - حياة آمنة ومطمئنة وهادئة',
+                'brand-name': 'نزل آمال رحمانية',
+                'nav-home': 'الرئيسية',
+                'nav-about': 'من نحن',
+                'nav-facilities': 'المرافق',
+                'nav-contact': 'اتصل بنا',
+                'hero-heading': 'حياة آمنة ومطمئنة وهادئة للطالبات',
+                'hero-subheading': 'مرحباً بك في نزل آمال رحمانية للسيدات، حيث نولي الأولوية للراحة والأمان وبيئة دراسية مواتية.',
+                'hero-cta': 'استفسر عن التوفر',
+                'about-heading': 'التزامنا بالتميز',
+                'feature-1-title': 'أمان لا مثيل له',
+                'feature-1-text': 'موظفو أمن على مدار الساعة طوال أيام الأسبوع، والتحكم البيومتري بالوصول، والمراقبة بالكاميرات لضمان بيئة معيشية آمنة في جميع الأوقات.',
+                'feature-2-title': 'التركيز على الدراسة',
+                'feature-2-text': 'قاعات دراسة مخصصة وشبكة واي فاي عالية السرعة تخلق الأجواء المثالية للنجاح الأكاديمي والتركيز.',
+                'feature-3-title': 'الراحة والمرافق',
+                'feature-3-text': 'استمتع بالوجبات المغذية والصحية والغرف النظيفة وخدمة الغسيل التي تتم صيانتها جيدًا لعيش حياة خالية من المتاعب.',
+                'facilities-heading': 'المرافق الحديثة',
+                'facility-1': 'واي فاي عالي السرعة',
+                'facility-2': 'مطعم صحي',
+                'facility-3': 'مياه على مدار 24 ساعة',
+                'facility-4': 'دخول بيومتري',
+                'contact-heading': 'تواصل معنا',
+                'label-name': 'الاسم الكامل',
+                'label-email': 'عنوان البريد الإلكتروني',
+                'label-message': 'رسالتك',
+                'submit-button': 'أرسل الاستفسار',
+                'form-success': 'شكراً لك! تم إرسال استفسارك.',
+                'form-error': 'حدث خطأ أثناء إرسال استفسارك. يرجى المحاولة مرة أخرى.',
+                'whatsapp-cta': 'الدردشة على واتساب',
+                'footer-text': 'نزل آمال رحمانية للسيدات. جميع الحقوق محفوظة.'
+            }
         };
 
-        // Function to apply current language translations
+
+        let currentLanguage = 'en';
+
+        // Helper function to apply translations based on the current language
         function applyTranslations() {
-            document.querySelectorAll('[data-key]').forEach(element => {
-                const key = element.getAttribute('data-key');
-                const translation = translations[currentLanguage][key];
-                if (translation) {
-                    if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
-                         element.setAttribute('placeholder', translation);
-                    } else if (element.tagName === 'TEXTAREA' && element.hasAttribute('placeholder')) {
-                         element.setAttribute('placeholder', translation);
-                    } else {
-                        element.innerHTML = translation;
-                    }
+            const langData = translations[currentLanguage];
+            if (!langData) return;
+
+            // Update page title separately as it's outside data-i18n
+            document.getElementById('page-title').textContent = langData['page-title'] || langData['brand-name'];
+
+            // Update elements with data-i18n attributes (using id fallback)
+            for (const key in langData) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = langData[key];
                 }
-            });
-            // Update page title separately
-            document.getElementById('page-title').textContent = translations[currentLanguage]['page-title'];
-            
-            // Handle RTL direction for Arabic
-            const html = document.documentElement;
-            if (currentLanguage === 'ar') {
-                html.setAttribute('dir', 'rtl');
-                html.classList.add('text-right');
-            } else {
-                html.setAttribute('dir', 'ltr');
-                html.classList.remove('text-right');
             }
         }
 
-        // Function to switch language based on user selection
-        function switchLanguage(lang) {
-            currentLanguage = lang;
+        // Function to switch the language
+        function switchLanguage(newLang) {
+            currentLanguage = newLang;
             applyTranslations();
         }
 
-        // --- THEME LOGIC ---
-        const themeToggle = document.getElementById('theme-toggle');
-        const htmlElement = document.documentElement;
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
-
-        // Function to set the theme
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                htmlElement.classList.add('dark');
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-            } else {
-                htmlElement.classList.remove('dark');
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-            }
-            localStorage.setItem('theme', theme);
-        }
-
-        // Function to initialize the theme on load
+        // Theme switching logic
         function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (savedTheme) {
-                setTheme(savedTheme);
-            } else if (prefersDark) {
-                setTheme('dark');
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
             } else {
-                setTheme('light');
+                document.documentElement.classList.remove('dark');
+                updateThemeIcon(false);
             }
         }
 
-        // Event listener for theme toggle button
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(newTheme);
-        });
-
-        // --- TIME DISPLAY LOGIC ---
-        function showTime() {
-            // Options for a more user-friendly date format
-            const options = { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZoneName: 'short' };
-            const timeString = new Date().toLocaleTimeString(undefined, options);
-            
-            const timeElement = document.getElementById('currentTime');
-            if (timeElement) {
-                 timeElement.textContent = timeString;
-            }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
         }
 
-        // --- FORM SUBMISSION LOGIC (Mock) ---
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('theme-icon');
+            if (isDark) {
+                // Moon icon for dark mode (user can switch to light)
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+            } else {
+                // Sun icon for light mode (user can switch to dark)
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+            }
+        }
+        
+        // Form Submission Logic
         function handleFormSubmission(event) {
             event.preventDefault();
-            const form = event.target;
             const messageBox = document.getElementById('form-message');
-            const submitButton = form.querySelector('button[type="submit"]');
+            messageBox.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
 
-            // 1. Disable button and show loading state
-            submitButton.disabled = true;
-            submitButton.textContent = currentLanguage === 'en' ? 'Submitting...' : (currentLanguage === 'ml' ? 'സമർപ്പിക്കുന്നു...' : 'جار الإرسال...');
-            submitButton.classList.add('opacity-70');
+            // Simple validation and success message simulation
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
 
-            // 2. Mock API call delay
+            if (name && email && message) {
+                // Simulating a successful API call
+                messageBox.textContent = translations[currentLanguage]['form-success'] || 'Thank you! Your inquiry has been sent.';
+                messageBox.classList.add('bg-green-100', 'text-green-700', 'block');
+                event.target.reset(); // Clear form
+            } else {
+                // Simulating an error
+                messageBox.textContent = translations[currentLanguage]['form-error'] || 'There was an error sending your inquiry. Please try again.';
+                messageBox.classList.add('bg-red-100', 'text-red-700', 'block');
+            }
+
             setTimeout(() => {
-                // Mock success scenario
-                const success = Math.random() > 0.1; // 90% chance of success
-
-                if (success) {
-                    messageBox.textContent = translations[currentLanguage]['form-success'];
-                    messageBox.className = 'p-3 rounded-lg font-semibold text-center bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
-                    form.reset(); // Clear form on success
-                } else {
-                    // Mock error scenario
-                    messageBox.textContent = translations[currentLanguage]['form-error'];
-                    messageBox.className = 'p-3 rounded-lg font-semibold text-center bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
-                }
-
-                messageBox.classList.remove('hidden');
-
-                // 3. Re-enable button and restore text
-                submitButton.disabled = false;
-                submitButton.textContent = translations[currentLanguage]['form-submit-cta'];
-                submitButton.classList.remove('opacity-70');
-
-                // Hide message after a few seconds
-                setTimeout(() => {
-                    messageBox.classList.add('hidden');
-                }, 5000);
-
-            }, 2000); // Simulate 2 second network delay
+                messageBox.classList.add('hidden');
+            }, 5000);
         }
 
-        // --- SCROLL ANIMATION LOGIC ---
+        // Time Display Logic (from script (12).js)
+        function showTime() {
+            document.getElementById('current-time').innerHTML = new Date().toLocaleTimeString(currentLanguage, {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                timeZoneName: 'short'
+            });
+        }
+
+        // Scroll Animation Logic
         function checkScroll() {
-            const sections = document.querySelectorAll('.section');
-            const triggerBottom = window.innerHeight * 0.8; // Trigger when 80% of the viewport is shown
+            const sections = document.querySelectorAll('.section-content');
+            const triggerBottom = window.innerHeight * 0.85;
 
             sections.forEach(section => {
                 const sectionTop = section.getBoundingClientRect().top;
@@ -779,6 +1199,7 @@
 
             // Initialize language setting
             const initialLang = document.getElementById('language-select').value;
+            // Check if the initial language is supported, otherwise default to 'en'
             if (initialLang && translations[initialLang]) {
                 currentLanguage = initialLang;
             } else {
