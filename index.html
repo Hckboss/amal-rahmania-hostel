@@ -7,8 +7,8 @@
     <title data-key="page_title">Amal Ladies Hostel - Near Kottayam Medical College</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Moved Lucide Script here for faster loading (to mitigate timing issues) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         /* Custom Font Import: Inter for modern readability */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -26,6 +26,147 @@
             margin: 8px auto 0;
             border-radius: 2px;
         }
+
+        /* --- THEMATIC PRELOADER STYLES: Students walking to the Hostel --- */
+        #preloader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f7fafc; /* Light background for the scene */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-in-out;
+            overflow: hidden; /* Keep walking figures contained */
+        }
+        
+        .hostel-scene {
+            position: relative;
+            width: 400px;
+            height: 200px;
+            /* Center the scene itself slightly below center */
+            transform: translateY(50px); 
+            display: flex;
+            justify-content: flex-end; /* Push the building to the right */
+            align-items: flex-end;
+        }
+
+        /* Ground line */
+        .hostel-scene::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -100px; /* Extend off-screen left */
+            width: 500px;
+            height: 10px;
+            background-color: #e5e7eb; /* Light gray road/ground */
+            z-index: 1;
+        }
+
+        /* Hostel Building */
+        .hostel-facade {
+            position: absolute;
+            bottom: 10px; /* Above the ground line */
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background-color: #059669; /* Hostel Green */
+            border-radius: 8px 8px 0 0;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+            z-index: 2;
+            border: 2px solid #047857;
+        }
+
+        .hostel-door {
+            position: absolute;
+            bottom: 10px;
+            right: 50px;
+            width: 30px;
+            height: 60px;
+            background-color: #374151; /* Dark Gray Door */
+            border-radius: 4px 4px 0 0;
+            z-index: 3;
+        }
+
+        /* Walking People Styles (Simple rounded rectangles) */
+        .person {
+            position: absolute;
+            bottom: 10px; /* Align with the ground */
+            width: 15px;
+            height: 40px;
+            border-radius: 50% 50% 0 0; /* Head/body shape */
+            left: -50px; /* Start position (off-screen left) */
+            z-index: 4;
+            animation-name: walk-animation;
+            animation-duration: 5s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        .person-1 {
+            background-color: #fcd34d; /* Amber */
+            animation-delay: 0s;
+        }
+
+        .person-2 {
+            background-color: #3b82f6; /* Blue */
+            width: 12px;
+            height: 35px;
+            animation-delay: 1.8s; /* Stagger the start */
+        }
+
+        .person-3 {
+            background-color: #ef4444; /* Red */
+            width: 16px;
+            height: 45px;
+            animation-delay: 3.5s; /* Stagger the start */
+        }
+
+        @keyframes walk-animation {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            80% {
+                 /* Stop just before the door */
+                transform: translateX(300px); 
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(300px); 
+                opacity: 0; /* Fade out as they enter the building area */
+            }
+        }
+        
+        /* Initial hide for body content wrapper - Now includes transition properties for smooth fade-in */
+        .hidden-content {
+            visibility: hidden;
+            opacity: 0;
+            /* Added transition to allow smooth fade-in when the class is removed in JavaScript */
+            transition: opacity 0.75s ease-in-out, visibility 0.75s; 
+        }
+
+        /* --- NEW ANIMATION STYLES FOR BUTTON PULSE --- */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); /* Accent Blue */
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        .button-pulse {
+            animation: pulse 1s infinite;
+        }
+        /* --- END OF NEW ANIMATION STYLES --- */
+
     </style>
     <script>
         tailwind.config = {
@@ -40,11 +181,6 @@
             },
         };
 
-        // Initialize Lucide Icons
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-        });
-
         // Firebase-related global variables (MANDATORY for Firebase/Firestore)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
@@ -53,307 +189,327 @@
 </head>
 <body class="text-gray-800">
 
-    <!-- Header & Navigation -->
-    <header class="sticky top-0 z-50 bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
-                <div class="flex justify-start lg:w-0 lg:flex-1">
-                    <a href="#" class="flex items-center space-x-2">
-                        <!-- Logo Implementation with onerror fallback for guaranteed display -->
-                        <img src="logo.png" 
-                             alt="Amal Ladies Hostel Logo" 
-                             class="h-10 w-auto object-contain"
-                             onerror="this.onerror=null; this.src='https://placehold.co/40x40/059669/ffffff?text=A';"
-                        >
-                        
-                        <span class="text-xl font-extrabold text-primary-hostel" data-key="brand_name">Amal Hostel</span>
-                    </a>
+    <!-- Thematic Preloader Overlay -->
+    <div id="preloader-overlay">
+        <!-- New Animated Scene -->
+        <div class="hostel-scene">
+            <div class="hostel-facade"></div>
+            <div class="hostel-door"></div>
+            <!-- Three walking figures -->
+            <div class="person person-1"></div>
+            <div class="person person-2"></div>
+            <div class="person person-3"></div>
+        </div>
+        <!-- End of Animated Scene -->
+    </div>
+
+    <!-- Main Content Wrapper - Initially hidden via CSS class -->
+    <div id="main-content-wrapper" class="hidden-content">
+
+        <!-- Header & Navigation -->
+        <header class="sticky top-0 z-50 bg-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
+                    <div class="flex justify-start lg:w-0 lg:flex-1">
+                        <a href="#" class="flex items-center space-x-2">
+                            <!-- Logo Implementation with onerror fallback for guaranteed display -->
+                            <img src="logo.png" 
+                                 alt="Amal Ladies Hostel Logo" 
+                                 class="h-10 w-auto object-contain"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/40x40/059669/ffffff?text=A';"
+                            >
+                            
+                            <span class="text-xl font-extrabold text-primary-hostel" data-key="brand_name">Amal Hostel</span>
+                        </a>
+                    </div>
+                    <nav class="hidden md:flex space-x-10">
+                        <a href="#amenities" data-key="nav_amenities" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Amenities</a>
+                        <a href="#rooms" data-key="nav_rooms" class="text-base font-medium text-primary-hostel hover:text-primary-hostel transition duration-150 border-b-2 border-primary-hostel pb-1">Rooms</a>
+                        <a href="#language-diversity" data-key="nav_diversity" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Diversity</a>
+                        <a href="#contact" data-key="nav_contact" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Contact</a>
+                    </nav>
+                    <div class="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
+                        <a href="#contact" class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700 transition duration-300">
+                            Book a Visit
+                        </a>
+                    </div>
+                    <!-- Mobile Menu Button (Hamburger) -->
+                    <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-primary-hostel focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
                 </div>
-                <nav class="hidden md:flex space-x-10">
-                    <a href="#amenities" data-key="nav_amenities" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Amenities</a>
-                    <a href="#rooms" data-key="nav_rooms" class="text-base font-medium text-primary-hostel hover:text-primary-hostel transition duration-150 border-b-2 border-primary-hostel pb-1">Rooms</a>
-                    <a href="#language-diversity" data-key="nav_diversity" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Diversity</a>
-                    <a href="#contact" data-key="nav_contact" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Contact</a>
-                </nav>
-                <div class="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-                    <a href="#contact" class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700 transition duration-300">
+            </div>
+            <!-- Mobile Menu (Hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 shadow-lg">
+                    <a href="#amenities" data-key="nav_amenities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Amenities</a>
+                    <a href="#rooms" data-key="nav_rooms" class="block px-3 py-2 rounded-md text-base font-medium text-primary-hostel bg-green-50/50">Rooms</a>
+                    <a href="#language-diversity" data-key="nav_diversity" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Diversity</a>
+                    <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Contact</a>
+                    <a href="#contact" class="block w-full text-center mt-2 px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700">
                         Book a Visit
                     </a>
                 </div>
-                <!-- Mobile Menu Button (Hamburger) -->
-                <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-primary-hostel focus:outline-none">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
             </div>
-        </div>
-        <!-- Mobile Menu (Hidden by default) -->
-        <div id="mobile-menu" class="hidden md:hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 shadow-lg">
-                <a href="#amenities" data-key="nav_amenities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Amenities</a>
-                <a href="#rooms" data-key="nav_rooms" class="block px-3 py-2 rounded-md text-base font-medium text-primary-hostel bg-green-50/50">Rooms</a>
-                <a href="#language-diversity" data-key="nav_diversity" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Diversity</a>
-                <a href="#contact" data-key="nav_contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Contact</a>
-                <a href="#contact" class="block w-full text-center mt-2 px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700">
-                    Book a Visit
-                </a>
-            </div>
-        </div>
-    </header>
+        </header>
 
-    <main>
-        <!-- Hero Section -->
-        <section class="relative bg-gray-100 pt-16 pb-20 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="lg:grid lg:grid-cols-12 lg:gap-8">
-                    <div class="lg:col-span-6 flex flex-col justify-center text-center lg:text-left">
-                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                            <span class="block xl:inline" data-key="hero_main_line_1">Your Home Away From Home</span>
-                            <span class="block text-primary-hostel xl:inline" data-key="hero_main_line_2">Near Kottayam Medical College.</span>
-                        </h1>
-                        <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0" data-key="hero_sub_text">
-                            Safe, Comfortable, and Convenient ladies' accommodation designed for students and professionals. Walkable distance to the Medical College.
-                        </p>
-                        <div class="mt-10 sm:flex sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-                            <a href="#rooms" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-primary-hostel hover:bg-green-700 transition duration-300 transform hover:scale-105">
-                                Explore Rooms
+        <main>
+            <!-- Hero Section -->
+            <section class="relative bg-gray-100 pt-16 pb-20 overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+                        <div class="lg:col-span-6 flex flex-col justify-center text-center lg:text-left">
+                            <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                                <span class="block xl:inline" data-key="hero_main_line_1">Your Home Away From Home</span>
+                                <span class="block text-primary-hostel xl:inline" data-key="hero_main_line_2">Near Kottayam Medical College.</span>
+                            </h1>
+                            <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0" data-key="hero_sub_text">
+                                Safe, Comfortable, and Convenient ladies' accommodation designed for students and professionals. Walkable distance to the Medical College.
+                            </p>
+                            <div class="mt-10 sm:flex sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+                                <a href="#rooms" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-primary-hostel hover:bg-green-700 transition duration-300 transform hover:scale-105">
+                                    Explore Rooms
+                                </a>
+                                <a href="#contact" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-primary-hostel text-base font-medium rounded-full shadow-lg text-primary-hostel bg-white hover:bg-gray-50 transition duration-300 transform hover:scale-105">
+                                    Virtual Tour
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-12 lg:mt-0 lg:col-span-6">
+                            <div class="relative max-w-lg mx-auto lg:max-w-none">
+                                <!-- Placeholder image for the hostel -->
+                                <img class="w-full h-auto rounded-xl shadow-2xl object-cover transform rotate-1 transition duration-500 hover:rotate-0"
+                                     src="https://placehold.co/600x400/059669/ffffff?text=Amal+Hostel+Exterior"
+                                     alt="Exterior view of the Amal Ladies Hostel building">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Amenities Section -->
+            <section id="amenities" class="py-16 sm:py-24 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_amenities_title">
+                        Comfort & Convenience Included
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-500" data-key="section_amenities_subtitle">
+                        Everything you need to focus on your studies and well-being.
+                    </p>
+                    <div class="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+
+                        <!-- Amenity Card 1 -->
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                                <i data-lucide="wifi" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_1_title">High-Speed Wi-Fi</h3>
+                            <p class="mt-2 text-base text-gray-500" data-key="amenity_1_description">Uninterrupted internet for online classes and research.</p>
+                        </div>
+
+                        <!-- Amenity Card 2 -->
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                                <i data-lucide="utensils" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_2_title">Nutritious Meals</h3>
+                            <p class="mt-2 text-base text-gray-500" data-key="amenity_2_description">Home-cooked, healthy food (Veg/Non-veg options).</p>
+                        </div>
+
+                        <!-- Amenity Card 3 -->
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                                <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_3_title">24/7 Security</h3>
+                            <p class="mt-2 text-base text-gray-500" data-key="amenity_3_description">Secure premises with CCTV surveillance and warden supervision.</p>
+                        </div>
+
+                        <!-- Amenity Card 4 -->
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                                <i data-lucide="locate-fixed" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_4_title">Prime Location</h3>
+                            <p class="mt-2 text-base text-gray-500" data-key="amenity_4_description">Just minutes walk from Kottayam Medical College.</p>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rooms Section (Now only featuring 3-Sharing) -->
+            <section id="rooms" class="py-16 sm:py-24 bg-gray-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_rooms_title">
+                        Our Exclusive Room Option
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-500" data-key="section_rooms_subtitle">
+                        We offer a single, high-comfort 3-Sharing room type to ensure the best balance of space and value.
+                    </p>
+
+                    <!-- Room Cards Container (Center the single card) -->
+                    <div class="mt-12 flex flex-wrap justify-center gap-8">
+
+                        <!-- Room Card: 3-Sharing (HIGHLIGHTED and only available option) -->
+                        <div class="w-full sm:w-80 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-100 transition duration-500 hover:scale-105 relative">
+                            <div class="absolute -top-3 right-0 bg-secondary-hostel text-gray-900 font-bold text-xs px-3 py-1 rounded-full shadow-lg" data-key="room_3_tag">
+                                FEATURED OPTION
+                            </div>
+                            <div class="flex justify-between items-start">
+                                <span class="text-3xl font-extrabold text-primary-hostel" data-key="room_3_title">3-Sharing Room</span>
+                            </div>
+                            <p class="text-gray-600 mt-2 mb-6 font-semibold" data-key="room_3_subtitle">The ideal balance of space, cost, and community.</p>
+                            <ul class="text-left space-y-4 text-lg text-gray-700">
+                                <li class="flex items-center"><i data-lucide="user-check" class="w-6 h-6 text-accent-hostel mr-3"></i> **Perfect for 3** (More personal space)</li>
+                                <li class="flex items-center"><i data-lucide="maximize" class="w-6 h-6 text-accent-hostel mr-3"></i> Dedicated study areas</li>
+                                <li class="flex items-center"><i data-lucide="lock" class="w-6 h-6 text-accent-hostel mr-3"></i> Lockable wardrobe provided</li>
+                                <li class="flex items-center"><i data-lucide="air-vent" class="w-6 h-6 text-accent-hostel mr-3"></i> Optimal comfort and ventilation</li>
+                            </ul>
+                            <a href="#contact" class="mt-8 block w-full text-center px-6 py-3 border border-transparent rounded-full text-base font-bold text-white bg-accent-hostel hover:bg-blue-600 transition duration-300 shadow-xl">
+                                Select This Room
                             </a>
-                            <a href="#contact" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-primary-hostel text-base font-medium rounded-full shadow-lg text-primary-hostel bg-white hover:bg-gray-50 transition duration-300 transform hover:scale-105">
-                                Virtual Tour
-                            </a>
                         </div>
+
                     </div>
-                    <div class="mt-12 lg:mt-0 lg:col-span-6">
-                        <div class="relative max-w-lg mx-auto lg:max-w-none">
-                            <!-- Placeholder image for the hostel -->
-                            <img class="w-full h-auto rounded-xl shadow-2xl object-cover transform rotate-1 transition duration-500 hover:rotate-0"
-                                 src="https://placehold.co/600x400/059669/ffffff?text=Amal+Hostel+Exterior"
-                                 alt="Exterior view of the Amal Ladies Hostel building">
+                </div>
+            </section>
+
+            <!-- Language Diversity Section -->
+            <section id="language-diversity" class="py-16 sm:py-24 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_diversity_title">
+                        A Place to Connect
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto" data-key="section_diversity_subtitle">
+                        We welcome students from all regions and backgrounds, fostering a supportive and diverse community.
+                    </p>
+                    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left">
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4">Our Community Vibe</h3>
+                            <p class="text-gray-600 mb-4">
+                                Hostel life is about shared experiences. We encourage a friendly environment where students help each other with studies and personal growth.
+                            </p>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start">
+                                    <i data-lucide="heart" class="w-5 h-5 text-red-500 mt-1 mr-3 flex-shrink-0"></i>
+                                    <span class="font-medium">Supportive atmosphere:</span> Seniors readily guide juniors.
+                                </li>
+                                <li class="flex items-start">
+                                    <i data-lucide="globe" class="w-5 h-5 text-blue-500 mt-1 mr-3 flex-shrink-0"></i>
+                                    <span class="font-medium">Cultural Exchange:</span> Learn about different traditions and languages.
+                                </li>
+                                <li class="flex items-start">
+                                    <i data-lucide="message-circle" class="w-5 h-5 text-yellow-500 mt-1 mr-3 flex-shrink-0"></i>
+                                    <span class="font-medium">Bilingual Support:</span> Malayalam and English speaking staff available.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="relative">
+                            <img class="w-full h-auto rounded-xl shadow-xl object-cover"
+                                 src="https://placehold.co/600x400/3b82f6/ffffff?text=Community+Space"
+                                 alt="Interior view of the common area in the hostel">
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Amenities Section -->
-        <section id="amenities" class="py-16 sm:py-24 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_amenities_title">
-                    Comfort & Convenience Included
-                </h2>
-                <p class="mt-4 text-xl text-gray-500" data-key="section_amenities_subtitle">
-                    Everything you need to focus on your studies and well-being.
-                </p>
-                <div class="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            <!-- Contact Section -->
+            <section id="contact" class="py-16 sm:py-24 bg-gray-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="lg:grid lg:grid-cols-2 lg:gap-12">
 
-                    <!-- Amenity Card 1 -->
-                    <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
-                            <i data-lucide="wifi" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_1_title">High-Speed Wi-Fi</h3>
-                        <p class="mt-2 text-base text-gray-500" data-key="amenity_1_description">Uninterrupted internet for online classes and research.</p>
-                    </div>
-
-                    <!-- Amenity Card 2 -->
-                    <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
-                            <i data-lucide="utensils" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_2_title">Nutritious Meals</h3>
-                        <p class="mt-2 text-base text-gray-500" data-key="amenity_2_description">Home-cooked, healthy food (Veg/Non-veg options).</p>
-                    </div>
-
-                    <!-- Amenity Card 3 -->
-                    <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
-                            <i data-lucide="shield-check" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_3_title">24/7 Security</h3>
-                        <p class="mt-2 text-base text-gray-500" data-key="amenity_3_description">Secure premises with CCTV surveillance and warden supervision.</p>
-                    </div>
-
-                    <!-- Amenity Card 4 -->
-                    <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
-                            <i data-lucide="locate-fixed" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_4_title">Prime Location</h3>
-                        <p class="mt-2 text-base text-gray-500" data-key="amenity_4_description">Just minutes walk from Kottayam Medical College.</p>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Rooms Section (Now only featuring 3-Sharing) -->
-        <section id="rooms" class="py-16 sm:py-24 bg-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_rooms_title">
-                    Our Exclusive Room Option
-                </h2>
-                <p class="mt-4 text-xl text-gray-500" data-key="section_rooms_subtitle">
-                    We offer a single, high-comfort 3-Sharing room type to ensure the best balance of space and value.
-                </p>
-
-                <!-- Room Cards Container (Center the single card) -->
-                <div class="mt-12 flex flex-wrap justify-center gap-8">
-
-                    <!-- Room Card: 3-Sharing (HIGHLIGHTED and only available option) -->
-                    <div class="w-full sm:w-80 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-100 transition duration-500 hover:scale-105 relative">
-                        <div class="absolute -top-3 right-0 bg-secondary-hostel text-gray-900 font-bold text-xs px-3 py-1 rounded-full shadow-lg" data-key="room_3_tag">
-                            FEATURED OPTION
-                        </div>
-                        <div class="flex justify-between items-start">
-                            <span class="text-3xl font-extrabold text-primary-hostel" data-key="room_3_title">3-Sharing Room</span>
-                        </div>
-                        <p class="text-gray-600 mt-2 mb-6 font-semibold" data-key="room_3_subtitle">The ideal balance of space, cost, and community.</p>
-                        <ul class="text-left space-y-4 text-lg text-gray-700">
-                            <li class="flex items-center"><i data-lucide="user-check" class="w-6 h-6 text-accent-hostel mr-3"></i> **Perfect for 3** (More personal space)</li>
-                            <li class="flex items-center"><i data-lucide="maximize" class="w-6 h-6 text-accent-hostel mr-3"></i> Dedicated study areas</li>
-                            <li class="flex items-center"><i data-lucide="lock" class="w-6 h-6 text-accent-hostel mr-3"></i> Lockable wardrobe provided</li>
-                            <li class="flex items-center"><i data-lucide="air-vent" class="w-6 h-6 text-accent-hostel mr-3"></i> Optimal comfort and ventilation</li>
-                        </ul>
-                        <a href="#contact" class="mt-8 block w-full text-center px-6 py-3 border border-transparent rounded-full text-base font-bold text-white bg-accent-hostel hover:bg-blue-600 transition duration-300 shadow-xl">
-                            Select This Room
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Language Diversity Section -->
-        <section id="language-diversity" class="py-16 sm:py-24 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_diversity_title">
-                    A Place to Connect
-                </h2>
-                <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto" data-key="section_diversity_subtitle">
-                    We welcome students from all regions and backgrounds, fostering a supportive and diverse community.
-                </p>
-                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left">
-                    <div class="p-6 bg-gray-50 rounded-xl shadow-lg">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Our Community Vibe</h3>
-                        <p class="text-gray-600 mb-4">
-                            Hostel life is about shared experiences. We encourage a friendly environment where students help each other with studies and personal growth.
-                        </p>
-                        <ul class="space-y-3 text-gray-700">
-                            <li class="flex items-start">
-                                <i data-lucide="heart" class="w-5 h-5 text-red-500 mt-1 mr-3 flex-shrink-0"></i>
-                                <span class="font-medium">Supportive atmosphere:</span> Seniors readily guide juniors.
-                            </li>
-                            <li class="flex items-start">
-                                <i data-lucide="globe" class="w-5 h-5 text-blue-500 mt-1 mr-3 flex-shrink-0"></i>
-                                <span class="font-medium">Cultural Exchange:</span> Learn about different traditions and languages.
-                            </li>
-                            <li class="flex items-start">
-                                <i data-lucide="message-circle" class="w-5 h-5 text-yellow-500 mt-1 mr-3 flex-shrink-0"></i>
-                                <span class="font-medium">Bilingual Support:</span> Malayalam and English speaking staff available.
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="relative">
-                        <img class="w-full h-auto rounded-xl shadow-xl object-cover"
-                             src="https://placehold.co/600x400/3b82f6/ffffff?text=Community+Space"
-                             alt="Interior view of the common area in the hostel">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="py-16 sm:py-24 bg-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="lg:grid lg:grid-cols-2 lg:gap-12">
-
-                    <!-- Contact Details -->
-                    <div class="mb-10 lg:mb-0">
-                        <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center lg:text-left" data-key="section_contact_title">
-                            Get in Touch
-                        </h2>
-                        <p class="mt-4 text-xl text-gray-500 max-w-xl text-center lg:text-left" data-key="section_contact_subtitle">
-                            We're here to answer all your questions about our facilities and rooms.
-                        </p>
-                        <div class="mt-10 space-y-6 text-left">
-                            <div class="flex items-start">
-                                <i data-lucide="phone" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
-                                <div>
-                                    <h3 class="text-lg font-medium text-gray-900">Call Us</h3>
-                                    <p class="text-gray-600" data-key="contact_phone_number">+91 96569 62786</p>
+                        <!-- Contact Details -->
+                        <div class="mb-10 lg:mb-0">
+                            <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center lg:text-left" data-key="section_contact_title">
+                                Get in Touch
+                            </h2>
+                            <p class="mt-4 text-xl text-gray-500 max-w-xl text-center lg:text-left" data-key="section_contact_subtitle">
+                                We're here to answer all your questions about our facilities and rooms.
+                            </p>
+                            <div class="mt-10 space-y-6 text-left">
+                                <div class="flex items-start">
+                                    <i data-lucide="phone" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900">Call Us</h3>
+                                        <p class="text-gray-600" data-key="contact_phone_number">+91 96569 62786</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="flex items-start">
-                                <i data-lucide="mail" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
-                                <div>
-                                    <h3 class="text-lg font-medium text-gray-900">Email</h3>
-                                    <p class="text-gray-600" data-key="contact_email">info@amalhostel.com</p>
+                                <div class="flex items-start">
+                                    <i data-lucide="mail" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900">Email</h3>
+                                        <p class="text-gray-600" data-key="contact_email">info@amalhostel.com</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="flex items-start">
-                                <i data-lucide="map-pin" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
-                                <div>
-                                    <h3 class="text-lg font-medium text-gray-900">Location</h3>
-                                    <!-- UPDATED ADDRESS -->
-                                    <p class="text-gray-600" data-key="contact_address">amal ladies hostel, gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
+                                <div class="flex items-start">
+                                    <i data-lucide="map-pin" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900">Location</h3>
+                                        <!-- UPDATED ADDRESS -->
+                                        <p class="text-gray-600" data-key="contact_address">amal ladies hostel, gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Enquiry Form -->
+                        <div class="bg-white p-8 rounded-xl shadow-2xl">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center" data-key="form_title">Send an Enquiry</h3>
+                            <!-- ADDED ID TO FORM TO ATTACH JAVASCRIPT LISTENER -->
+                            <form id="enquiry-form" class="space-y-6"> 
+                                <div>
+                                    <label for="full-name" class="block text-sm font-medium text-gray-700" data-key="label_name">Full Name</label>
+                                    <input type="text" id="full-name" name="full-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700" data-key="label_email">Email Address</label>
+                                    <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                </div>
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium text-gray-700" data-key="label_phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                </div>
+                                <div>
+                                    <label for="room-preference" class="block text-sm font-medium text-gray-700" data-key="label_preference">Room Preference</label>
+                                    <!-- Updated to only show 3-Sharing as an option -->
+                                    <select id="room-preference" name="room-preference" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                        <option value="3-sharing" selected>3-Sharing Room</option>
+                                    </select>
+                                    <p class="mt-1 text-xs text-gray-500">Only 3-Sharing rooms are currently available.</p>
+                                </div>
+                                <div>
+                                    <label for="message" class="block text-sm font-medium text-gray-700" data-key="label_message">Your Message / Query</label>
+                                    <textarea id="message" name="message" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150"></textarea>
+                                </div>
+                                <!-- UPDATED BUTTON TEXT AND ADDED ID -->
+                                <button type="submit" id="submit-button" data-key="btn_send_enquiry" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-accent-hostel hover:bg-primary-hostel transition duration-300">
+                                    Send Enquiry (via WhatsApp)
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
-                    <!-- Enquiry Form -->
-                    <div class="bg-white p-8 rounded-xl shadow-2xl">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center" data-key="form_title">Send an Enquiry</h3>
-                        <form action="#" method="POST" class="space-y-6">
-                            <div>
-                                <label for="full-name" class="block text-sm font-medium text-gray-700" data-key="label_name">Full Name</label>
-                                <input type="text" id="full-name" name="full-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
-                            </div>
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700" data-key="label_email">Email Address</label>
-                                <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
-                            </div>
-                            <div>
-                                <label for="phone" class="block text-sm font-medium text-gray-700" data-key="label_phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
-                            </div>
-                            <div>
-                                <label for="room-preference" class="block text-sm font-medium text-gray-700" data-key="label_preference">Room Preference</label>
-                                <!-- Updated to only show 3-Sharing as an option -->
-                                <select id="room-preference" name="room-preference" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
-                                    <option value="3-sharing" selected>3-Sharing Room</option>
-                                </select>
-                                <p class="mt-1 text-xs text-gray-500">Only 3-Sharing rooms are currently available.</p>
-                            </div>
-                            <div>
-                                <label for="message" class="block text-sm font-medium text-gray-700" data-key="label_message">Your Message / Query</label>
-                                <textarea id="message" name="message" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150"></textarea>
-                            </div>
-                            <button type="submit" data-key="btn_send_enquiry" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-accent-hostel hover:bg-primary-hostel transition duration-300">
-                                Send Enquiry
-                            </button>
-                        </form>
-                    </div>
                 </div>
+            </section>
 
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex justify-center space-x-6 mb-4">
+                    <a href="#amenities" data-key="nav_amenities" class="text-gray-400 hover:text-white transition duration-150">Amenities</a>
+                    <a href="#rooms" data-key="nav_rooms" class="text-gray-400 hover:text-white transition duration-150">Rooms</a>
+                    <a href="#language-diversity" data-key="nav_diversity" class="text-gray-400 hover:text-white transition duration-150">Diversity</a>
+                    <a href="#contact" data-key="nav_contact" class="text-gray-400 hover:text-white transition duration-150">Contact</a>
+                </div>
+                <p class="text-gray-500 text-sm" data-key="copyright_text">&copy; 2025 Amal Ladies Hostel. All rights reserved. Managed with Care.</p>
             </div>
-        </section>
+        </footer>
+    </div> <!-- end of #main-content-wrapper -->
 
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex justify-center space-x-6 mb-4">
-                <a href="#amenities" data-key="nav_amenities" class="text-gray-400 hover:text-white transition duration-150">Amenities</a>
-                <a href="#rooms" data-key="nav_rooms" class="text-gray-400 hover:text-white transition duration-150">Rooms</a>
-                <a href="#language-diversity" data-key="nav_diversity" class="text-gray-400 hover:text-white transition duration-150">Diversity</a>
-                <a href="#contact" data-key="nav_contact" class="text-gray-400 hover:text-white transition duration-150">Contact</a>
-            </div>
-            <p class="text-gray-500 text-sm" data-key="copyright_text">&copy; 2025 Amal Ladies Hostel. All rights reserved. Managed with Care.</p>
-        </div>
-    </footer>
-
-    <!-- JavaScript for Mobile Menu Functionality -->
+    <!-- App Initialization and Logic -->
     <script>
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
@@ -375,6 +531,120 @@
                 });
             });
         });
+
+        /**
+         * Hides the preloader and initiates the fade-in for the main content.
+         */
+        function hidePreloader() {
+             const preloader = document.getElementById('preloader-overlay');
+             const mainContent = document.getElementById('main-content-wrapper');
+
+             if (preloader && mainContent) {
+                // Fade out the preloader (0.5s transition defined in CSS)
+                preloader.style.opacity = '0';
+
+                // After the preloader fade transition, hide it completely 
+                // and reveal the main content by removing the 'hidden-content' class.
+                setTimeout(() => {
+                    preloader.style.display = 'none'; // Completely hide the preloader
+                    
+                    // Reveal main content - CSS will handle the smooth 0.75s fade-in
+                    mainContent.classList.remove('hidden-content');
+                }, 500); // Wait for the preloader opacity transition (0.5s) to finish
+            }
+        }
+
+        /**
+         * Handles Lucide icon creation using polling to prevent race conditions, 
+         * then initiates the fade-in for the main content.
+         */
+        window.onload = function() {
+            const maxAttempts = 30; // Try for up to 1.5 seconds (30 * 50ms)
+            let attempt = 0; // Initialize attempt counter here
+
+            function tryCreateIcons() {
+                // 1. Check if lucide library is loaded and its main function is available
+                // We rely on the function existing, and use try/catch for the internal failure.
+                if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                    try {
+                        // Attempt to create icons. If the library throws an internal error (like the one reported),
+                        // the catch block will retry, preventing the application crash.
+                        lucide.createIcons();
+                        hidePreloader(); // Only hide preloader if icon creation succeeds
+                        return; // Stop polling on success
+                    } catch (error) {
+                        // If it fails due to the reported TypeError, log and retry in the next cycle.
+                        console.warn(`Lucide icon creation failed internally (Attempt ${attempt + 1}). Retrying...`, error);
+                        // Fall through to retry logic
+                    }
+                } 
+
+                // 2. Polling logic
+                if (attempt < maxAttempts) {
+                    attempt++;
+                    setTimeout(tryCreateIcons, 50); // Re-try polling every 50ms
+                } else {
+                    // Timeout reached. Proceed with content visibility as a fallback.
+                    console.error("Lucide icon creation timed out. Proceeding without icons.");
+                    hidePreloader();
+                }
+            }
+
+            tryCreateIcons(); // Start the polling process upon window load
+        };
+
+        // --- NEW WHATSAPP INTEGRATION LOGIC WITH ANIMATION ---
+        document.getElementById('enquiry-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Stop the default form submission
+
+            const form = e.target;
+            const submitButton = document.getElementById('submit-button');
+            
+            // Get form values
+            const name = form['full-name'].value || 'N/A';
+            const email = form['email'].value || 'N/A';
+            const phone = form['phone'].value || 'N/A';
+            const room = form['room-preference'].value || '3-sharing';
+            const message = form['message'].value.trim() || 'No specific message.';
+
+            // Hostel WhatsApp number (91 is the country code for India)
+            const whatsappNumber = '919656962786'; 
+
+            // Construct the message text for WhatsApp
+            let whatsappText = 
+                `*New Hostel Enquiry (Web Form)*\n\n` +
+                `*Name:* ${name}\n` +
+                `*Email:* ${email}\n` +
+                `*Phone:* ${phone}\n` +
+                `*Room Preference:* ${room}\n` +
+                `*Message:* ${message}`;
+
+            // URL encode the message text
+            const encodedText = encodeURIComponent(whatsappText);
+
+            // Construct the final WhatsApp API URL (wa.me is the standard universal link)
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedText}`;
+
+            // 1. Start Animation: Disable button and add pulse class
+            submitButton.disabled = true;
+            submitButton.textContent = 'Opening WhatsApp...';
+            submitButton.classList.add('button-pulse', 'bg-blue-600');
+            submitButton.classList.remove('hover:bg-primary-hostel'); // Change hover color temporarily
+
+            // 2. Delay before opening the link to show the animation (500ms)
+            setTimeout(() => {
+                // Open the URL in a new window/tab
+                window.open(whatsappUrl, '_blank');
+
+                // 3. Reset Button State immediately after opening the link
+                submitButton.disabled = false;
+                submitButton.textContent = 'Send Enquiry (via WhatsApp)';
+                submitButton.classList.remove('button-pulse', 'bg-blue-600');
+                submitButton.classList.add('hover:bg-primary-hostel');
+                
+            }, 500); // Animation duration
+        });
+        // --- END OF NEW LOGIC ---
     </script>
 </body>
 </html>
