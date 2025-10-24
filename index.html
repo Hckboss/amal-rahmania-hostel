@@ -59,9 +59,13 @@
             <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
                 <div class="flex justify-start lg:w-0 lg:flex-1">
                     <a href="#" class="flex items-center space-x-2">
-                        <svg class="h-8 w-8 text-primary-hostel" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 00-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                        </svg>
+                        <!-- Logo Implementation with onerror fallback for guaranteed display -->
+                        <img src="logo.png" 
+                             alt="Amal Ladies Hostel Logo" 
+                             class="h-10 w-auto object-contain"
+                             onerror="this.onerror=null; this.src='https://placehold.co/40x40/059669/ffffff?text=A';"
+                        >
+                        
                         <span class="text-xl font-extrabold text-primary-hostel" data-key="brand_name">Amal Hostel</span>
                     </a>
                 </div>
@@ -181,45 +185,28 @@
             </div>
         </section>
 
-        <!-- Rooms Section (Updated to Highlight 3-Sharing) -->
+        <!-- Rooms Section (Now only featuring 3-Sharing) -->
         <section id="rooms" class="py-16 sm:py-24 bg-gray-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_rooms_title">
-                    Our Room Options
+                    Our Exclusive Room Option
                 </h2>
                 <p class="mt-4 text-xl text-gray-500" data-key="section_rooms_subtitle">
-                    Choose the perfect space for your comfort and budget.
+                    We offer a single, high-comfort 3-Sharing room type to ensure the best balance of space and value.
                 </p>
 
-                <!-- Room Cards Container (Flex layout for responsiveness) -->
+                <!-- Room Cards Container (Center the single card) -->
                 <div class="mt-12 flex flex-wrap justify-center gap-8">
 
-                    <!-- Room Card 1: 4-Sharing (Standard) -->
-                    <div class="w-full sm:w-80 p-6 bg-white rounded-xl shadow-lg border border-gray-200 transition duration-300 hover:shadow-xl">
-                        <div class="flex justify-between items-start">
-                            <span class="text-2xl font-bold text-gray-800" data-key="room_4_title">4-Sharing Room</span>
-                        </div>
-                        <p class="text-gray-500 mt-1 mb-4" data-key="room_4_subtitle">Economical and social.</p>
-                        <ul class="text-left space-y-3 text-gray-600">
-                            <li class="flex items-center"><i data-lucide="user-check" class="w-5 h-5 text-primary-hostel mr-2"></i> 4 Occupants</li>
-                            <li class="flex items-center"><i data-lucide="bed" class="w-5 h-5 text-primary-hostel mr-2"></i> Individual beds & storage</li>
-                            <li class="flex items-center"><i data-lucide="lightbulb" class="w-5 h-5 text-primary-hostel mr-2"></i> Well-ventilated space</li>
-                            <li class="flex items-center"><i data-lucide="monitor" class="w-5 h-5 text-primary-hostel mr-2"></i> Shared study table</li>
-                        </ul>
-                        <a href="#contact" class="mt-6 block w-full text-center px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition duration-300">
-                            Enquire Now
-                        </a>
-                    </div>
-
-                    <!-- Room Card 2: 3-Sharing (HIGHLIGHTED) -->
-                    <div class="w-full sm:w-80 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-105 transition duration-500 hover:scale-110 relative">
+                    <!-- Room Card: 3-Sharing (HIGHLIGHTED and only available option) -->
+                    <div class="w-full sm:w-80 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-100 transition duration-500 hover:scale-105 relative">
                         <div class="absolute -top-3 right-0 bg-secondary-hostel text-gray-900 font-bold text-xs px-3 py-1 rounded-full shadow-lg" data-key="room_3_tag">
-                            BEST VALUE
+                            FEATURED OPTION
                         </div>
                         <div class="flex justify-between items-start">
                             <span class="text-3xl font-extrabold text-primary-hostel" data-key="room_3_title">3-Sharing Room</span>
                         </div>
-                        <p class="text-gray-600 mt-2 mb-6 font-semibold" data-key="room_3_subtitle">The ideal balance of space and cost.</p>
+                        <p class="text-gray-600 mt-2 mb-6 font-semibold" data-key="room_3_subtitle">The ideal balance of space, cost, and community.</p>
                         <ul class="text-left space-y-4 text-lg text-gray-700">
                             <li class="flex items-center"><i data-lucide="user-check" class="w-6 h-6 text-accent-hostel mr-3"></i> **Perfect for 3** (More personal space)</li>
                             <li class="flex items-center"><i data-lucide="maximize" class="w-6 h-6 text-accent-hostel mr-3"></i> Dedicated study areas</li>
@@ -228,23 +215,6 @@
                         </ul>
                         <a href="#contact" class="mt-8 block w-full text-center px-6 py-3 border border-transparent rounded-full text-base font-bold text-white bg-accent-hostel hover:bg-blue-600 transition duration-300 shadow-xl">
                             Select This Room
-                        </a>
-                    </div>
-
-                    <!-- Room Card 3: 2-Sharing (Premium) -->
-                    <div class="w-full sm:w-80 p-6 bg-white rounded-xl shadow-lg border border-gray-200 transition duration-300 hover:shadow-xl">
-                        <div class="flex justify-between items-start">
-                            <span class="text-2xl font-bold text-gray-800" data-key="room_2_title">2-Sharing Room</span>
-                        </div>
-                        <p class="text-gray-500 mt-1 mb-4" data-key="room_2_subtitle">Maximum privacy and space.</p>
-                        <ul class="text-left space-y-3 text-gray-600">
-                            <li class="flex items-center"><i data-lucide="user-check" class="w-5 h-5 text-primary-hostel mr-2"></i> 2 Occupants</li>
-                            <li class="flex items-center"><i data-lucide="table-2" class="w-5 h-5 text-primary-hostel mr-2"></i> Separate desks for each</li>
-                            <li class="flex items-center"><i data-lucide="bath" class="w-5 h-5 text-primary-hostel mr-2"></i> Attached bathroom option</li>
-                            <li class="flex items-center"><i data-lucide="star" class="w-5 h-5 text-primary-hostel mr-2"></i> Premium amenities</li>
-                        </ul>
-                        <a href="#contact" class="mt-6 block w-full text-center px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition duration-300">
-                            Enquire Now
                         </a>
                     </div>
 
@@ -309,7 +279,7 @@
                                 <i data-lucide="phone" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                 <div>
                                     <h3 class="text-lg font-medium text-gray-900">Call Us</h3>
-                                    <p class="text-gray-600" data-key="contact_phone_number">+91 9876 543 210</p>
+                                    <p class="text-gray-600" data-key="contact_phone_number">+91 96569 62786</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
@@ -323,7 +293,8 @@
                                 <i data-lucide="map-pin" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                 <div>
                                     <h3 class="text-lg font-medium text-gray-900">Location</h3>
-                                    <p class="text-gray-600" data-key="contact_address">Opposite Medical College Gate 1, Kottayam, Kerala 686008</p>
+                                    <!-- UPDATED ADDRESS -->
+                                    <p class="text-gray-600" data-key="contact_address">amal ladies hostel, gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
                                 </div>
                             </div>
                         </div>
@@ -347,12 +318,11 @@
                             </div>
                             <div>
                                 <label for="room-preference" class="block text-sm font-medium text-gray-700" data-key="label_preference">Room Preference</label>
+                                <!-- Updated to only show 3-Sharing as an option -->
                                 <select id="room-preference" name="room-preference" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
-                                    <option value="3-sharing" selected>3-Sharing Room (Featured)</option>
-                                    <option value="2-sharing">2-Sharing Room</option>
-                                    <option value="4-sharing">4-Sharing Room</option>
-                                    <option value="any">Any Available</option>
+                                    <option value="3-sharing" selected>3-Sharing Room</option>
                                 </select>
+                                <p class="mt-1 text-xs text-gray-500">Only 3-Sharing rooms are currently available.</p>
                             </div>
                             <div>
                                 <label for="message" class="block text-sm font-medium text-gray-700" data-key="label_message">Your Message / Query</label>
