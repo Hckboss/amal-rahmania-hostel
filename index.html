@@ -212,12 +212,53 @@
                 <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
                     <div class="flex justify-start lg:w-0 lg:flex-1">
                         <a href="#" class="flex items-center space-x-2">
-                            <!-- Logo Implementation with onerror fallback for guaranteed display -->
-                            <img src="logo.png" 
-                                 alt="Amal Ladies Hostel Logo" 
-                                 class="h-10 w-auto object-contain"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/40x40/059669/ffffff?text=A';"
+                            <!-- INLINE SVG LOGO (AH Initials) -->
+                            <svg 
+                                class="h-10 w-10 object-contain" 
+                                viewBox="0 0 300 300" 
+                                xmlns="http://www.w3.org/2000/svg"
+                                role="img"
+                                aria-labelledby="logoTitle"
                             >
+                                <title id="logoTitle">AH Initials Logo</title>
+                                <!-- Circle (using the hostel's primary green) -->
+                                <circle 
+                                    cx="150" 
+                                    cy="150" 
+                                    r="100" 
+                                    stroke="#059669" 
+                                    fill="none" 
+                                    stroke-width="4" 
+                                    stroke-linecap="round"
+                                />
+
+                                <!-- "A" (using the hostel's primary green) -->
+                                <text 
+                                    x="110" 
+                                    y="170" 
+                                    font-size="80" 
+                                    fill="#059669" 
+                                    font-family="Arial, sans-serif" 
+                                    font-weight="900" 
+                                    alignment-baseline="middle"
+                                >A</text>
+
+                                <!-- "H" (using the hostel's primary green) -->
+                                <text 
+                                    x="170" 
+                                    y="170" 
+                                    font-size="80" 
+                                    fill="#059669" 
+                                    font-family="Arial, sans-serif" 
+                                    font-weight="900" 
+                                    alignment-baseline="middle"
+                                >H</text>
+
+                                <!-- Flower/crown motif (using the original pink) -->
+                                <circle cx="150" cy="40" r="10" fill="#F4A7B9" />
+                                <circle cx="130" cy="50" r="8" fill="#F4A7B9" />
+                                <circle cx="170" cy="50" r="8" fill="#F4A7B9" />
+                            </svg>
                             
                             <span class="text-xl font-extrabold text-primary-hostel" data-key="brand_name">Amal Hostel</span>
                         </a>
@@ -269,7 +310,7 @@
                             <div class="mt-10 sm:flex sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
                                 <a href="#rooms" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-primary-hostel hover:bg-green-700 transition duration-300 transform hover:scale-105">
                                     Explore Rooms
-                                </a>
+                                }</a>
                                 <a href="#contact" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-primary-hostel text-base font-medium rounded-full shadow-lg text-primary-hostel bg-white hover:bg-gray-50 transition duration-300 transform hover:scale-105">
                                     Virtual Tour
                                 </a>
