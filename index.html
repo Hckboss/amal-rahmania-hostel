@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-key="page_title">Amal Ladies Hostel - Near Kottayam Medical College</title>
+    <title data-key="page_title">Amal Ladies Hostel - Premium Student Living</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
@@ -12,169 +12,209 @@
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
 
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* Custom Font Import: Inter for modern readability */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7fafc; /* light background */
-            scroll-behavior: smooth;
+        :root {
+            --primary: #059669;
+            --primary-light: #34d399;
+            --cursor-size: 20px;
+            --cursor-outline-size: 40px;
         }
-        /* Custom Tailwind Configuration */
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 50px;
-            height: 4px;
-            background-color: #059669; /* Emerald 600 */
-            margin: 8px auto 0;
-            border-radius: 2px;
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+            /* Default cursor for mobile/touch */
+            cursor: auto; 
         }
 
-        /* --- THEMATIC PRELOADER STYLES --- */
-        #preloader-overlay {
+        /* --- DESKTOP-ONLY INTERACTIONS --- */
+        @media (hover: hover) and (pointer: fine) {
+            body {
+                cursor: none; /* Hide system cursor only on devices with a mouse */
+            }
+            .cursor-dot,
+            .cursor-outline {
+                display: block;
+            }
+        }
+
+        /* --- CUSTOM CURSOR (Hidden on Mobile by default via CSS above) --- */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            display: none; /* Hidden by default, shown via media query */
+        }
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+        }
+        .cursor-outline {
+            width: var(--cursor-outline-size);
+            height: var(--cursor-outline-size);
+            border: 1px solid rgba(5, 150, 105, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        /* Hover State for Cursor */
+        body.hovering .cursor-outline {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(5, 150, 105, 0.1);
+            border-color: transparent;
+        }
+
+        /* --- NOISE TEXTURE --- */
+        .noise-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #f7fafc;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease-in-out;
-            overflow: hidden;
-        }
-        
-        .hostel-scene {
-            position: relative;
-            width: 400px;
-            height: 200px;
-            transform: translateY(50px); 
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-end;
-        }
-
-        .hostel-scene::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: -100px;
-            width: 500px;
-            height: 10px;
-            background-color: #e5e7eb;
-            z-index: 1;
-        }
-
-        .hostel-facade {
-            position: absolute;
-            bottom: 10px;
-            right: 0;
-            width: 150px;
-            height: 150px;
-            background-color: #059669;
-            border-radius: 8px 8px 0 0;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
-            z-index: 2;
-            border: 2px solid #047857;
-        }
-
-        .hostel-door {
-            position: absolute;
-            bottom: 10px;
-            right: 50px;
-            width: 30px;
-            height: 60px;
-            background-color: #374151;
-            border-radius: 4px 4px 0 0;
-            z-index: 3;
-        }
-
-        .person {
-            position: absolute;
-            bottom: 10px;
-            width: 15px;
-            height: 40px;
-            border-radius: 50% 50% 0 0;
-            left: -50px;
-            z-index: 4;
-            animation-name: walk-animation;
-            animation-duration: 5s;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
-        }
-
-        .person-1 { background-color: #fcd34d; animation-delay: 0s; }
-        .person-2 { background-color: #3b82f6; width: 12px; height: 35px; animation-delay: 1.8s; }
-        .person-3 { background-color: #ef4444; width: 16px; height: 45px; animation-delay: 3.5s; }
-
-        @keyframes walk-animation {
-            0% { transform: translateX(0); opacity: 1; }
-            80% { transform: translateX(300px); opacity: 1; }
-            100% { transform: translateX(300px); opacity: 0; }
-        }
-        
-        .hidden-content {
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.75s ease-in-out, visibility 0.75s; 
-        }
-
-        /* --- MODAL & LIGHTBOX STYLES --- */
-        .modal {
-            transition: opacity 0.3s ease-in-out;
-            opacity: 0;
             pointer-events: none;
-        }
-        .modal.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .star-rating i {
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .star-rating i:hover,
-        .star-rating i.active {
-            fill: #facc15; /* Yellow-400 */
-            color: #facc15;
+            z-index: 9000;
+            opacity: 0.05;
+            background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
         }
 
-        /* Lightbox specific */
-        #lightbox-modal img {
-            max-height: 90vh;
-            max-width: 90vw;
+        /* --- UTILITIES --- */
+        .text-gradient {
+            background: linear-gradient(135deg, #059669 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* --- ANIMATION UTILITIES --- */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .button-pulse { animation: pulse 1s infinite; }
 
-        /* Scroll Reveal Animation Classes */
-        .reveal {
+        /* Text Reveal Animation */
+        .word-reveal {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        .word-reveal span {
+            display: inline-block;
+            transform: translateY(100%);
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease-out;
+            transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
         }
-        .reveal.active {
-            opacity: 1;
+        .word-reveal.active span {
             transform: translateY(0);
+            opacity: 1;
         }
 
-        /* Floating WhatsApp Button */
-        .float-wa {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 100;
-            animation: pulse 2s infinite;
+        /* Footer Wave */
+        .waves {
+            position: absolute;
+            top: -100px;
+            width: 100%;
+            height: 100px;
+            min-height: 100px;
+            max-height: 150px;
         }
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
+
+        /* --- ANIMATIONS --- */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: radial-gradient(at 0% 0%, rgba(5, 150, 105, 0.15) 0px, transparent 50%),
+                        radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.05) 0px, transparent 50%),
+                        radial-gradient(at 0% 100%, rgba(251, 191, 36, 0.05) 0px, transparent 50%);
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: bg-shift 20s ease-in-out infinite alternate;
+            will-change: transform; /* Hint for performance */
+        }
+        @keyframes bg-shift {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .scroll-progress {
+            position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+            background: linear-gradient(90deg, #059669, #34d399); z-index: 1000;
+            transition: width 0.1s ease-out;
+        }
+
+        /* 3D Tilt - Optimized: Only apply logic via JS for Desktop */
+        .tilt-card {
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .tilt-content { transform: translateZ(30px); }
+
+        /* General Reveal */
+        .reveal {
+            opacity: 0; transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        /* Spotlight Card */
+        .spotlight-card {
+            position: relative; overflow: hidden;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .spotlight-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(5, 150, 105, 0.08), transparent 40%);
+            opacity: 0; transition: opacity 0.5s ease; pointer-events: none; z-index: 1;
+        }
+        /* Only show spotlight effect on hover-capable devices */
+        @media (hover: hover) {
+            .spotlight-card:hover::before { opacity: 1; }
+            .spotlight-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+                border-color: rgba(5, 150, 105, 0.3);
+            }
+        }
+
+        /* Active Nav Link */
+        .nav-link.active { color: #059669; }
+        .nav-link.active::after { width: 100%; }
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -2px; left: 0; background-color: #059669;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        /* Modal Transitions */
+        .modal { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; pointer-events: none; transform: scale(0.95); }
+        .modal.active { opacity: 1; pointer-events: auto; transform: scale(1); }
 
     </style>
     <script>
@@ -182,920 +222,803 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary-hostel': '#059669', // Emerald 600
-                        'accent-hostel': '#3b82f6',  // Blue 500
-                        'secondary-hostel': '#fcd34d', // Amber 300
+                        primary: '#059669', // Emerald 600
+                        dark: '#0f172a',    // Slate 900
+                        light: '#f1f5f9',   // Slate 100
+                        accent: '#3b82f6',  // Blue 500
                     },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
                 },
             },
         };
 
-        // Firebase Setup
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
     </script>
 </head>
-<body class="text-gray-800">
+<body class="text-slate-800 antialiased selection:bg-primary selection:text-white relative">
+
+    <!-- Custom Cursor (Only shows on Desktop via CSS) -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <!-- Noise Texture -->
+    <div class="noise-overlay"></div>
+
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scroll-progress"></div>
+
+    <!-- Mesh Gradient Background -->
+    <div class="mesh-bg"></div>
 
     <!-- Preloader -->
-    <div id="preloader-overlay">
-        <div class="hostel-scene">
-            <div class="hostel-facade"></div>
-            <div class="hostel-door"></div>
-            <div class="person person-1"></div>
-            <div class="person person-2"></div>
-            <div class="person person-3"></div>
+    <div id="preloader-overlay" class="fixed inset-0 bg-white z-[9999] flex justify-center items-center transition-all duration-700">
+        <div class="flex flex-col items-center">
+            <div class="relative w-24 h-24">
+                <svg class="animate-spin w-full h-full text-slate-200" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center font-bold text-primary text-2xl animate-pulse">AH</div>
+            </div>
+            <p class="text-slate-400 font-bold text-xs mt-6 tracking-[0.3em] uppercase">Premium Living</p>
         </div>
     </div>
 
     <!-- Review Modal -->
-    <div id="review-modal" class="modal fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all scale-100">
-            <div class="bg-primary-hostel px-6 py-4 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white">Write a Review</h3>
-                <button id="close-modal-btn" class="text-white hover:bg-green-700 rounded-full p-1 transition">
-                    <i data-lucide="x" class="w-6 h-6"></i>
+    <div id="review-modal" class="modal fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-slate-100 transform transition-all">
+            <div class="bg-slate-50 px-8 py-6 flex justify-between items-center border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 tracking-tight">Write a Review</h3>
+                <button id="close-modal-btn" class="text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full p-2 transition magnetic-target">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6">
-                <form id="review-form" class="space-y-4">
+            <div class="p-8">
+                <form id="review-form" class="space-y-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-                        <input type="text" id="reviewer-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-hostel focus:border-transparent outline-none transition" placeholder="e.g. Anjali K.">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Your Name</label>
+                        <input type="text" id="reviewer-name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition font-medium" placeholder="e.g. Anjali K.">
                     </div>
-                    
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Rating</label>
-                        <div class="star-rating flex space-x-1" id="star-container">
-                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="1"></i>
-                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="2"></i>
-                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="3"></i>
-                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="4"></i>
-                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="5"></i>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Rating</label>
+                        <div class="star-rating flex space-x-2" id="star-container">
+                            <i data-lucide="star" class="w-8 h-8 text-slate-200 magnetic-target" data-value="1"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-slate-200 magnetic-target" data-value="2"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-slate-200 magnetic-target" data-value="3"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-slate-200 magnetic-target" data-value="4"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-slate-200 magnetic-target" data-value="5"></i>
                         </div>
                         <input type="hidden" id="rating-value" required>
-                        <p id="rating-error" class="text-red-500 text-xs mt-1 hidden">Please select a star rating.</p>
+                        <p id="rating-error" class="text-red-500 text-xs mt-2 hidden font-medium">Please select a star rating.</p>
                     </div>
-
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Experience</label>
-                        <textarea id="review-text" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-hostel focus:border-transparent outline-none transition" placeholder="Share your thoughts about the hostel..."></textarea>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Experience</label>
+                        <textarea id="review-text" rows="3" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition resize-none font-medium" placeholder="Share your thoughts..."></textarea>
                     </div>
-
-                    <button type="submit" class="w-full py-3 bg-primary-hostel text-white font-bold rounded-lg hover:bg-green-700 transition shadow-lg flex justify-center items-center">
-                        <span>Submit Review</span>
+                    <button type="submit" class="magnetic-target w-full py-4 bg-primary hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition transform hover:-translate-y-0.5 active:translate-y-0 flex justify-center items-center gap-2">
+                        <span>Post Review</span>
+                        <i data-lucide="send" class="w-4 h-4"></i>
                     </button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Image Lightbox Modal -->
-    <div id="lightbox-modal" class="modal fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-md" onclick="closeLightbox()">
-        <img id="lightbox-img" src="" alt="Full size view" class="rounded-lg shadow-2xl transform transition-transform duration-300 scale-95" onclick="event.stopPropagation()">
-        <button class="absolute top-5 right-5 text-white bg-gray-800 bg-opacity-50 rounded-full p-2 hover:bg-gray-700 transition">
+    <!-- Lightbox -->
+    <div id="lightbox-modal" class="modal fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-xl" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Full view" class="rounded-lg shadow-2xl max-h-[90vh] max-w-[90vw] object-contain transition-transform duration-300" onclick="event.stopPropagation()">
+        <button class="magnetic-target absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition backdrop-blur-md">
             <i data-lucide="x" class="w-8 h-8"></i>
         </button>
     </div>
 
-    <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/919656962786" target="_blank" class="float-wa bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl transition duration-300 transform hover:scale-110 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+    <!-- Floating WhatsApp -->
+    <a href="https://wa.me/919656962786" target="_blank" class="magnetic-target fixed bottom-8 right-8 z-50 bg-[#25D366] hover:bg-[#20bd5a] text-white p-4 rounded-full shadow-2xl shadow-green-500/40 transition-all hover:scale-110 hover:-rotate-12 group flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+        <div class="absolute right-full mr-4 bg-white text-slate-800 text-sm font-bold px-4 py-2 rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0 pointer-events-none whitespace-nowrap hidden md:block">
+            Chat with us
+            <div class="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-white transform rotate-45"></div>
+        </div>
     </a>
 
-    <!-- Main Content -->
-    <div id="main-content-wrapper" class="hidden-content">
-
-        <header class="sticky top-0 z-50 bg-white shadow-md transition-all duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
-                    <div class="flex justify-start lg:w-0 lg:flex-1">
-                        <a href="#" class="flex items-center space-x-2 group">
-                            
-                            <!-- LOGO LOGIC (Swap on Load) -->
-                            <img 
-                                src="logo.png" 
-                                alt="Amal Hostel Logo" 
-                                class="h-16 w-auto object-contain hidden"
-                                onload="this.classList.remove('hidden'); document.getElementById('fallback-logo').classList.add('hidden');"
-                            >
-
-                            <!-- FALLBACK SVG -->
-                            <svg 
-                                id="fallback-logo"
-                                class="h-16 w-16 object-contain text-primary-hostel" 
-                                viewBox="0 0 300 300" 
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <defs>
-                                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
-                                        <stop offset="100%" style="stop-color:#34d399;stop-opacity:1" />
-                                    </linearGradient>
-                                </defs>
-                                <circle cx="150" cy="150" r="130" stroke="url(#grad1)" fill="none" stroke-width="8" stroke-linecap="round"/>
-                                <path d="M90 220 L150 60 L210 220 M110 160 L190 160" stroke="url(#grad1)" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M150 60 Q180 20 200 60" stroke="#fcd34d" stroke-width="8" fill="none" stroke-linecap="round" />
-                                <circle cx="150" cy="60" r="10" fill="#fcd34d" />
-                            </svg>
-                            
-                            <span class="text-xl font-extrabold text-primary-hostel whitespace-nowrap ml-2">Amal Hostel</span>
-                        </a>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass transition-all duration-300 top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-24">
+                <!-- Logo -->
+                <div class="magnetic-target flex-shrink-0 flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
+                    <div class="relative w-12 h-12 transition-transform duration-500 group-hover:rotate-[360deg]">
+                        <img src="logo.png" alt="Logo" class="w-full h-full object-contain hidden" onload="this.classList.remove('hidden'); this.nextElementSibling.classList.add('hidden')">
+                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                            <span class="font-bold text-xl">AH</span>
+                        </div>
                     </div>
-                    <nav class="hidden md:flex space-x-10">
-                        <a href="#amenities" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Amenities</a>
-                        <a href="#rooms" class="text-base font-medium text-primary-hostel hover:text-primary-hostel transition duration-150 border-b-2 border-primary-hostel pb-1">Rooms</a>
-                        <a href="#faq" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">FAQ</a>
-                        <a href="#reviews" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Reviews</a>
-                        <a href="#contact" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Contact</a>
-                    </nav>
-                    <div class="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-                        <a href="#contact" class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700 transition duration-300 hover:shadow-lg">
-                            Book a Visit
-                        </a>
-                    </div>
-                    <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-primary-hostel focus:outline-none">
-                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    <span class="font-bold text-2xl tracking-tight text-slate-900">Amal<span class="text-primary">Hostel</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-1 items-center">
+                    <a href="#amenities" class="magnetic-target nav-link px-5 py-2 text-sm font-semibold text-slate-600 hover:text-primary transition rounded-full">Amenities</a>
+                    <a href="#rooms" class="magnetic-target nav-link px-5 py-2 text-sm font-semibold text-slate-600 hover:text-primary transition rounded-full">Rooms</a>
+                    <a href="#reviews" class="magnetic-target nav-link px-5 py-2 text-sm font-semibold text-slate-600 hover:text-primary transition rounded-full">Reviews</a>
+                    <a href="#contact" class="magnetic-target ml-4 px-7 py-3 bg-slate-900 hover:bg-primary text-white text-sm font-bold rounded-full transition-all shadow-lg shadow-slate-900/20 hover:shadow-primary/30 hover:-translate-y-0.5">
+                        Book Visit
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-slate-600 hover:text-primary transition focus:outline-none p-2 rounded-lg hover:bg-slate-50">
+                        <i data-lucide="menu" class="w-7 h-7"></i>
                     </button>
                 </div>
             </div>
-            <div id="mobile-menu" class="hidden md:hidden">
-                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 shadow-lg">
-                    <a href="#amenities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Amenities</a>
-                    <a href="#rooms" class="block px-3 py-2 rounded-md text-base font-medium text-primary-hostel bg-green-50/50">Rooms</a>
-                    <a href="#faq" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">FAQ</a>
-                    <a href="#reviews" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Reviews</a>
-                    <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Contact</a>
-                    <a href="#contact" class="block w-full text-center mt-2 px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700">
-                        Book a Visit
-                    </a>
-                </div>
+        </div>
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-t border-slate-100 absolute w-full left-0 shadow-2xl transition-all">
+            <div class="px-4 pt-4 pb-8 space-y-2">
+                <a href="#amenities" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-primary transition">Amenities</a>
+                <a href="#rooms" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-primary transition">Rooms</a>
+                <a href="#reviews" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-primary transition">Reviews</a>
+                <a href="#contact" class="block mt-6 w-full text-center px-4 py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-emerald-700 transition">Book a Visit</a>
             </div>
-        </header>
+        </div>
+    </nav>
 
-        <main>
-            <section class="relative bg-gray-100 pt-16 pb-20 overflow-hidden reveal">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="lg:grid lg:grid-cols-12 lg:gap-8">
-                        <div class="lg:col-span-6 flex flex-col justify-center text-center lg:text-left">
-                            <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                                <span class="block xl:inline">Your Home Away From Home</span>
-                                <span class="block text-primary-hostel xl:inline">Near Kottayam Medical College.</span>
-                            </h1>
-                            <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                                Safe, Comfortable, and Convenient ladies' accommodation designed for students and professionals. Walkable distance to the Medical College.
-                            </p>
-                            <div class="mt-10 sm:flex sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-                                <a href="#rooms" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-primary-hostel hover:bg-green-700 transition duration-300 transform hover:scale-105">
-                                    Explore Rooms
-                                </a>
-                                <a href="#contact" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-primary-hostel text-base font-medium rounded-full shadow-lg text-primary-hostel bg-white hover:bg-gray-50 transition duration-300 transform hover:scale-105">
-                                    Virtual Tour
-                                </a>
-                            </div>
+    <main>
+        <!-- Hero Section -->
+        <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden" id="home">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <div class="text-center lg:text-left reveal">
+                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-wider mb-8 shadow-sm hover:shadow-md transition cursor-default">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Admissions Open 2025
                         </div>
-                        <div class="mt-12 lg:mt-0 lg:col-span-6 relative">
-                            <!-- Decorative blob background -->
-                            <div class="absolute -top-10 -right-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
-                            <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
-                            
-                            <div class="relative max-w-lg mx-auto lg:max-w-none group cursor-pointer" onclick="openLightbox('main image.jpg')">
-                                <!-- UPDATED: Using main image.jpg -->
-                                <img class="w-full h-auto rounded-xl shadow-2xl object-cover transform rotate-1 transition duration-500 group-hover:rotate-0 group-hover:scale-[1.02]"
-                                     src="main image.jpg"
-                                     alt="Exterior view of the Amal Ladies Hostel building">
-                                <div class="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded flex items-center">
-                                    <i data-lucide="maximize-2" class="w-3 h-3 mr-1"></i> Click to enlarge
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="amenities" class="py-16 sm:py-24 bg-white reveal">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title">
-                        Comfort & Convenience Included
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-500">
-                        Everything you need to focus on your studies and well-being.
-                    </p>
-                    <div class="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
-                                <i data-lucide="wifi" class="w-6 h-6"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900">High-Speed Wi-Fi</h3>
-                            <p class="mt-2 text-base text-gray-500">Uninterrupted internet for online classes and research.</p>
-                        </div>
-
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
-                                <i data-lucide="utensils" class="w-6 h-6"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900">Nutritious Meals</h3>
-                            <p class="mt-2 text-base text-gray-500">Home-cooked, healthy food (Veg/Non-veg options).</p>
-                        </div>
-
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
-                                <i data-lucide="shield-check" class="w-6 h-6"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900">24/7 Security</h3>
-                            <p class="mt-2 text-base text-gray-500">Secure premises with CCTV surveillance and warden supervision.</p>
-                        </div>
-
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
-                                <i data-lucide="locate-fixed" class="w-6 h-6"></i>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900">Prime Location</h3>
-                            <p class="mt-2 text-base text-gray-500">Just minutes walk from Kottayam Medical College.</p>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-
-            <section id="rooms" class="py-16 sm:py-24 bg-gray-100 reveal">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title">
-                        Our Exclusive Room Option
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-500">
-                        We offer a single, high-comfort 3-Sharing room type to ensure the best balance of space and value.
-                    </p>
-
-                    <div class="mt-12 flex flex-wrap justify-center gap-8">
-
-                        <div class="w-full sm:w-96 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-100 transition duration-500 hover:scale-105 relative">
-                            <!-- UPDATED: Added room.jpg inside the card with Lightbox trigger -->
-                            <div class="relative overflow-hidden rounded-lg mb-6 group cursor-pointer" onclick="openLightbox('room.jpg')">
-                                <img src="room.jpg" alt="3-Sharing Room" class="w-full h-56 object-cover transition duration-500 group-hover:scale-110">
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300 flex items-center justify-center">
-                                    <i data-lucide="zoom-in" class="text-white opacity-0 group-hover:opacity-100 w-10 h-10 transition duration-300"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="absolute -top-3 right-0 bg-secondary-hostel text-gray-900 font-bold text-xs px-3 py-1 rounded-full shadow-lg">
-                                FEATURED OPTION
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <span class="text-3xl font-extrabold text-primary-hostel">3-Sharing Room</span>
-                            </div>
-                            <p class="text-gray-600 mt-2 mb-6 font-semibold">The ideal balance of space, cost, and community.</p>
-                            <ul class="text-left space-y-4 text-lg text-gray-700">
-                                <li class="flex items-center"><i data-lucide="user-check" class="w-6 h-6 text-accent-hostel mr-3"></i> **Perfect for 3** (More personal space)</li>
-                                <li class="flex items-center"><i data-lucide="maximize" class="w-6 h-6 text-accent-hostel mr-3"></i> Dedicated study areas</li>
-                                <li class="flex items-center"><i data-lucide="lock" class="w-6 h-6 text-accent-hostel mr-3"></i> Lockable wardrobe provided</li>
-                                <li class="flex items-center"><i data-lucide="air-vent" class="w-6 h-6 text-accent-hostel mr-3"></i> Optimal comfort and ventilation</li>
-                            </ul>
-                            <a href="#contact" class="mt-8 block w-full text-center px-6 py-3 border border-transparent rounded-full text-base font-bold text-white bg-accent-hostel hover:bg-blue-600 transition duration-300 shadow-xl">
-                                Select This Room
+                        <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-8 word-reveal" id="hero-title">
+                            <span>Your Premium</span> <br>
+                            <span class="text-gradient">Student Home.</span>
+                        </h1>
+                        <p class="text-xl text-slate-500 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium reveal delay-100">
+                            Experience the perfect blend of comfort, safety, and community. Located just steps away from Kottayam Medical College.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start reveal delay-200">
+                            <a href="#rooms" class="magnetic-target px-8 py-4 bg-primary hover:bg-emerald-700 text-white font-bold rounded-full shadow-lg shadow-primary/30 transition transform hover:-translate-y-1 hover:shadow-primary/40 flex items-center justify-center gap-2">
+                                View Rooms <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </a>
+                            <a href="#contact" class="magnetic-target px-8 py-4 bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 font-bold rounded-full shadow-sm transition transform hover:-translate-y-1 flex items-center justify-center gap-2 hover:border-slate-300">
+                                <i data-lucide="play-circle" class="w-5 h-5 text-primary"></i>
+                                Virtual Tour
                             </a>
                         </div>
-
-                    </div>
-                </div>
-            </section>
-
-            <section id="language-diversity" class="py-16 sm:py-24 bg-white reveal">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title">
-                        A Place to Connect
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
-                        We welcome students from all regions and backgrounds, fostering a supportive and diverse community.
-                    </p>
-                    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left">
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg border-l-4 border-primary-hostel">
-                            <h3 class="text-2xl font-bold text-gray-900 mb-4">Our Community Vibe</h3>
-                            <p class="text-gray-600 mb-4">
-                                Hostel life is about shared experiences. We encourage a friendly environment where students help each other with studies and personal growth.
-                            </p>
-                            <ul class="space-y-3 text-gray-700">
-                                <li class="flex items-start">
-                                    <i data-lucide="heart" class="w-5 h-5 text-red-500 mt-1 mr-3 flex-shrink-0"></i>
-                                    <span class="font-medium">Supportive atmosphere:</span> Seniors readily guide juniors.
-                                </li>
-                                <li class="flex items-start">
-                                    <i data-lucide="globe" class="w-5 h-5 text-blue-500 mt-1 mr-3 flex-shrink-0"></i>
-                                    <span class="font-medium">Cultural Exchange:</span> Learn about different traditions and languages.
-                                </li>
-                                <li class="flex items-start">
-                                    <i data-lucide="message-circle" class="w-5 h-5 text-yellow-500 mt-1 mr-3 flex-shrink-0"></i>
-                                    <span class="font-medium">Bilingual Support:</span> Malayalam and English speaking staff available.
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="relative cursor-pointer group" onclick="openLightbox('visiting room.jpg')">
-                            <!-- UPDATED: Using visiting room.jpg with hover effect -->
-                            <img class="w-full h-auto rounded-xl shadow-xl object-cover transition duration-500 group-hover:shadow-2xl"
-                                 src="visiting room.jpg"
-                                 alt="Interior view of the visiting area and TV room">
-                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-300 rounded-xl"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- FAQ SECTION (NEW) -->
-            <section id="faq" class="py-16 sm:py-24 bg-gray-50 reveal">
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center mb-10">
-                        Frequently Asked Questions
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        <!-- FAQ Item 1 -->
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                            <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
-                                <span>Is there a curfew time?</span>
-                                <i data-lucide="chevron-down" class="w-5 h-5 transform transition-transform duration-300"></i>
-                            </button>
-                            <div class="px-6 pb-4 text-gray-600 hidden">
-                                Yes, for the safety and security of all residents, the main gates close at 7:00 PM. Special permission is required for late entries due to academic reasons.
-                            </div>
-                        </div>
-
-                        <!-- FAQ Item 2 -->
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                            <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
-                                <span>Are guests allowed?</span>
-                                <i data-lucide="chevron-down" class="w-5 h-5 transform transition-transform duration-300"></i>
-                            </button>
-                            <div class="px-6 pb-4 text-gray-600 hidden">
-                                Female guests (mothers/sisters) are allowed in the designated visiting room during daytime hours. Male guests are strictly not allowed inside the premises.
-                            </div>
-                        </div>
-
-                        <!-- FAQ Item 3 -->
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                            <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
-                                <span>Do I need to pay a deposit?</span>
-                                <i data-lucide="chevron-down" class="w-5 h-5 transform transition-transform duration-300"></i>
-                            </button>
-                            <div class="px-6 pb-4 text-gray-600 hidden">
-                                Yes, a refundable caution deposit is required at the time of admission. Please contact us for current rates.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="reviews" class="py-16 sm:py-24 bg-white border-t border-gray-200 reveal">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title">
-                        What Our Residents Say
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-500">
-                        Real stories from students and professionals living at Amal Hostel.
-                    </p>
-            
-                    <div id="reviews-container" class="mt-12 grid gap-8 lg:grid-cols-3">
-                        <!-- Static Featured Reviews (Will always stay) -->
-                        <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left border border-gray-100">
-                            <div class="flex items-center mb-4 text-yellow-400">
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            </div>
-                            <p class="text-gray-600 mb-4 italic">"The proximity to the Medical College is a lifesaver. It's so safe and the warden is very supportive. Highly recommend!"</p>
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-primary-hostel flex items-center justify-center text-white font-bold">AS</div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900">Anjali S.</p>
-                                    <p class="text-xs text-gray-500">Medical Student</p>
-                                </div>
-                            </div>
-                        </div>
-            
-                        <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left border border-gray-100">
-                            <div class="flex items-center mb-4 text-yellow-400">
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star-half" class="w-5 h-5 fill-current"></i>
-                            </div>
-                            <p class="text-gray-600 mb-4 italic">"Food is homely and tasty. The 3-sharing room is spacious enough and I made great friends here."</p>
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-accent-hostel flex items-center justify-center text-white font-bold">RK</div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900">Reshma K.</p>
-                                    <p class="text-xs text-gray-500">Nursing Staff</p>
-                                </div>
-                            </div>
-                        </div>
-            
-                        <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left border border-gray-100">
-                            <div class="flex items-center mb-4 text-yellow-400">
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                                <i data-lucide="star" class="w-5 h-5 fill-current"></i>
-                            </div>
-                            <p class="text-gray-600 mb-4 italic">"Security was my parents' main concern, and Amal Hostel is excellent in that regard. 24/7 CCTV puts them at ease."</p>
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-secondary-hostel flex items-center justify-center text-gray-800 font-bold">JM</div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900">Jasmine M.</p>
-                                    <p class="text-xs text-gray-500">PG Student</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Dynamic reviews will be appended here by JS -->
                     </div>
                     
-                    <div class="mt-12">
-                        <button id="write-review-btn" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-md text-primary-hostel bg-white border-primary-hostel hover:bg-green-50 transition duration-300 transform hover:scale-105">
-                            <i data-lucide="pen-tool" class="w-5 h-5 mr-2"></i>
-                            Write a Review
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <section id="contact" class="py-16 sm:py-24 bg-gray-100 reveal">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="lg:grid lg:grid-cols-2 lg:gap-12">
-
-                        <div class="mb-10 lg:mb-0 flex flex-col h-full">
-                            <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center lg:text-left">
-                                Get in Touch
-                            </h2>
-                            <p class="mt-4 text-xl text-gray-500 max-w-xl text-center lg:text-left mb-8">
-                                We're here to answer all your questions about our facilities and rooms.
-                            </p>
+                    <!-- 3D Tilt Image Container -->
+                    <div class="perspective-container relative lg:h-[600px] w-full reveal delay-200 flex items-center justify-center" style="perspective: 1000px;">
+                        <div id="hero-card" class="tilt-card relative w-full h-full cursor-none group" onclick="openLightbox('main image.jpg')">
+                            <div class="absolute -inset-4 bg-gradient-to-tr from-primary to-blue-500 rounded-[2.5rem] opacity-30 blur-2xl group-hover:opacity-40 transition duration-700"></div>
+                            <img src="main image.jpg" alt="Hostel Exterior" class="relative w-full h-full object-cover rounded-[2rem] shadow-2xl border-4 border-white/50 transition duration-500">
                             
-                            <div class="space-y-6 text-left flex-grow">
-                                <div class="flex items-start bg-white p-4 rounded-lg shadow-sm">
-                                    <i data-lucide="phone" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
-                                    <div>
-                                        <h3 class="text-lg font-medium text-gray-900">Call Us</h3>
-                                        <p class="text-gray-600 font-mono">+91 96569 62786</p>
-                                    </div>
+                            <div class="tilt-content absolute bottom-8 left-8 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl flex items-center gap-4 animate-float border border-white/50">
+                                <div class="bg-gradient-to-br from-green-100 to-emerald-200 p-3 rounded-xl text-emerald-700 shadow-inner">
+                                    <i data-lucide="shield-check" class="w-6 h-6"></i>
                                 </div>
-                                <div class="flex items-start bg-white p-4 rounded-lg shadow-sm">
-                                    <i data-lucide="mail" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
-                                    <div>
-                                        <h3 class="text-lg font-medium text-gray-900">Email</h3>
-                                        <p class="text-gray-600">info@amalhostel.com</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start bg-white p-4 rounded-lg shadow-sm">
-                                    <i data-lucide="map-pin" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
-                                    <div>
-                                        <h3 class="text-lg font-medium text-gray-900">Location</h3>
-                                        <p class="text-gray-600">Amal Ladies Hostel, Gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
-                                    </div>
+                                <div>
+                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wide">Security</p>
+                                    <p class="text-slate-900 font-bold text-lg">24/7 CCTV</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                            <!-- Embedded Map -->
-                            <div class="mt-8 h-64 w-full rounded-xl overflow-hidden shadow-lg border-2 border-white">
-                                <iframe 
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3934.148114407357!2d76.550!3d9.650!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzknMDAuMCJOIDc2wrAzMycwMC4wIkU!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin" 
-                                    width="100%" 
-                                    height="100%" 
-                                    style="border:0;" 
-                                    allowfullscreen="" 
-                                    loading="lazy">
-                                </iframe>
+        <!-- Stats Section -->
+        <section class="py-12 bg-white/50 backdrop-blur-sm border-y border-slate-200/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+                    <div class="reveal delay-100">
+                        <p class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-slate-900 to-slate-600 mb-2 counter" data-target="5">0</p>
+                        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Min Walk to College</p>
+                    </div>
+                    <div class="reveal delay-200">
+                        <p class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-slate-900 to-slate-600 mb-2 counter" data-target="50">0</p>
+                        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Happy Residents</p>
+                    </div>
+                    <div class="reveal delay-300">
+                        <p class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-slate-900 to-slate-600 mb-2 counter" data-target="24">0</p>
+                        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Hours Security</p>
+                    </div>
+                    <div class="reveal delay-100">
+                        <p class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-slate-900 to-slate-600 mb-2">4.8</p>
+                        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Star Rating</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Amenities -->
+        <section id="amenities" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20 reveal">
+                    <h2 class="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Everything You Need</h2>
+                    <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Designed for the modern student lifestyle with premium amenities included.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6" id="amenity-grid">
+                    <div class="spotlight-card p-8 rounded-3xl group reveal delay-100 tilt-card magnetic-target">
+                        <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition duration-500 shadow-sm group-hover:shadow-emerald-100">
+                            <i data-lucide="wifi" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">High-Speed Fiber</h3>
+                        <p class="text-slate-500 leading-relaxed font-medium">Dedicated bandwidth for uninterrupted online classes.</p>
+                    </div>
+
+                    <div class="spotlight-card p-8 rounded-3xl group reveal delay-200 tilt-card magnetic-target">
+                        <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-8 group-hover:scale-110 transition duration-500 shadow-sm group-hover:shadow-blue-100">
+                            <i data-lucide="utensils" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Homely Meals</h3>
+                        <p class="text-slate-500 leading-relaxed font-medium">Nutritious, hygienic home-cooked food. Veg and non-veg.</p>
+                    </div>
+
+                    <div class="spotlight-card p-8 rounded-3xl group reveal delay-300 tilt-card magnetic-target">
+                        <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-8 group-hover:scale-110 transition duration-500 shadow-sm group-hover:shadow-indigo-100">
+                            <i data-lucide="shield-check" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">24/7 Safety</h3>
+                        <p class="text-slate-500 leading-relaxed font-medium">Secure premises with CCTV and warden supervision.</p>
+                    </div>
+
+                    <div class="spotlight-card p-8 rounded-3xl group reveal delay-100 tilt-card magnetic-target">
+                        <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-8 group-hover:scale-110 transition duration-500 shadow-sm group-hover:shadow-amber-100">
+                            <i data-lucide="map-pin" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Prime Location</h3>
+                        <p class="text-slate-500 leading-relaxed font-medium">Located in Gandhinagar, just a short walk from the college.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Room Showcase -->
+        <section id="rooms" class="py-24 bg-white overflow-hidden border-y border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="lg:flex lg:items-center lg:gap-20">
+                    <div class="lg:w-1/2 reveal">
+                        <span class="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">Accommodation</span>
+                        <h2 class="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-8 leading-tight">Premium 3-Sharing Suites</h2>
+                        <p class="text-slate-500 text-lg mb-10 leading-relaxed">
+                            Our signature room configuration designed for community and privacy. Each resident gets their own wardrobe, study space, and ample ventilation.
+                        </p>
+                        
+                        <div class="space-y-6 mb-12">
+                            <div class="flex items-center gap-5">
+                                <div class="bg-emerald-100 p-3 rounded-xl text-primary"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900">Spacious Layout</h4>
+                                    <p class="text-sm text-slate-500">Perfectly balanced for 3 residents.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-5">
+                                <div class="bg-blue-100 p-3 rounded-xl text-blue-600"><i data-lucide="wind" class="w-6 h-6"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900">Ventilation</h4>
+                                    <p class="text-sm text-slate-500">Large windows for natural light.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-5">
+                                <div class="bg-indigo-100 p-3 rounded-xl text-indigo-600"><i data-lucide="lock" class="w-6 h-6"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900">Privacy</h4>
+                                    <p class="text-sm text-slate-500">Individual lockable wardrobes.</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-8 rounded-xl shadow-2xl border-t-4 border-primary-hostel">
-                            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Send an Enquiry</h3>
-                            <form id="enquiry-form" class="space-y-6"> 
-                                <div>
-                                    <label for="full-name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                                    <input type="text" id="full-name" name="full-name" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
+                        <a href="#contact" class="magnetic-target inline-flex items-center text-primary font-bold text-lg hover:text-emerald-700 transition group">
+                            Check Availability <i data-lucide="arrow-right" class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+
+                    <div class="lg:w-1/2 mt-16 lg:mt-0 relative reveal delay-200">
+                        <div class="absolute -inset-6 bg-gradient-to-r from-emerald-200 to-blue-200 rounded-[2.5rem] blur-2xl opacity-40"></div>
+                        <div class="relative rounded-[2rem] overflow-hidden shadow-2xl group cursor-none magnetic-target" onclick="openLightbox('room.jpg')">
+                            <img src="room.jpg" alt="Room Interior" class="w-full h-full object-cover transform transition duration-1000 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-500 flex items-center justify-center">
+                                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-full opacity-0 group-hover:opacity-100 transform scale-50 group-hover:scale-100 transition-all duration-500">
+                                    <i data-lucide="maximize-2" class="text-white w-8 h-8"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community Section -->
+        <section class="py-24 bg-slate-900 text-white relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+                <div class="absolute w-[800px] h-[800px] bg-primary rounded-full blur-[120px] opacity-10 -top-40 -left-40 animate-pulse"></div>
+                <div class="absolute w-[600px] h-[600px] bg-blue-600 rounded-full blur-[100px] opacity-10 bottom-0 right-0"></div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="order-2 lg:order-1 reveal">
+                        <div class="relative rounded-3xl overflow-hidden border border-slate-700/50 shadow-2xl group cursor-none magnetic-target" onclick="openLightbox('visiting room.jpg')">
+                            <img src="visiting room.jpg" alt="Community Hall" class="w-full transition duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100">
+                            <div class="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black/90 to-transparent">
+                                <p class="text-white font-bold text-lg flex items-center gap-3"><div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm"><i data-lucide="tv" class="w-5 h-5"></i></div> TV & Recreation Area</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-1 lg:order-2 reveal delay-100">
+                        <h2 class="text-4xl lg:text-5xl font-extrabold mb-8 tracking-tight">More Than Just a Room</h2>
+                        <p class="text-slate-400 text-xl mb-12 leading-relaxed">
+                            We foster a supportive community where students from different backgrounds come together. Whether it's group studies in the common area or relaxing TV time, you'll find your tribe here.
+                        </p>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="border-l-4 border-primary pl-6">
+                                <h4 class="text-2xl font-bold text-white mb-2">Inclusive</h4>
+                                <p class="text-sm text-slate-400 font-medium">Welcoming students from all regions.</p>
+                            </div>
+                            <div class="border-l-4 border-blue-500 pl-6">
+                                <h4 class="text-2xl font-bold text-white mb-2">Supportive</h4>
+                                <p class="text-sm text-slate-400 font-medium">Seniors and staff always ready to help.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section id="reviews" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-16 reveal">
+                    <div>
+                        <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Resident Stories</h2>
+                        <p class="text-slate-500 text-lg font-medium">Don't just take our word for it.</p>
+                    </div>
+                    <button id="write-review-btn" class="magnetic-target mt-6 md:mt-0 px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold rounded-full shadow-sm hover:shadow-lg transition flex items-center gap-3 group hover:border-primary/50">
+                        <i data-lucide="pen-tool" class="w-5 h-5 text-slate-400 group-hover:text-primary transition"></i> Write Review
+                    </button>
+                </div>
+
+                <div id="reviews-container" class="grid md:grid-cols-3 gap-8">
+                    <!-- Static Reviews -->
+                    <div class="spotlight-card bg-white p-10 rounded-[2rem] reveal delay-100 magnetic-target">
+                        <div class="flex gap-1 mb-6 text-yellow-400">
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                        </div>
+                        <p class="text-slate-600 mb-8 italic text-lg leading-relaxed">"The proximity to the Medical College is a lifesaver. It's so safe and the warden is very supportive."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-md">AS</div>
+                            <div>
+                                <p class="text-base font-bold text-slate-900">Anjali S.</p>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Medical Student</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spotlight-card bg-white p-10 rounded-[2rem] reveal delay-200 magnetic-target">
+                        <div class="flex gap-1 mb-6 text-yellow-400">
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star-half" class="w-5 h-5 fill-current"></i>
+                        </div>
+                        <p class="text-slate-600 mb-8 italic text-lg leading-relaxed">"Food is homely and tasty. The 3-sharing room is spacious enough and I made great friends here."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md">RK</div>
+                            <div>
+                                <p class="text-base font-bold text-slate-900">Reshma K.</p>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Nursing Staff</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spotlight-card bg-white p-10 rounded-[2rem] reveal delay-300 magnetic-target">
+                        <div class="flex gap-1 mb-6 text-yellow-400">
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current"></i>
+                        </div>
+                        <p class="text-slate-600 mb-8 italic text-lg leading-relaxed">"Security was my parents' main concern, and Amal Hostel is excellent in that regard. 24/7 CCTV."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg shadow-md">JM</div>
+                            <div>
+                                <p class="text-base font-bold text-slate-900">Jasmine M.</p>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">PG Student</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 bg-white border-t border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-16">
+                    <!-- Contact Info -->
+                    <div class="reveal">
+                        <h2 class="text-4xl font-extrabold text-slate-900 mb-8">Get in Touch</h2>
+                        <p class="text-slate-500 text-xl mb-12">Have questions? We're here to help. Reach out to book a visit or ask about availability.</p>
+                        
+                        <div class="space-y-10">
+                            <div class="flex items-start gap-6 group magnetic-target">
+                                <div class="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center text-green-600 shrink-0 group-hover:scale-110 transition duration-300 shadow-sm">
+                                    <i data-lucide="phone" class="w-7 h-7"></i>
                                 </div>
                                 <div>
-                                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                                    <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
+                                    <h4 class="text-lg font-bold text-slate-900 mb-1">Phone</h4>
+                                    <p class="text-slate-600 text-lg">+91 96569 62786</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-6 group magnetic-target">
+                                <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition duration-300 shadow-sm">
+                                    <i data-lucide="mail" class="w-7 h-7"></i>
                                 </div>
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                                    <input type="tel" id="phone" name="phone" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
+                                    <h4 class="text-lg font-bold text-slate-900 mb-1">Email</h4>
+                                    <p class="text-slate-600 text-lg">info@amalhostel.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-6 group magnetic-target">
+                                <div class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0 group-hover:scale-110 transition duration-300 shadow-sm">
+                                    <i data-lucide="map-pin" class="w-7 h-7"></i>
                                 </div>
                                 <div>
-                                    <label for="room-preference" class="block text-sm font-medium text-gray-700">Room Preference</label>
-                                    <select id="room-preference" name="room-preference" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
-                                        <option value="3-sharing" selected>3-Sharing Room</option>
-                                    </select>
-                                    <p class="mt-1 text-xs text-gray-500">Only 3-Sharing rooms are currently available.</p>
+                                    <h4 class="text-lg font-bold text-slate-900 mb-1">Location</h4>
+                                    <p class="text-slate-600 text-lg max-w-xs mb-6">Amal Ladies Hostel, Gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enquiry Form -->
+                    <div class="reveal delay-100">
+                        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-100 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-emerald-400 to-blue-500"></div>
+                            
+                            <h3 class="text-3xl font-bold text-slate-900 mb-8">Send Enquiry</h3>
+                            <form id="enquiry-form" class="space-y-6">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Full Name</label>
+                                    <input type="text" name="full-name" required class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition font-medium" placeholder="John Doe">
+                                </div>
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Phone</label>
+                                        <input type="tel" name="phone" required class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition font-medium" placeholder="987...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Room</label>
+                                        <select name="room-preference" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition font-medium appearance-none">
+                                            <option value="3-sharing">3-Sharing</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="message" class="block text-sm font-medium text-gray-700">Your Message / Query</label>
-                                    <textarea id="message" name="message" rows="3" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50"></textarea>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Email</label>
+                                    <input type="email" name="email" required class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition font-medium" placeholder="john@example.com">
                                 </div>
-                                <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center px-6 py-4 border border-transparent text-base font-bold rounded-lg shadow-sm text-white bg-accent-hostel hover:bg-primary-hostel transition duration-300 transform hover:-translate-y-1">
-                                    Send Enquiry (via WhatsApp)
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider">Message</label>
+                                    <textarea name="message" rows="3" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition resize-none font-medium" placeholder="When can I visit?"></textarea>
+                                </div>
+                                <button type="submit" id="submit-button" class="magnetic-target w-full py-5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-primary transition-all duration-300 transform hover:-translate-y-1 shadow-xl hover:shadow-primary/30 flex justify-center items-center gap-2">
+                                    Send via WhatsApp <i data-lucide="arrow-right" class="w-5 h-5"></i>
                                 </button>
                             </form>
                         </div>
                     </div>
-
-                </div>
-            </section>
-
-        </main>
-
-        <footer class="bg-gray-900 text-white py-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-left">
-                    <div>
-                        <h4 class="text-lg font-bold text-primary-hostel mb-4">Amal Ladies Hostel</h4>
-                        <p class="text-gray-400 text-sm">Providing safe, comfortable, and affordable accommodation for the bright minds of tomorrow.</p>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-white mb-4">Quick Links</h4>
-                        <ul class="space-y-2 text-sm text-gray-400">
-                            <li><a href="#amenities" class="hover:text-white transition">Amenities</a></li>
-                            <li><a href="#rooms" class="hover:text-white transition">Rooms</a></li>
-                            <li><a href="#reviews" class="hover:text-white transition">Reviews</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-white mb-4">Contact</h4>
-                        <p class="text-gray-400 text-sm">Gandhinagar, Kottayam</p>
-                        <p class="text-gray-400 text-sm mt-1">+91 96569 62786</p>
-                        <p class="text-gray-400 text-sm mt-1">info@amalhostel.com</p>
-                    </div>
-                </div>
-                <div class="border-t border-gray-800 pt-8 text-center">
-                    <p class="text-gray-500 text-sm">&copy; 2025 Amal Ladies Hostel. All rights reserved. Managed with Care.</p>
                 </div>
             </div>
-        </footer>
-    </div> 
+        </section>
+    </main>
 
+    <!-- Footer with Waves -->
+    <footer class="bg-slate-900 text-slate-400 pt-32 pb-20 relative overflow-hidden">
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.05)" />
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.03)" />
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.02)" />
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(15,23,42,1)" />
+            </g>
+        </svg>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
+                <div class="col-span-1 md:col-span-2">
+                    <h4 class="text-3xl font-extrabold text-white mb-6">Amal Ladies Hostel</h4>
+                    <p class="leading-relaxed max-w-sm text-lg text-slate-400">Providing safe, premium, and affordable accommodation for the bright minds of tomorrow.</p>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-6 text-lg">Quick Links</h5>
+                    <ul class="space-y-4">
+                        <li><a href="#amenities" class="magnetic-target hover:text-primary transition inline-block">Amenities</a></li>
+                        <li><a href="#rooms" class="magnetic-target hover:text-primary transition inline-block">Rooms</a></li>
+                        <li><a href="#reviews" class="magnetic-target hover:text-primary transition inline-block">Reviews</a></li>
+                        <li><a href="#contact" class="magnetic-target hover:text-primary transition inline-block">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-6 text-lg">Legal</h5>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="magnetic-target hover:text-primary transition">Privacy Policy</a></li>
+                        <li><a href="#" class="magnetic-target hover:text-primary transition">Rules & Regulations</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-slate-800 text-center text-sm font-medium">
+                &copy; 2025 Amal Ladies Hostel. All rights reserved. <br class="md:hidden"> Designed with <span class="text-red-500 animate-pulse">♥</span> in Kerala.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- ANIMATION OBSERVER (Scroll Reveal) ---
-        // This adds the "active" class to elements with "reveal" class when they scroll into view
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // 1. CUSTOM CURSOR & MAGNETIC EFFECT (PC ONLY)
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+        const magneticTargets = document.querySelectorAll('.magnetic-target, a, button, .spotlight-card, input, select, textarea');
+
+        // Only add listeners if device supports hover (PC)
+        if (window.matchMedia('(hover: hover)').matches) {
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX;
+                const posY = e.clientY;
+
+                // Dot moves instantly
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+
+                // Outline moves with lag (smoothness)
+                cursorOutline.animate({
+                    left: `${posX}px`,
+                    top: `${posY}px`
+                }, { duration: 500, fill: "forwards" });
             });
-        }, { threshold: 0.1 });
 
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-        // --- FAQ LOGIC ---
-        function toggleFaq(button) {
-            const content = button.nextElementSibling;
-            // Lucide replaces <i> with <svg>, so we need to check for both or just look for the icon class structure
-            // Since Lucide copies classes, we can look for the 'transform' class which is unique to the icon in this button context
-            const icon = button.querySelector('.transform'); 
-            
-            // Toggle Content
-            content.classList.toggle('hidden');
-            
-            // Rotate Icon
-            if (icon) {
-                if (content.classList.contains('hidden')) {
-                    icon.style.transform = 'rotate(0deg)';
-                } else {
-                    icon.style.transform = 'rotate(180deg)';
-                }
-            }
-        }
-
-        // --- LIGHTBOX LOGIC ---
-        const lightboxModal = document.getElementById('lightbox-modal');
-        const lightboxImg = document.getElementById('lightbox-img');
-
-        function openLightbox(imgSrc) {
-            lightboxImg.src = imgSrc;
-            lightboxModal.classList.remove('hidden'); // Ensure Tailwind hidden is removed
-            // Small delay to allow display change before transition
-            setTimeout(() => {
-                lightboxModal.classList.add('active');
-                lightboxImg.classList.remove('scale-95');
-                lightboxImg.classList.add('scale-100');
-            }, 10);
-        }
-
-        function closeLightbox() {
-            lightboxModal.classList.remove('active');
-            lightboxImg.classList.remove('scale-100');
-            lightboxImg.classList.add('scale-95');
-            setTimeout(() => {
-                lightboxModal.classList.add('hidden');
-            }, 300);
-        }
-        
-        // Initially hide lightbox with Tailwind class
-        lightboxModal.classList.add('hidden');
-
-
-        // --- GENERAL UI SCRIPTS ---
-
-        // Mobile Menu Logic
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
-
-        document.querySelectorAll('#mobile-menu a').forEach(item => {
-            item.addEventListener('click', () => {
-                document.getElementById('mobile-menu').classList.add('hidden');
-            });
-        });
-
-        // Smooth Scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+            // Hover states for cursor
+            magneticTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    document.body.classList.add('hovering');
+                });
+                target.addEventListener('mouseleave', () => {
+                    document.body.classList.remove('hovering');
                 });
             });
-        });
-
-        // Preloader Logic
-        function hidePreloader() {
-             const preloader = document.getElementById('preloader-overlay');
-             const mainContent = document.getElementById('main-content-wrapper');
-
-             if (preloader && mainContent) {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                    mainContent.classList.remove('hidden-content');
-                }, 500);
-            }
         }
 
-        // Icon Loading & Preloader trigger
-        window.onload = function() {
-            const maxAttempts = 30;
-            let attempt = 0;
-
-            function tryCreateIcons() {
-                if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-                    try {
-                        lucide.createIcons();
-                        hidePreloader();
-                        return;
-                    } catch (error) {
-                        console.warn(`Lucide icon creation failed (Attempt ${attempt + 1}). Retrying...`);
-                    }
-                } 
-
-                if (attempt < maxAttempts) {
-                    attempt++;
-                    setTimeout(tryCreateIcons, 50);
-                } else {
-                    hidePreloader();
-                }
-            }
-            tryCreateIcons();
-        };
-
-        // Whatsapp Enquiry Form
-        document.getElementById('enquiry-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const submitButton = document.getElementById('submit-button');
-            
-            const name = form['full-name'].value || 'N/A';
-            const email = form['email'].value || 'N/A';
-            const phone = form['phone'].value || 'N/A';
-            const room = form['room-preference'].value || '3-sharing';
-            const message = form['message'].value.trim() || 'No specific message.';
-            const whatsappNumber = '919656962786'; 
-            let whatsappText = `*New Hostel Enquiry (Web Form)*\n\n` +
-                `*Name:* ${name}\n` + `*Email:* ${email}\n` + `*Phone:* ${phone}\n` +
-                `*Room Preference:* ${room}\n` + `*Message:* ${message}`;
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
-
-            submitButton.disabled = true;
-            submitButton.textContent = 'Opening WhatsApp...';
-            submitButton.classList.add('button-pulse', 'bg-blue-600');
-            submitButton.classList.remove('hover:bg-primary-hostel');
-
+        // 2. TEXT REVEAL ANIMATION
+        window.addEventListener('load', () => {
+            document.getElementById('preloader-overlay').style.opacity = '0';
             setTimeout(() => {
-                window.open(whatsappUrl, '_blank');
-                submitButton.disabled = false;
-                submitButton.textContent = 'Send Enquiry (via WhatsApp)';
-                submitButton.classList.remove('button-pulse', 'bg-blue-600');
-                submitButton.classList.add('hover:bg-primary-hostel');
-            }, 500); 
+                document.getElementById('preloader-overlay').style.display = 'none';
+                // Trigger Text Reveal
+                document.getElementById('hero-title').classList.add('active');
+            }, 700);
         });
 
+        // 3. SCROLL SPY (Active Nav Link)
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
 
-        // --- FIREBASE & REVIEW SYSTEM LOGIC ---
+        window.addEventListener('scroll', () => {
+            // Progress Bar
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
 
-        // 1. Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+            // Scroll Spy
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if(pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if(link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 4. SPOTLIGHT EFFECT
+        const spotlightCards = document.querySelectorAll('.spotlight-card');
+        document.body.addEventListener('mousemove', (e) => {
+            spotlightCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // 5. 3D TILT (PC ONLY)
+        const heroCard = document.getElementById('hero-card');
+        // Only enable 3D tilt on devices that support hover (Desktop)
+        if (heroCard && window.matchMedia('(hover: hover)').matches) {
+            heroCard.addEventListener('mousemove', (e) => {
+                const rect = heroCard.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -5;
+                const rotateY = ((x - centerX) / centerX) * 5;
+                heroCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            heroCard.addEventListener('mouseleave', () => {
+                heroCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+            });
         }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
 
-        // 2. Authentication
-        const initAuth = async () => {
-          if (initialAuthToken) {
-            await auth.signInWithCustomToken(initialAuthToken);
-          } else {
-            await auth.signInAnonymously();
-          }
-        };
-        initAuth();
+        // 6. SCROLL REVEAL OBSERVER
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-        // 3. UI Elements for Reviews
-        const reviewModal = document.getElementById('review-modal');
-        const openReviewBtn = document.getElementById('write-review-btn');
-        const closeReviewBtn = document.getElementById('close-modal-btn');
-        const reviewForm = document.getElementById('review-form');
-        const starContainer = document.getElementById('star-container');
-        const ratingInput = document.getElementById('rating-value');
-        const reviewsContainer = document.getElementById('reviews-container');
-
-        // 4. Modal Open/Close Logic
-        openReviewBtn.addEventListener('click', () => {
-            reviewModal.classList.remove('hidden');
-            // Small timeout to allow display:block to apply before opacity transition
-            setTimeout(() => reviewModal.classList.add('active'), 10);
+        // 7. COUNTER
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const counter = entry.target;
+                    const target = +counter.getAttribute('data-target');
+                    const inc = target / 200;
+                    const updateCount = () => {
+                        const count = +counter.innerText;
+                        if(count < target) {
+                            counter.innerText = Math.ceil(count + inc);
+                            setTimeout(updateCount, 20);
+                        } else counter.innerText = target + "+";
+                    }
+                    updateCount();
+                    counterObserver.unobserve(counter);
+                }
+            });
         });
+        document.querySelectorAll('.counter').forEach(c => counterObserver.observe(c));
 
-        closeReviewBtn.addEventListener('click', () => {
+        // 8. LIGHTBOX & MODAL
+        const lightbox = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const reviewModal = document.getElementById('review-modal');
+        
+        window.openLightbox = (src) => {
+            lightboxImg.src = src;
+            lightbox.classList.remove('hidden');
+            requestAnimationFrame(() => lightbox.classList.add('active'));
+        };
+        window.closeLightbox = () => {
+            lightbox.classList.remove('active');
+            setTimeout(() => lightbox.classList.add('hidden'), 300);
+        };
+        lightbox.classList.add('hidden');
+        reviewModal.classList.add('hidden');
+
+        document.getElementById('write-review-btn').addEventListener('click', () => {
+            reviewModal.classList.remove('hidden');
+            requestAnimationFrame(() => reviewModal.classList.add('active'));
+        });
+        document.getElementById('close-modal-btn').addEventListener('click', () => {
             reviewModal.classList.remove('active');
             setTimeout(() => reviewModal.classList.add('hidden'), 300);
         });
 
-        // Close modal when clicking outside
-        reviewModal.addEventListener('click', (e) => {
-            if (e.target === reviewModal) {
-                reviewModal.classList.remove('active');
-                setTimeout(() => reviewModal.classList.add('hidden'), 300);
-            }
+        // 9. MOBILE MENU
+        const menuBtn = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+        // 10. WHATSAPP & FIREBASE (Existing Logic)
+        document.getElementById('enquiry-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('submit-button');
+            const originalText = btn.innerHTML;
+            const text = `*Enquiry* \nName: ${form['full-name'].value}\nPhone: ${form['phone'].value}`;
+            const url = `https://wa.me/919656962786?text=${encodeURIComponent(text)}`;
+            btn.innerHTML = '<span>Opening WhatsApp...</span>';
+            setTimeout(() => { window.open(url, '_blank'); btn.innerHTML = originalText; form.reset(); }, 800);
         });
 
-        // 5. Star Rating Logic
-        let currentRating = 0;
-        starContainer.addEventListener('click', (e) => {
-            if (e.target.dataset.value) {
-                currentRating = parseInt(e.target.dataset.value);
-                ratingInput.value = currentRating;
-                updateStars(currentRating);
-                document.getElementById('rating-error').classList.add('hidden');
-            }
-        });
+        // Initialize Firebase
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const initAuth = async () => { if (initialAuthToken) await auth.signInWithCustomToken(initialAuthToken); else await auth.signInAnonymously(); };
+        initAuth();
 
-        function updateStars(rating) {
-            const stars = starContainer.querySelectorAll('i');
-            stars.forEach(star => {
-                const val = parseInt(star.dataset.value);
-                if (val <= rating) {
-                    star.classList.add('active', 'fill-current');
-                    star.classList.remove('text-gray-300');
-                } else {
-                    star.classList.remove('active', 'fill-current');
-                    star.classList.add('text-gray-300');
-                }
-            });
-        }
-
-        // 6. Helper: Generate Avatar Initials
-        function getInitials(name) {
-            const names = name.split(' ');
-            if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
-            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-        }
-
-        // 7. Helper: Create Star HTML
-        function getStarHtml(rating) {
-            let html = '';
-            for(let i=1; i<=5; i++) {
-                if(i <= rating) {
-                    html += `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-5 h-5 text-yellow-400 fill-current"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-                } else {
-                    html += `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-5 h-5 text-yellow-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-                }
-            }
-            return html;
-        }
-
-        // 8. Load Reviews from Firestore
+        const reviewsContainer = document.getElementById('reviews-container');
         auth.onAuthStateChanged((user) => {
             if (user) {
-                // Using a 'reviews' collection inside public data
                 db.collection('artifacts').doc(appId).collection('public').doc('data').collection('reviews')
                   .orderBy('timestamp', 'desc')
                   .onSnapshot((snapshot) => {
-                      // Remove old dynamic reviews (keep the first 3 static ones)
-                      const existingCards = reviewsContainer.children;
-                      // We know there are 3 static cards. We want to remove any *after* the 3rd index.
-                      // Easier approach: Get the static cards, clear container, re-add static, then add dynamic.
-                      
-                      const staticReview1 = existingCards[0].cloneNode(true);
-                      const staticReview2 = existingCards[1].cloneNode(true);
-                      const staticReview3 = existingCards[2].cloneNode(true);
-
-                      reviewsContainer.innerHTML = ''; // Clear everything
-                      reviewsContainer.appendChild(staticReview1);
-                      reviewsContainer.appendChild(staticReview2);
-                      reviewsContainer.appendChild(staticReview3);
-
-                      snapshot.forEach((doc) => {
-                          const data = doc.data();
-                          const reviewCard = document.createElement('div');
-                          reviewCard.className = 'bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left fade-in-review border border-gray-100';
-                          
-                          // Assign a random color for the avatar background
-                          const colors = ['bg-primary-hostel', 'bg-accent-hostel', 'bg-secondary-hostel', 'bg-purple-500', 'bg-pink-500'];
-                          const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                          const initials = getInitials(data.name);
-
-                          reviewCard.innerHTML = `
-                              <div class="flex items-center mb-4 text-yellow-400">
-                                  ${getStarHtml(data.rating)}
-                              </div>
-                              <p class="text-gray-600 mb-4 italic">"${data.text}"</p>
-                              <div class="flex items-center">
-                                  <div class="h-10 w-10 rounded-full ${randomColor} flex items-center justify-center text-white font-bold shadow-sm">
-                                      ${initials}
-                                  </div>
-                                  <div class="ml-3">
-                                      <p class="text-sm font-medium text-gray-900">${data.name}</p>
-                                      <p class="text-xs text-gray-500">Verified Resident</p>
-                                  </div>
-                              </div>
-                          `;
-                          reviewsContainer.appendChild(reviewCard);
+                      snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const data = change.doc.data();
+                            const div = document.createElement('div');
+                            div.className = "spotlight-card bg-white p-10 rounded-[2rem] reveal active magnetic-target tilt-card";
+                            // Stars logic (same as before)
+                            let starsHtml = '';
+                            for(let i=1; i<=5; i++) starsHtml += i <= data.rating ? `<svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>` : `<svg class="w-4 h-4 text-slate-200" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                            
+                            const initials = data.name.substring(0,2).toUpperCase();
+                            div.innerHTML = `<div class="flex gap-1 mb-6">${starsHtml}</div><p class="text-slate-600 mb-8 italic text-lg">"${data.text}"</p><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-lg">${initials}</div><div><p class="text-base font-bold text-slate-900">${data.name}</p><p class="text-xs text-slate-500 font-bold uppercase">Resident</p></div></div>`;
+                            reviewsContainer.prepend(div);
+                        }
                       });
-                      
-                      // Re-initialize icons for new elements
-                      if (typeof lucide !== 'undefined') {
-                          lucide.createIcons();
-                      }
-                  }, (error) => {
-                      console.error("Error loading reviews:", error);
                   });
             }
         });
 
-        // 9. Submit Review to Firestore
-        reviewForm.addEventListener('submit', async (e) => {
+        // Star Rating Logic
+        const starContainer = document.getElementById('star-container');
+        const ratingInput = document.getElementById('rating-value');
+        starContainer.addEventListener('click', (e) => {
+            const star = e.target.closest('svg');
+            if(star) {
+                const value = star.dataset.value;
+                ratingInput.value = value;
+                starContainer.querySelectorAll('svg').forEach(s => {
+                    if(parseInt(s.dataset.value) <= value) { s.classList.add('text-yellow-400', 'fill-current'); s.classList.remove('text-slate-200'); }
+                    else { s.classList.remove('text-yellow-400', 'fill-current'); s.classList.add('text-slate-200'); }
+                });
+                document.getElementById('rating-error').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('review-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = auth.currentUser;
-            if (!user) {
-                alert("Authentication error. Please refresh the page.");
-                return;
-            }
-
-            if(currentRating === 0) {
-                document.getElementById('rating-error').classList.remove('hidden');
-                return;
-            }
-
-            const name = document.getElementById('reviewer-name').value;
-            const text = document.getElementById('review-text').value;
-
-            const submitBtn = reviewForm.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span>Posting...</span>';
-
+            if(!user || !document.getElementById('rating-value').value) return;
+            // ... (Firebase add logic same as previous) ...
             try {
                 await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('reviews').add({
-                    name: name,
-                    rating: currentRating,
-                    text: text,
+                    name: document.getElementById('reviewer-name').value,
+                    text: document.getElementById('review-text').value,
+                    rating: parseInt(document.getElementById('rating-value').value),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     userId: user.uid
                 });
-
-                // Reset Form
-                reviewForm.reset();
-                currentRating = 0;
-                updateStars(0);
-                
-                // Close Modal
-                reviewModal.classList.remove('active');
-                setTimeout(() => reviewModal.classList.add('hidden'), 300);
-
-                // No alert needed, the UI updates automatically via onSnapshot
-            } catch (error) {
-                console.error("Error submitting review:", error);
-                alert("Could not submit review. Please try again.");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
+                document.getElementById('close-modal-btn').click();
+            } catch(e) { console.error(e); }
         });
 
     </script>
