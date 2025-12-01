@@ -18,6 +18,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f7fafc; /* light background */
+            scroll-behavior: smooth;
         }
         /* Custom Tailwind Configuration */
         .section-title::after {
@@ -121,7 +122,7 @@
             transition: opacity 0.75s ease-in-out, visibility 0.75s; 
         }
 
-        /* --- MODAL STYLES --- */
+        /* --- MODAL & LIGHTBOX STYLES --- */
         .modal {
             transition: opacity 0.3s ease-in-out;
             opacity: 0;
@@ -141,13 +142,39 @@
             color: #facc15;
         }
 
-        /* --- BUTTON PULSE --- */
+        /* Lightbox specific */
+        #lightbox-modal img {
+            max-height: 90vh;
+            max-width: 90vw;
+        }
+
+        /* --- ANIMATION UTILITIES --- */
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
             70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
             100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
         .button-pulse { animation: pulse 1s infinite; }
+
+        /* Scroll Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Floating WhatsApp Button */
+        .float-wa {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 100;
+            animation: pulse 2s infinite;
+        }
 
     </style>
     <script>
@@ -224,22 +251,29 @@
         </div>
     </div>
 
+    <!-- Image Lightbox Modal -->
+    <div id="lightbox-modal" class="modal fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-md" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Full size view" class="rounded-lg shadow-2xl transform transition-transform duration-300 scale-95" onclick="event.stopPropagation()">
+        <button class="absolute top-5 right-5 text-white bg-gray-800 bg-opacity-50 rounded-full p-2 hover:bg-gray-700 transition">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919656962786" target="_blank" class="float-wa bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl transition duration-300 transform hover:scale-110 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+    </a>
+
     <!-- Main Content -->
     <div id="main-content-wrapper" class="hidden-content">
 
-        <header class="sticky top-0 z-50 bg-white shadow-md">
+        <header class="sticky top-0 z-50 bg-white shadow-md transition-all duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
                     <div class="flex justify-start lg:w-0 lg:flex-1">
                         <a href="#" class="flex items-center space-x-2 group">
                             
-                            <!-- 
-                                LOGO LOGIC (Swap on Load):
-                                1. The IMG is 'hidden' by default.
-                                2. The SVG is visible by default.
-                                3. When the IMG successfully loads, it removes its own 'hidden' class 
-                                   and adds 'hidden' to the SVG.
-                            -->
+                            <!-- LOGO LOGIC (Swap on Load) -->
                             <img 
                                 src="logo.png" 
                                 alt="Amal Hostel Logo" 
@@ -247,7 +281,7 @@
                                 onload="this.classList.remove('hidden'); document.getElementById('fallback-logo').classList.add('hidden');"
                             >
 
-                            <!-- FALLBACK SVG: Visible initially, hidden only if PNG loads -->
+                            <!-- FALLBACK SVG -->
                             <svg 
                                 id="fallback-logo"
                                 class="h-16 w-16 object-contain text-primary-hostel" 
@@ -261,27 +295,23 @@
                                     </linearGradient>
                                 </defs>
                                 <circle cx="150" cy="150" r="130" stroke="url(#grad1)" fill="none" stroke-width="8" stroke-linecap="round"/>
-                                
-                                <!-- Stylized 'AH' Monogram -->
                                 <path d="M90 220 L150 60 L210 220 M110 160 L190 160" stroke="url(#grad1)" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                                
-                                <!-- Decorative leaf accents -->
                                 <path d="M150 60 Q180 20 200 60" stroke="#fcd34d" stroke-width="8" fill="none" stroke-linecap="round" />
                                 <circle cx="150" cy="60" r="10" fill="#fcd34d" />
                             </svg>
                             
-                            <!-- BRAND NAME: Now prevents wrapping to a second line -->
                             <span class="text-xl font-extrabold text-primary-hostel whitespace-nowrap ml-2">Amal Hostel</span>
                         </a>
                     </div>
                     <nav class="hidden md:flex space-x-10">
                         <a href="#amenities" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Amenities</a>
                         <a href="#rooms" class="text-base font-medium text-primary-hostel hover:text-primary-hostel transition duration-150 border-b-2 border-primary-hostel pb-1">Rooms</a>
+                        <a href="#faq" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">FAQ</a>
                         <a href="#reviews" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Reviews</a>
                         <a href="#contact" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Contact</a>
                     </nav>
                     <div class="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-                        <a href="#contact" class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700 transition duration-300">
+                        <a href="#contact" class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700 transition duration-300 hover:shadow-lg">
                             Book a Visit
                         </a>
                     </div>
@@ -294,6 +324,7 @@
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 shadow-lg">
                     <a href="#amenities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Amenities</a>
                     <a href="#rooms" class="block px-3 py-2 rounded-md text-base font-medium text-primary-hostel bg-green-50/50">Rooms</a>
+                    <a href="#faq" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">FAQ</a>
                     <a href="#reviews" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Reviews</a>
                     <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Contact</a>
                     <a href="#contact" class="block w-full text-center mt-2 px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700">
@@ -304,7 +335,7 @@
         </header>
 
         <main>
-            <section class="relative bg-gray-100 pt-16 pb-20 overflow-hidden">
+            <section class="relative bg-gray-100 pt-16 pb-20 overflow-hidden reveal">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
                         <div class="lg:col-span-6 flex flex-col justify-center text-center lg:text-left">
@@ -324,19 +355,26 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="mt-12 lg:mt-0 lg:col-span-6">
-                            <div class="relative max-w-lg mx-auto lg:max-w-none">
+                        <div class="mt-12 lg:mt-0 lg:col-span-6 relative">
+                            <!-- Decorative blob background -->
+                            <div class="absolute -top-10 -right-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+                            <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+                            
+                            <div class="relative max-w-lg mx-auto lg:max-w-none group cursor-pointer" onclick="openLightbox('main image.jpg')">
                                 <!-- UPDATED: Using main image.jpg -->
-                                <img class="w-full h-auto rounded-xl shadow-2xl object-cover transform rotate-1 transition duration-500 hover:rotate-0"
+                                <img class="w-full h-auto rounded-xl shadow-2xl object-cover transform rotate-1 transition duration-500 group-hover:rotate-0 group-hover:scale-[1.02]"
                                      src="main image.jpg"
                                      alt="Exterior view of the Amal Ladies Hostel building">
+                                <div class="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded flex items-center">
+                                    <i data-lucide="maximize-2" class="w-3 h-3 mr-1"></i> Click to enlarge
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section id="amenities" class="py-16 sm:py-24 bg-white">
+            <section id="amenities" class="py-16 sm:py-24 bg-white reveal">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 class="text-3xl font-extrabold text-gray-900 section-title">
                         Comfort & Convenience Included
@@ -346,35 +384,35 @@
                     </p>
                     <div class="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
 
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
                                 <i data-lucide="wifi" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900">High-Speed Wi-Fi</h3>
+                            <h3 class="text-lg font-bold text-gray-900">High-Speed Wi-Fi</h3>
                             <p class="mt-2 text-base text-gray-500">Uninterrupted internet for online classes and research.</p>
                         </div>
 
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
                                 <i data-lucide="utensils" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900">Nutritious Meals</h3>
+                            <h3 class="text-lg font-bold text-gray-900">Nutritious Meals</h3>
                             <p class="mt-2 text-base text-gray-500">Home-cooked, healthy food (Veg/Non-veg options).</p>
                         </div>
 
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
                                 <i data-lucide="shield-check" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900">24/7 Security</h3>
+                            <h3 class="text-lg font-bold text-gray-900">24/7 Security</h3>
                             <p class="mt-2 text-base text-gray-500">Secure premises with CCTV surveillance and warden supervision.</p>
                         </div>
 
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto mb-4">
                                 <i data-lucide="locate-fixed" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900">Prime Location</h3>
+                            <h3 class="text-lg font-bold text-gray-900">Prime Location</h3>
                             <p class="mt-2 text-base text-gray-500">Just minutes walk from Kottayam Medical College.</p>
                         </div>
 
@@ -382,7 +420,7 @@
                 </div>
             </section>
 
-            <section id="rooms" class="py-16 sm:py-24 bg-gray-100">
+            <section id="rooms" class="py-16 sm:py-24 bg-gray-100 reveal">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 class="text-3xl font-extrabold text-gray-900 section-title">
                         Our Exclusive Room Option
@@ -393,9 +431,14 @@
 
                     <div class="mt-12 flex flex-wrap justify-center gap-8">
 
-                        <div class="w-full sm:w-80 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-100 transition duration-500 hover:scale-105 relative">
-                            <!-- UPDATED: Added room.jpg inside the card -->
-                            <img src="room.jpg" alt="3-Sharing Room" class="w-full h-48 object-cover rounded-lg mb-6">
+                        <div class="w-full sm:w-96 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-100 transition duration-500 hover:scale-105 relative">
+                            <!-- UPDATED: Added room.jpg inside the card with Lightbox trigger -->
+                            <div class="relative overflow-hidden rounded-lg mb-6 group cursor-pointer" onclick="openLightbox('room.jpg')">
+                                <img src="room.jpg" alt="3-Sharing Room" class="w-full h-56 object-cover transition duration-500 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300 flex items-center justify-center">
+                                    <i data-lucide="zoom-in" class="text-white opacity-0 group-hover:opacity-100 w-10 h-10 transition duration-300"></i>
+                                </div>
+                            </div>
                             
                             <div class="absolute -top-3 right-0 bg-secondary-hostel text-gray-900 font-bold text-xs px-3 py-1 rounded-full shadow-lg">
                                 FEATURED OPTION
@@ -419,7 +462,7 @@
                 </div>
             </section>
 
-            <section id="language-diversity" class="py-16 sm:py-24 bg-white">
+            <section id="language-diversity" class="py-16 sm:py-24 bg-white reveal">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 class="text-3xl font-extrabold text-gray-900 section-title">
                         A Place to Connect
@@ -428,7 +471,7 @@
                         We welcome students from all regions and backgrounds, fostering a supportive and diverse community.
                     </p>
                     <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left">
-                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg">
+                        <div class="p-6 bg-gray-50 rounded-xl shadow-lg border-l-4 border-primary-hostel">
                             <h3 class="text-2xl font-bold text-gray-900 mb-4">Our Community Vibe</h3>
                             <p class="text-gray-600 mb-4">
                                 Hostel life is about shared experiences. We encourage a friendly environment where students help each other with studies and personal growth.
@@ -448,17 +491,62 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="relative">
-                            <!-- UPDATED: Using visiting room.jpg -->
-                            <img class="w-full h-auto rounded-xl shadow-xl object-cover"
+                        <div class="relative cursor-pointer group" onclick="openLightbox('visiting room.jpg')">
+                            <!-- UPDATED: Using visiting room.jpg with hover effect -->
+                            <img class="w-full h-auto rounded-xl shadow-xl object-cover transition duration-500 group-hover:shadow-2xl"
                                  src="visiting room.jpg"
                                  alt="Interior view of the visiting area and TV room">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-300 rounded-xl"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section id="reviews" class="py-16 sm:py-24 bg-gray-50 border-t border-gray-200">
+            <!-- FAQ SECTION (NEW) -->
+            <section id="faq" class="py-16 sm:py-24 bg-gray-50 reveal">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center mb-10">
+                        Frequently Asked Questions
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <!-- FAQ Item 1 -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
+                                <span>Is there a curfew time?</span>
+                                <i data-lucide="chevron-down" class="w-5 h-5 transform transition-transform duration-300"></i>
+                            </button>
+                            <div class="px-6 pb-4 text-gray-600 hidden">
+                                Yes, for the safety and security of all residents, the main gates close at 7:00 PM. Special permission is required for late entries due to academic reasons.
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 2 -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
+                                <span>Are guests allowed?</span>
+                                <i data-lucide="chevron-down" class="w-5 h-5 transform transition-transform duration-300"></i>
+                            </button>
+                            <div class="px-6 pb-4 text-gray-600 hidden">
+                                Female guests (mothers/sisters) are allowed in the designated visiting room during daytime hours. Male guests are strictly not allowed inside the premises.
+                            </div>
+                        </div>
+
+                        <!-- FAQ Item 3 -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
+                                <span>Do I need to pay a deposit?</span>
+                                <i data-lucide="chevron-down" class="w-5 h-5 transform transition-transform duration-300"></i>
+                            </button>
+                            <div class="px-6 pb-4 text-gray-600 hidden">
+                                Yes, a refundable caution deposit is required at the time of admission. Please contact us for current rates.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="reviews" class="py-16 sm:py-24 bg-white border-t border-gray-200 reveal">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 class="text-3xl font-extrabold text-gray-900 section-title">
                         What Our Residents Say
@@ -469,7 +557,7 @@
             
                     <div id="reviews-container" class="mt-12 grid gap-8 lg:grid-cols-3">
                         <!-- Static Featured Reviews (Will always stay) -->
-                        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left">
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left border border-gray-100">
                             <div class="flex items-center mb-4 text-yellow-400">
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
@@ -477,7 +565,7 @@
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                             </div>
-                            <p class="text-gray-600 mb-4">"The proximity to the Medical College is a lifesaver. It's so safe and the warden is very supportive. Highly recommend!"</p>
+                            <p class="text-gray-600 mb-4 italic">"The proximity to the Medical College is a lifesaver. It's so safe and the warden is very supportive. Highly recommend!"</p>
                             <div class="flex items-center">
                                 <div class="h-10 w-10 rounded-full bg-primary-hostel flex items-center justify-center text-white font-bold">AS</div>
                                 <div class="ml-3">
@@ -487,7 +575,7 @@
                             </div>
                         </div>
             
-                        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left">
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left border border-gray-100">
                             <div class="flex items-center mb-4 text-yellow-400">
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
@@ -495,7 +583,7 @@
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 <i data-lucide="star-half" class="w-5 h-5 fill-current"></i>
                             </div>
-                            <p class="text-gray-600 mb-4">"Food is homely and tasty. The 3-sharing room is spacious enough and I made great friends here."</p>
+                            <p class="text-gray-600 mb-4 italic">"Food is homely and tasty. The 3-sharing room is spacious enough and I made great friends here."</p>
                             <div class="flex items-center">
                                 <div class="h-10 w-10 rounded-full bg-accent-hostel flex items-center justify-center text-white font-bold">RK</div>
                                 <div class="ml-3">
@@ -505,7 +593,7 @@
                             </div>
                         </div>
             
-                        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left">
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left border border-gray-100">
                             <div class="flex items-center mb-4 text-yellow-400">
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
@@ -513,7 +601,7 @@
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                             </div>
-                            <p class="text-gray-600 mb-4">"Security was my parents' main concern, and Amal Hostel is excellent in that regard. 24/7 CCTV puts them at ease."</p>
+                            <p class="text-gray-600 mb-4 italic">"Security was my parents' main concern, and Amal Hostel is excellent in that regard. 24/7 CCTV puts them at ease."</p>
                             <div class="flex items-center">
                                 <div class="h-10 w-10 rounded-full bg-secondary-hostel flex items-center justify-center text-gray-800 font-bold">JM</div>
                                 <div class="ml-3">
@@ -527,7 +615,7 @@
                     </div>
                     
                     <div class="mt-12">
-                        <button id="write-review-btn" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-md text-primary-hostel bg-white border-primary-hostel hover:bg-green-50 transition duration-300">
+                        <button id="write-review-btn" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-md text-primary-hostel bg-white border-primary-hostel hover:bg-green-50 transition duration-300 transform hover:scale-105">
                             <i data-lucide="pen-tool" class="w-5 h-5 mr-2"></i>
                             Write a Review
                         </button>
@@ -535,69 +623,82 @@
                 </div>
             </section>
 
-            <section id="contact" class="py-16 sm:py-24 bg-gray-100">
+            <section id="contact" class="py-16 sm:py-24 bg-gray-100 reveal">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="lg:grid lg:grid-cols-2 lg:gap-12">
 
-                        <div class="mb-10 lg:mb-0">
+                        <div class="mb-10 lg:mb-0 flex flex-col h-full">
                             <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center lg:text-left">
                                 Get in Touch
                             </h2>
-                            <p class="mt-4 text-xl text-gray-500 max-w-xl text-center lg:text-left">
+                            <p class="mt-4 text-xl text-gray-500 max-w-xl text-center lg:text-left mb-8">
                                 We're here to answer all your questions about our facilities and rooms.
                             </p>
-                            <div class="mt-10 space-y-6 text-left">
-                                <div class="flex items-start">
+                            
+                            <div class="space-y-6 text-left flex-grow">
+                                <div class="flex items-start bg-white p-4 rounded-lg shadow-sm">
                                     <i data-lucide="phone" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                     <div>
                                         <h3 class="text-lg font-medium text-gray-900">Call Us</h3>
-                                        <p class="text-gray-600">+91 96569 62786</p>
+                                        <p class="text-gray-600 font-mono">+91 96569 62786</p>
                                     </div>
                                 </div>
-                                <div class="flex items-start">
+                                <div class="flex items-start bg-white p-4 rounded-lg shadow-sm">
                                     <i data-lucide="mail" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                     <div>
                                         <h3 class="text-lg font-medium text-gray-900">Email</h3>
                                         <p class="text-gray-600">info@amalhostel.com</p>
                                     </div>
                                 </div>
-                                <div class="flex items-start">
+                                <div class="flex items-start bg-white p-4 rounded-lg shadow-sm">
                                     <i data-lucide="map-pin" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                     <div>
                                         <h3 class="text-lg font-medium text-gray-900">Location</h3>
-                                        <p class="text-gray-600">amal ladies hostel, gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
+                                        <p class="text-gray-600">Amal Ladies Hostel, Gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Embedded Map -->
+                            <div class="mt-8 h-64 w-full rounded-xl overflow-hidden shadow-lg border-2 border-white">
+                                <iframe 
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3934.148114407357!2d76.550!3d9.650!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzknMDAuMCJOIDc2wrAzMycwMC4wIkU!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin" 
+                                    width="100%" 
+                                    height="100%" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy">
+                                </iframe>
+                            </div>
                         </div>
 
-                        <div class="bg-white p-8 rounded-xl shadow-2xl">
+                        <div class="bg-white p-8 rounded-xl shadow-2xl border-t-4 border-primary-hostel">
                             <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Send an Enquiry</h3>
                             <form id="enquiry-form" class="space-y-6"> 
                                 <div>
                                     <label for="full-name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                                    <input type="text" id="full-name" name="full-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                    <input type="text" id="full-name" name="full-name" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
                                 </div>
                                 <div>
                                     <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                                    <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                    <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
                                 </div>
                                 <div>
                                     <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                                    <input type="tel" id="phone" name="phone" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                    <input type="tel" id="phone" name="phone" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
                                 </div>
                                 <div>
                                     <label for="room-preference" class="block text-sm font-medium text-gray-700">Room Preference</label>
-                                    <select id="room-preference" name="room-preference" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
+                                    <select id="room-preference" name="room-preference" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50">
                                         <option value="3-sharing" selected>3-Sharing Room</option>
                                     </select>
                                     <p class="mt-1 text-xs text-gray-500">Only 3-Sharing rooms are currently available.</p>
                                 </div>
                                 <div>
                                     <label for="message" class="block text-sm font-medium text-gray-700">Your Message / Query</label>
-                                    <textarea id="message" name="message" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150"></textarea>
+                                    <textarea id="message" name="message" rows="3" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150 bg-gray-50"></textarea>
                                 </div>
-                                <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-accent-hostel hover:bg-primary-hostel transition duration-300">
+                                <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center px-6 py-4 border border-transparent text-base font-bold rounded-lg shadow-sm text-white bg-accent-hostel hover:bg-primary-hostel transition duration-300 transform hover:-translate-y-1">
                                     Send Enquiry (via WhatsApp)
                                 </button>
                             </form>
@@ -609,21 +710,96 @@
 
         </main>
 
-        <footer class="bg-gray-900 text-white py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="flex justify-center space-x-6 mb-4">
-                    <a href="#amenities" class="text-gray-400 hover:text-white transition duration-150">Amenities</a>
-                    <a href="#rooms" class="text-gray-400 hover:text-white transition duration-150">Rooms</a>
-                    <a href="#reviews" class="text-gray-400 hover:text-white transition duration-150">Reviews</a>
-                    <a href="#language-diversity" class="text-gray-400 hover:text-white transition duration-150">Diversity</a>
-                    <a href="#contact" class="text-gray-400 hover:text-white transition duration-150">Contact</a>
+        <footer class="bg-gray-900 text-white py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-left">
+                    <div>
+                        <h4 class="text-lg font-bold text-primary-hostel mb-4">Amal Ladies Hostel</h4>
+                        <p class="text-gray-400 text-sm">Providing safe, comfortable, and affordable accommodation for the bright minds of tomorrow.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white mb-4">Quick Links</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><a href="#amenities" class="hover:text-white transition">Amenities</a></li>
+                            <li><a href="#rooms" class="hover:text-white transition">Rooms</a></li>
+                            <li><a href="#reviews" class="hover:text-white transition">Reviews</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white mb-4">Contact</h4>
+                        <p class="text-gray-400 text-sm">Gandhinagar, Kottayam</p>
+                        <p class="text-gray-400 text-sm mt-1">+91 96569 62786</p>
+                        <p class="text-gray-400 text-sm mt-1">info@amalhostel.com</p>
+                    </div>
                 </div>
-                <p class="text-gray-500 text-sm">&copy; 2025 Amal Ladies Hostel. All rights reserved. Managed with Care.</p>
+                <div class="border-t border-gray-800 pt-8 text-center">
+                    <p class="text-gray-500 text-sm">&copy; 2025 Amal Ladies Hostel. All rights reserved. Managed with Care.</p>
+                </div>
             </div>
         </footer>
     </div> 
 
     <script>
+        // --- ANIMATION OBSERVER (Scroll Reveal) ---
+        // This adds the "active" class to elements with "reveal" class when they scroll into view
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // --- FAQ LOGIC ---
+        function toggleFaq(button) {
+            const content = button.nextElementSibling;
+            // Lucide replaces <i> with <svg>, so we need to check for both or just look for the icon class structure
+            // Since Lucide copies classes, we can look for the 'transform' class which is unique to the icon in this button context
+            const icon = button.querySelector('.transform'); 
+            
+            // Toggle Content
+            content.classList.toggle('hidden');
+            
+            // Rotate Icon
+            if (icon) {
+                if (content.classList.contains('hidden')) {
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        }
+
+        // --- LIGHTBOX LOGIC ---
+        const lightboxModal = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(imgSrc) {
+            lightboxImg.src = imgSrc;
+            lightboxModal.classList.remove('hidden'); // Ensure Tailwind hidden is removed
+            // Small delay to allow display change before transition
+            setTimeout(() => {
+                lightboxModal.classList.add('active');
+                lightboxImg.classList.remove('scale-95');
+                lightboxImg.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeLightbox() {
+            lightboxModal.classList.remove('active');
+            lightboxImg.classList.remove('scale-100');
+            lightboxImg.classList.add('scale-95');
+            setTimeout(() => {
+                lightboxModal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // Initially hide lightbox with Tailwind class
+        lightboxModal.classList.add('hidden');
+
+
         // --- GENERAL UI SCRIPTS ---
 
         // Mobile Menu Logic
@@ -836,7 +1012,7 @@
                       snapshot.forEach((doc) => {
                           const data = doc.data();
                           const reviewCard = document.createElement('div');
-                          reviewCard.className = 'bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left fade-in-review';
+                          reviewCard.className = 'bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left fade-in-review border border-gray-100';
                           
                           // Assign a random color for the avatar background
                           const colors = ['bg-primary-hostel', 'bg-accent-hostel', 'bg-secondary-hostel', 'bg-purple-500', 'bg-pink-500'];
@@ -847,7 +1023,7 @@
                               <div class="flex items-center mb-4 text-yellow-400">
                                   ${getStarHtml(data.rating)}
                               </div>
-                              <p class="text-gray-600 mb-4">"${data.text}"</p>
+                              <p class="text-gray-600 mb-4 italic">"${data.text}"</p>
                               <div class="flex items-center">
                                   <div class="h-10 w-10 rounded-full ${randomColor} flex items-center justify-center text-white font-bold shadow-sm">
                                       ${initials}
