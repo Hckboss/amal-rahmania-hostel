@@ -6,6 +6,12 @@
     <title data-key="page_title">Amal Ladies Hostel - Near Kottayam Medical College</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js"></script>
+
     <style>
         /* Custom Font Import: Inter for modern readability */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -24,53 +30,50 @@
             border-radius: 2px;
         }
 
-        /* --- THEMATIC PRELOADER STYLES: Students walking to the Hostel --- */
+        /* --- THEMATIC PRELOADER STYLES --- */
         #preloader-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #f7fafc; /* Light background for the scene */
+            background-color: #f7fafc;
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
             transition: opacity 0.5s ease-in-out;
-            overflow: hidden; /* Keep walking figures contained */
+            overflow: hidden;
         }
         
         .hostel-scene {
             position: relative;
             width: 400px;
             height: 200px;
-            /* Center the scene itself slightly below center */
             transform: translateY(50px); 
             display: flex;
-            justify-content: flex-end; /* Push the building to the right */
+            justify-content: flex-end;
             align-items: flex-end;
         }
 
-        /* Ground line */
         .hostel-scene::before {
             content: '';
             position: absolute;
             bottom: 0;
-            left: -100px; /* Extend off-screen left */
+            left: -100px;
             width: 500px;
             height: 10px;
-            background-color: #e5e7eb; /* Light gray road/ground */
+            background-color: #e5e7eb;
             z-index: 1;
         }
 
-        /* Hostel Building */
         .hostel-facade {
             position: absolute;
-            bottom: 10px; /* Above the ground line */
+            bottom: 10px;
             right: 0;
             width: 150px;
             height: 150px;
-            background-color: #059669; /* Hostel Green */
+            background-color: #059669;
             border-radius: 8px 8px 0 0;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
             z-index: 2;
@@ -83,19 +86,18 @@
             right: 50px;
             width: 30px;
             height: 60px;
-            background-color: #374151; /* Dark Gray Door */
+            background-color: #374151;
             border-radius: 4px 4px 0 0;
             z-index: 3;
         }
 
-        /* Walking People Styles (Simple rounded rectangles) */
         .person {
             position: absolute;
-            bottom: 10px; /* Align with the ground */
+            bottom: 10px;
             width: 15px;
             height: 40px;
-            border-radius: 50% 50% 0 0; /* Head/body shape */
-            left: -50px; /* Start position (off-screen left) */
+            border-radius: 50% 50% 0 0;
+            left: -50px;
             z-index: 4;
             animation-name: walk-animation;
             animation-duration: 5s;
@@ -103,66 +105,49 @@
             animation-iteration-count: infinite;
         }
 
-        .person-1 {
-            background-color: #fcd34d; /* Amber */
-            animation-delay: 0s;
-        }
-
-        .person-2 {
-            background-color: #3b82f6; /* Blue */
-            width: 12px;
-            height: 35px;
-            animation-delay: 1.8s; /* Stagger the start */
-        }
-
-        .person-3 {
-            background-color: #ef4444; /* Red */
-            width: 16px;
-            height: 45px;
-            animation-delay: 3.5s; /* Stagger the start */
-        }
+        .person-1 { background-color: #fcd34d; animation-delay: 0s; }
+        .person-2 { background-color: #3b82f6; width: 12px; height: 35px; animation-delay: 1.8s; }
+        .person-3 { background-color: #ef4444; width: 16px; height: 45px; animation-delay: 3.5s; }
 
         @keyframes walk-animation {
-            0% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            80% {
-                 /* Stop just before the door */
-                transform: translateX(300px); 
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(300px); 
-                opacity: 0; /* Fade out as they enter the building area */
-            }
+            0% { transform: translateX(0); opacity: 1; }
+            80% { transform: translateX(300px); opacity: 1; }
+            100% { transform: translateX(300px); opacity: 0; }
         }
         
-        /* Initial hide for body content wrapper - Now includes transition properties for smooth fade-in */
         .hidden-content {
             visibility: hidden;
             opacity: 0;
-            /* Added transition to allow smooth fade-in when the class is removed in JavaScript */
             transition: opacity 0.75s ease-in-out, visibility 0.75s; 
         }
 
-        /* --- NEW ANIMATION STYLES FOR BUTTON PULSE --- */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); /* Accent Blue */
-            }
-            70% {
-                box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-            }
+        /* --- MODAL STYLES --- */
+        .modal {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .star-rating i {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating i:hover,
+        .star-rating i.active {
+            fill: #facc15; /* Yellow-400 */
+            color: #facc15;
         }
 
-        .button-pulse {
-            animation: pulse 1s infinite;
+        /* --- BUTTON PULSE --- */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
-        /* --- END OF NEW ANIMATION STYLES --- */
+        .button-pulse { animation: pulse 1s infinite; }
 
     </style>
     <script>
@@ -171,14 +156,14 @@
                 extend: {
                     colors: {
                         'primary-hostel': '#059669', // Emerald 600
-                        'accent-hostel': '#3b82f6',  // Blue 500 (Used for actions/focus)
+                        'accent-hostel': '#3b82f6',  // Blue 500
                         'secondary-hostel': '#fcd34d', // Amber 300
                     },
                 },
             },
         };
 
-        // Firebase-related global variables (MANDATORY for Firebase/Firestore)
+        // Firebase Setup
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -186,6 +171,7 @@
 </head>
 <body class="text-gray-800">
 
+    <!-- Preloader -->
     <div id="preloader-overlay">
         <div class="hostel-scene">
             <div class="hostel-facade"></div>
@@ -194,66 +180,105 @@
             <div class="person person-2"></div>
             <div class="person person-3"></div>
         </div>
-        </div>
+    </div>
 
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all scale-100">
+            <div class="bg-primary-hostel px-6 py-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Write a Review</h3>
+                <button id="close-modal-btn" class="text-white hover:bg-green-700 rounded-full p-1 transition">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="review-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                        <input type="text" id="reviewer-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-hostel focus:border-transparent outline-none transition" placeholder="e.g. Anjali K.">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Rating</label>
+                        <div class="star-rating flex space-x-1" id="star-container">
+                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="1"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="2"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="3"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="4"></i>
+                            <i data-lucide="star" class="w-8 h-8 text-gray-300" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="rating-value" required>
+                        <p id="rating-error" class="text-red-500 text-xs mt-1 hidden">Please select a star rating.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Experience</label>
+                        <textarea id="review-text" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-hostel focus:border-transparent outline-none transition" placeholder="Share your thoughts about the hostel..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-primary-hostel text-white font-bold rounded-lg hover:bg-green-700 transition shadow-lg flex justify-center items-center">
+                        <span>Submit Review</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <div id="main-content-wrapper" class="hidden-content">
 
         <header class="sticky top-0 z-50 bg-white shadow-md">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4 md:justify-start md:space-x-10">
                     <div class="flex justify-start lg:w-0 lg:flex-1">
-                        <a href="#" class="flex items-center space-x-2">
+                        <a href="#" class="flex items-center space-x-2 group">
+                            
+                            <!-- 
+                                LOGO LOGIC (Swap on Load):
+                                1. The IMG is 'hidden' by default.
+                                2. The SVG is visible by default.
+                                3. When the IMG successfully loads, it removes its own 'hidden' class 
+                                   and adds 'hidden' to the SVG.
+                            -->
+                            <img 
+                                src="logo.png" 
+                                alt="Amal Hostel Logo" 
+                                class="h-16 w-auto object-contain hidden"
+                                onload="this.classList.remove('hidden'); document.getElementById('fallback-logo').classList.add('hidden');"
+                            >
+
+                            <!-- FALLBACK SVG: Visible initially, hidden only if PNG loads -->
                             <svg 
-                                class="h-10 w-10 object-contain" 
+                                id="fallback-logo"
+                                class="h-16 w-16 object-contain text-primary-hostel" 
                                 viewBox="0 0 300 300" 
                                 xmlns="http://www.w3.org/2000/svg"
-                                role="img"
-                                aria-labelledby="logoTitle"
                             >
-                                <title id="logoTitle">AH Initials Logo</title>
-                                <circle 
-                                    cx="150" 
-                                    cy="150" 
-                                    r="100" 
-                                    stroke="#059669" 
-                                    fill="none" 
-                                    stroke-width="4" 
-                                    stroke-linecap="round"
-                                />
-
-                                <text 
-                                    x="110" 
-                                    y="170" 
-                                    font-size="80" 
-                                    fill="#059669" 
-                                    font-family="Arial, sans-serif" 
-                                    font-weight="900" 
-                                    alignment-baseline="middle"
-                                >A</text>
-
-                                <text 
-                                    x="170" 
-                                    y="170" 
-                                    font-size="80" 
-                                    fill="#059669" 
-                                    font-family="Arial, sans-serif" 
-                                    font-weight="900" 
-                                    alignment-baseline="middle"
-                                >H</text>
-
-                                <circle cx="150" cy="40" r="10" fill="#F4A7B9" />
-                                <circle cx="130" cy="50" r="8" fill="#F4A7B9" />
-                                <circle cx="170" cy="50" r="8" fill="#F4A7B9" />
+                                <defs>
+                                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#34d399;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="150" cy="150" r="130" stroke="url(#grad1)" fill="none" stroke-width="8" stroke-linecap="round"/>
+                                
+                                <!-- Stylized 'AH' Monogram -->
+                                <path d="M90 220 L150 60 L210 220 M110 160 L190 160" stroke="url(#grad1)" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                
+                                <!-- Decorative leaf accents -->
+                                <path d="M150 60 Q180 20 200 60" stroke="#fcd34d" stroke-width="8" fill="none" stroke-linecap="round" />
+                                <circle cx="150" cy="60" r="10" fill="#fcd34d" />
                             </svg>
                             
-                            <span class="text-xl font-extrabold text-primary-hostel" data-key="brand_name">Amal Hostel</span>
+                            <!-- BRAND NAME: Now prevents wrapping to a second line -->
+                            <span class="text-xl font-extrabold text-primary-hostel whitespace-nowrap ml-2">Amal Hostel</span>
                         </a>
                     </div>
                     <nav class="hidden md:flex space-x-10">
-                        <a href="#amenities" data-key="nav_amenities" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Amenities</a>
-                        <a href="#rooms" data-key="nav_rooms" class="text-base font-medium text-primary-hostel hover:text-primary-hostel transition duration-150 border-b-2 border-primary-hostel pb-1">Rooms</a>
+                        <a href="#amenities" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Amenities</a>
+                        <a href="#rooms" class="text-base font-medium text-primary-hostel hover:text-primary-hostel transition duration-150 border-b-2 border-primary-hostel pb-1">Rooms</a>
                         <a href="#reviews" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Reviews</a>
-                        <a href="#contact" data-key="nav_contact" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Contact</a>
+                        <a href="#contact" class="text-base font-medium text-gray-500 hover:text-primary-hostel transition duration-150">Contact</a>
                     </nav>
                     <div class="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
                         <a href="#contact" class="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700 transition duration-300">
@@ -267,8 +292,8 @@
             </div>
             <div id="mobile-menu" class="hidden md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 shadow-lg">
-                    <a href="#amenities" data-key="nav_amenities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Amenities</a>
-                    <a href="#rooms" data-key="nav_rooms" class="block px-3 py-2 rounded-md text-base font-medium text-primary-hostel bg-green-50/50">Rooms</a>
+                    <a href="#amenities" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Amenities</a>
+                    <a href="#rooms" class="block px-3 py-2 rounded-md text-base font-medium text-primary-hostel bg-green-50/50">Rooms</a>
                     <a href="#reviews" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Reviews</a>
                     <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Contact</a>
                     <a href="#contact" class="block w-full text-center mt-2 px-4 py-2 border border-transparent rounded-full shadow-sm text-base font-medium text-white bg-primary-hostel hover:bg-green-700">
@@ -284,10 +309,10 @@
                     <div class="lg:grid lg:grid-cols-12 lg:gap-8">
                         <div class="lg:col-span-6 flex flex-col justify-center text-center lg:text-left">
                             <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                                <span class="block xl:inline" data-key="hero_main_line_1">Your Home Away From Home</span>
-                                <span class="block text-primary-hostel xl:inline" data-key="hero_main_line_2">Near Kottayam Medical College.</span>
+                                <span class="block xl:inline">Your Home Away From Home</span>
+                                <span class="block text-primary-hostel xl:inline">Near Kottayam Medical College.</span>
                             </h1>
-                            <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0" data-key="hero_sub_text">
+                            <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                                 Safe, Comfortable, and Convenient ladies' accommodation designed for students and professionals. Walkable distance to the Medical College.
                             </p>
                             <div class="mt-10 sm:flex sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
@@ -301,8 +326,9 @@
                         </div>
                         <div class="mt-12 lg:mt-0 lg:col-span-6">
                             <div class="relative max-w-lg mx-auto lg:max-w-none">
+                                <!-- UPDATED: Using main image.jpg -->
                                 <img class="w-full h-auto rounded-xl shadow-2xl object-cover transform rotate-1 transition duration-500 hover:rotate-0"
-                                     src="https://placehold.co/600x400/059669/ffffff?text=Amal+Hostel+Exterior"
+                                     src="main image.jpg"
                                      alt="Exterior view of the Amal Ladies Hostel building">
                             </div>
                         </div>
@@ -312,10 +338,10 @@
 
             <section id="amenities" class="py-16 sm:py-24 bg-white">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_amenities_title">
+                    <h2 class="text-3xl font-extrabold text-gray-900 section-title">
                         Comfort & Convenience Included
                     </h2>
-                    <p class="mt-4 text-xl text-gray-500" data-key="section_amenities_subtitle">
+                    <p class="mt-4 text-xl text-gray-500">
                         Everything you need to focus on your studies and well-being.
                     </p>
                     <div class="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -324,32 +350,32 @@
                             <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
                                 <i data-lucide="wifi" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_1_title">High-Speed Wi-Fi</h3>
-                            <p class="mt-2 text-base text-gray-500" data-key="amenity_1_description">Uninterrupted internet for online classes and research.</p>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900">High-Speed Wi-Fi</h3>
+                            <p class="mt-2 text-base text-gray-500">Uninterrupted internet for online classes and research.</p>
                         </div>
 
                         <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
                             <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
                                 <i data-lucide="utensils" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_2_title">Nutritious Meals</h3>
-                            <p class="mt-2 text-base text-gray-500" data-key="amenity_2_description">Home-cooked, healthy food (Veg/Non-veg options).</p>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900">Nutritious Meals</h3>
+                            <p class="mt-2 text-base text-gray-500">Home-cooked, healthy food (Veg/Non-veg options).</p>
                         </div>
 
                         <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
                             <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
                                 <i data-lucide="shield-check" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_3_title">24/7 Security</h3>
-                            <p class="mt-2 text-base text-gray-500" data-key="amenity_3_description">Secure premises with CCTV surveillance and warden supervision.</p>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900">24/7 Security</h3>
+                            <p class="mt-2 text-base text-gray-500">Secure premises with CCTV surveillance and warden supervision.</p>
                         </div>
 
                         <div class="p-6 bg-gray-50 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
                             <div class="flex items-center justify-center h-12 w-12 rounded-full bg-primary-hostel text-white mx-auto">
                                 <i data-lucide="locate-fixed" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="mt-6 text-lg font-medium text-gray-900" data-key="amenity_4_title">Prime Location</h3>
-                            <p class="mt-2 text-base text-gray-500" data-key="amenity_4_description">Just minutes walk from Kottayam Medical College.</p>
+                            <h3 class="mt-6 text-lg font-medium text-gray-900">Prime Location</h3>
+                            <p class="mt-2 text-base text-gray-500">Just minutes walk from Kottayam Medical College.</p>
                         </div>
 
                     </div>
@@ -358,23 +384,26 @@
 
             <section id="rooms" class="py-16 sm:py-24 bg-gray-100">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_rooms_title">
+                    <h2 class="text-3xl font-extrabold text-gray-900 section-title">
                         Our Exclusive Room Option
                     </h2>
-                    <p class="mt-4 text-xl text-gray-500" data-key="section_rooms_subtitle">
+                    <p class="mt-4 text-xl text-gray-500">
                         We offer a single, high-comfort 3-Sharing room type to ensure the best balance of space and value.
                     </p>
 
                     <div class="mt-12 flex flex-wrap justify-center gap-8">
 
                         <div class="w-full sm:w-80 p-8 bg-white rounded-xl shadow-2xl ring-4 ring-primary-hostel border-4 border-primary-hostel transform scale-100 transition duration-500 hover:scale-105 relative">
-                            <div class="absolute -top-3 right-0 bg-secondary-hostel text-gray-900 font-bold text-xs px-3 py-1 rounded-full shadow-lg" data-key="room_3_tag">
+                            <!-- UPDATED: Added room.jpg inside the card -->
+                            <img src="room.jpg" alt="3-Sharing Room" class="w-full h-48 object-cover rounded-lg mb-6">
+                            
+                            <div class="absolute -top-3 right-0 bg-secondary-hostel text-gray-900 font-bold text-xs px-3 py-1 rounded-full shadow-lg">
                                 FEATURED OPTION
                             </div>
                             <div class="flex justify-between items-start">
-                                <span class="text-3xl font-extrabold text-primary-hostel" data-key="room_3_title">3-Sharing Room</span>
+                                <span class="text-3xl font-extrabold text-primary-hostel">3-Sharing Room</span>
                             </div>
-                            <p class="text-gray-600 mt-2 mb-6 font-semibold" data-key="room_3_subtitle">The ideal balance of space, cost, and community.</p>
+                            <p class="text-gray-600 mt-2 mb-6 font-semibold">The ideal balance of space, cost, and community.</p>
                             <ul class="text-left space-y-4 text-lg text-gray-700">
                                 <li class="flex items-center"><i data-lucide="user-check" class="w-6 h-6 text-accent-hostel mr-3"></i> **Perfect for 3** (More personal space)</li>
                                 <li class="flex items-center"><i data-lucide="maximize" class="w-6 h-6 text-accent-hostel mr-3"></i> Dedicated study areas</li>
@@ -392,10 +421,10 @@
 
             <section id="language-diversity" class="py-16 sm:py-24 bg-white">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900 section-title" data-key="section_diversity_title">
+                    <h2 class="text-3xl font-extrabold text-gray-900 section-title">
                         A Place to Connect
                     </h2>
-                    <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto" data-key="section_diversity_subtitle">
+                    <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
                         We welcome students from all regions and backgrounds, fostering a supportive and diverse community.
                     </p>
                     <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left">
@@ -420,9 +449,10 @@
                             </ul>
                         </div>
                         <div class="relative">
+                            <!-- UPDATED: Using visiting room.jpg -->
                             <img class="w-full h-auto rounded-xl shadow-xl object-cover"
-                                 src="https://placehold.co/600x400/3b82f6/ffffff?text=Community+Space"
-                                 alt="Interior view of the common area in the hostel">
+                                 src="visiting room.jpg"
+                                 alt="Interior view of the visiting area and TV room">
                         </div>
                     </div>
                 </div>
@@ -437,7 +467,8 @@
                         Real stories from students and professionals living at Amal Hostel.
                     </p>
             
-                    <div class="mt-12 grid gap-8 lg:grid-cols-3">
+                    <div id="reviews-container" class="mt-12 grid gap-8 lg:grid-cols-3">
+                        <!-- Static Featured Reviews (Will always stay) -->
                         <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left">
                             <div class="flex items-center mb-4 text-yellow-400">
                                 <i data-lucide="star" class="w-5 h-5 fill-current"></i>
@@ -491,6 +522,8 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Dynamic reviews will be appended here by JS -->
                     </div>
                     
                     <div class="mt-12">
@@ -507,10 +540,10 @@
                     <div class="lg:grid lg:grid-cols-2 lg:gap-12">
 
                         <div class="mb-10 lg:mb-0">
-                            <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center lg:text-left" data-key="section_contact_title">
+                            <h2 class="text-3xl font-extrabold text-gray-900 section-title text-center lg:text-left">
                                 Get in Touch
                             </h2>
-                            <p class="mt-4 text-xl text-gray-500 max-w-xl text-center lg:text-left" data-key="section_contact_subtitle">
+                            <p class="mt-4 text-xl text-gray-500 max-w-xl text-center lg:text-left">
                                 We're here to answer all your questions about our facilities and rooms.
                             </p>
                             <div class="mt-10 space-y-6 text-left">
@@ -518,53 +551,53 @@
                                     <i data-lucide="phone" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                     <div>
                                         <h3 class="text-lg font-medium text-gray-900">Call Us</h3>
-                                        <p class="text-gray-600" data-key="contact_phone_number">+91 96569 62786</p>
+                                        <p class="text-gray-600">+91 96569 62786</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start">
                                     <i data-lucide="mail" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                     <div>
                                         <h3 class="text-lg font-medium text-gray-900">Email</h3>
-                                        <p class="text-gray-600" data-key="contact_email">info@amalhostel.com</p>
+                                        <p class="text-gray-600">info@amalhostel.com</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start">
                                     <i data-lucide="map-pin" class="w-6 h-6 text-primary-hostel mt-1 mr-3 flex-shrink-0"></i>
                                     <div>
                                         <h3 class="text-lg font-medium text-gray-900">Location</h3>
-                                        <p class="text-gray-600" data-key="contact_address">amal ladies hostel, gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
+                                        <p class="text-gray-600">amal ladies hostel, gandhinagar, Kottayam, Arpookara, Kerala 686008</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="bg-white p-8 rounded-xl shadow-2xl">
-                            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center" data-key="form_title">Send an Enquiry</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Send an Enquiry</h3>
                             <form id="enquiry-form" class="space-y-6"> 
                                 <div>
-                                    <label for="full-name" class="block text-sm font-medium text-gray-700" data-key="label_name">Full Name</label>
+                                    <label for="full-name" class="block text-sm font-medium text-gray-700">Full Name</label>
                                     <input type="text" id="full-name" name="full-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
                                 </div>
                                 <div>
-                                    <label for="email" class="block text-sm font-medium text-gray-700" data-key="label_email">Email Address</label>
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
                                     <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
                                 </div>
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700" data-key="label_phone">Phone Number</label>
+                                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
                                     <input type="tel" id="phone" name="phone" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
                                 </div>
                                 <div>
-                                    <label for="room-preference" class="block text-sm font-medium text-gray-700" data-key="label_preference">Room Preference</label>
+                                    <label for="room-preference" class="block text-sm font-medium text-gray-700">Room Preference</label>
                                     <select id="room-preference" name="room-preference" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150">
                                         <option value="3-sharing" selected>3-Sharing Room</option>
                                     </select>
                                     <p class="mt-1 text-xs text-gray-500">Only 3-Sharing rooms are currently available.</p>
                                 </div>
                                 <div>
-                                    <label for="message" class="block text-sm font-medium text-gray-700" data-key="label_message">Your Message / Query</label>
+                                    <label for="message" class="block text-sm font-medium text-gray-700">Your Message / Query</label>
                                     <textarea id="message" name="message" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary-hostel focus:border-primary-hostel transition duration-150"></textarea>
                                 </div>
-                                <button type="submit" id="submit-button" data-key="btn_send_enquiry" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-accent-hostel hover:bg-primary-hostel transition duration-300">
+                                <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-accent-hostel hover:bg-primary-hostel transition duration-300">
                                     Send Enquiry (via WhatsApp)
                                 </button>
                             </form>
@@ -579,28 +612,32 @@
         <footer class="bg-gray-900 text-white py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div class="flex justify-center space-x-6 mb-4">
-                    <a href="#amenities" data-key="nav_amenities" class="text-gray-400 hover:text-white transition duration-150">Amenities</a>
-                    <a href="#rooms" data-key="nav_rooms" class="text-gray-400 hover:text-white transition duration-150">Rooms</a>
+                    <a href="#amenities" class="text-gray-400 hover:text-white transition duration-150">Amenities</a>
+                    <a href="#rooms" class="text-gray-400 hover:text-white transition duration-150">Rooms</a>
                     <a href="#reviews" class="text-gray-400 hover:text-white transition duration-150">Reviews</a>
-                    <a href="#language-diversity" data-key="nav_diversity" class="text-gray-400 hover:text-white transition duration-150">Diversity</a>
-                    <a href="#contact" data-key="nav_contact" class="text-gray-400 hover:text-white transition duration-150">Contact</a>
+                    <a href="#language-diversity" class="text-gray-400 hover:text-white transition duration-150">Diversity</a>
+                    <a href="#contact" class="text-gray-400 hover:text-white transition duration-150">Contact</a>
                 </div>
-                <p class="text-gray-500 text-sm" data-key="copyright_text">&copy; 2025 Amal Ladies Hostel. All rights reserved. Managed with Care.</p>
+                <p class="text-gray-500 text-sm">&copy; 2025 Amal Ladies Hostel. All rights reserved. Managed with Care.</p>
             </div>
         </footer>
-    </div> <script>
+    </div> 
+
+    <script>
+        // --- GENERAL UI SCRIPTS ---
+
+        // Mobile Menu Logic
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        // Close mobile menu on link click
         document.querySelectorAll('#mobile-menu a').forEach(item => {
             item.addEventListener('click', () => {
                 document.getElementById('mobile-menu').classList.add('hidden');
             });
         });
 
-        // Simple smooth scrolling for internal links
+        // Smooth Scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -610,130 +647,281 @@
             });
         });
 
-        /**
-         * Hides the preloader and initiates the fade-in for the main content.
-         */
+        // Preloader Logic
         function hidePreloader() {
              const preloader = document.getElementById('preloader-overlay');
              const mainContent = document.getElementById('main-content-wrapper');
 
              if (preloader && mainContent) {
-                // Fade out the preloader (0.5s transition defined in CSS)
                 preloader.style.opacity = '0';
-
-                // After the preloader fade transition, hide it completely 
-                // and reveal the main content by removing the 'hidden-content' class.
                 setTimeout(() => {
-                    preloader.style.display = 'none'; // Completely hide the preloader
-                    
-                    // Reveal main content - CSS will handle the smooth 0.75s fade-in
+                    preloader.style.display = 'none';
                     mainContent.classList.remove('hidden-content');
-                }, 500); // Wait for the preloader opacity transition (0.5s) to finish
+                }, 500);
             }
         }
 
-        /**
-         * Handles Lucide icon creation using polling to prevent race conditions, 
-         * then initiates the fade-in for the main content.
-         */
+        // Icon Loading & Preloader trigger
         window.onload = function() {
-            const maxAttempts = 30; // Try for up to 1.5 seconds (30 * 50ms)
-            let attempt = 0; // Initialize attempt counter here
+            const maxAttempts = 30;
+            let attempt = 0;
 
             function tryCreateIcons() {
-                // 1. Check if lucide library is loaded and its main function is available
-                // We rely on the function existing, and use try/catch for the internal failure.
                 if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
                     try {
-                        // Attempt to create icons. If the library throws an internal error (like the one reported),
-                        // the catch block will retry, preventing the application crash.
                         lucide.createIcons();
-                        hidePreloader(); // Only hide preloader if icon creation succeeds
-                        return; // Stop polling on success
+                        hidePreloader();
+                        return;
                     } catch (error) {
-                        // If it fails due to the reported TypeError, log and retry in the next cycle.
-                        console.warn(`Lucide icon creation failed internally (Attempt ${attempt + 1}). Retrying...`, error);
-                        // Fall through to retry logic
+                        console.warn(`Lucide icon creation failed (Attempt ${attempt + 1}). Retrying...`);
                     }
                 } 
 
-                // 2. Polling logic
                 if (attempt < maxAttempts) {
                     attempt++;
-                    setTimeout(tryCreateIcons, 50); // Re-try polling every 50ms
+                    setTimeout(tryCreateIcons, 50);
                 } else {
-                    // Timeout reached. Proceed with content visibility as a fallback.
-                    console.error("Lucide icon creation timed out. Proceeding without icons.");
                     hidePreloader();
                 }
             }
-
-            tryCreateIcons(); // Start the polling process upon window load
+            tryCreateIcons();
         };
 
-        // --- NEW WHATSAPP INTEGRATION LOGIC WITH ANIMATION ---
+        // Whatsapp Enquiry Form
         document.getElementById('enquiry-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Stop the default form submission
-
+            e.preventDefault();
             const form = e.target;
             const submitButton = document.getElementById('submit-button');
             
-            // Get form values
             const name = form['full-name'].value || 'N/A';
             const email = form['email'].value || 'N/A';
             const phone = form['phone'].value || 'N/A';
             const room = form['room-preference'].value || '3-sharing';
             const message = form['message'].value.trim() || 'No specific message.';
-
-            // Hostel WhatsApp number (91 is the country code for India)
             const whatsappNumber = '919656962786'; 
+            let whatsappText = `*New Hostel Enquiry (Web Form)*\n\n` +
+                `*Name:* ${name}\n` + `*Email:* ${email}\n` + `*Phone:* ${phone}\n` +
+                `*Room Preference:* ${room}\n` + `*Message:* ${message}`;
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
 
-            // Construct the message text for WhatsApp
-            let whatsappText = 
-                `*New Hostel Enquiry (Web Form)*\n\n` +
-                `*Name:* ${name}\n` +
-                `*Email:* ${email}\n` +
-                `*Phone:* ${phone}\n` +
-                `*Room Preference:* ${room}\n` +
-                `*Message:* ${message}`;
-
-            // URL encode the message text
-            const encodedText = encodeURIComponent(whatsappText);
-
-            // Construct the final WhatsApp API URL (wa.me is the standard universal link)
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedText}`;
-
-            // 1. Start Animation: Disable button and add pulse class
             submitButton.disabled = true;
             submitButton.textContent = 'Opening WhatsApp...';
             submitButton.classList.add('button-pulse', 'bg-blue-600');
-            submitButton.classList.remove('hover:bg-primary-hostel'); // Change hover color temporarily
+            submitButton.classList.remove('hover:bg-primary-hostel');
 
-            // 2. Delay before opening the link to show the animation (500ms)
             setTimeout(() => {
-                // Open the URL in a new window/tab
                 window.open(whatsappUrl, '_blank');
-
-                // 3. Reset Button State immediately after opening the link
                 submitButton.disabled = false;
                 submitButton.textContent = 'Send Enquiry (via WhatsApp)';
                 submitButton.classList.remove('button-pulse', 'bg-blue-600');
                 submitButton.classList.add('hover:bg-primary-hostel');
-                
-            }, 500); // Animation duration
+            }, 500); 
         });
 
-        // --- WRITE A REVIEW BUTTON LOGIC ---
-        // This simple script handles the new "Write a Review" button click
-        document.getElementById('write-review-btn').addEventListener('click', function() {
-            // Same WhatsApp number
-            const whatsappNumber = '919656962786';
-            // Pre-filled message to make it easy for users
-            const text = "Hi, I would like to submit a review for Amal Ladies Hostel. ⭐";
-            // Open WhatsApp
-            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank');
+
+        // --- FIREBASE & REVIEW SYSTEM LOGIC ---
+
+        // 1. Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // 2. Authentication
+        const initAuth = async () => {
+          if (initialAuthToken) {
+            await auth.signInWithCustomToken(initialAuthToken);
+          } else {
+            await auth.signInAnonymously();
+          }
+        };
+        initAuth();
+
+        // 3. UI Elements for Reviews
+        const reviewModal = document.getElementById('review-modal');
+        const openReviewBtn = document.getElementById('write-review-btn');
+        const closeReviewBtn = document.getElementById('close-modal-btn');
+        const reviewForm = document.getElementById('review-form');
+        const starContainer = document.getElementById('star-container');
+        const ratingInput = document.getElementById('rating-value');
+        const reviewsContainer = document.getElementById('reviews-container');
+
+        // 4. Modal Open/Close Logic
+        openReviewBtn.addEventListener('click', () => {
+            reviewModal.classList.remove('hidden');
+            // Small timeout to allow display:block to apply before opacity transition
+            setTimeout(() => reviewModal.classList.add('active'), 10);
         });
-        // --- END OF NEW LOGIC ---
+
+        closeReviewBtn.addEventListener('click', () => {
+            reviewModal.classList.remove('active');
+            setTimeout(() => reviewModal.classList.add('hidden'), 300);
+        });
+
+        // Close modal when clicking outside
+        reviewModal.addEventListener('click', (e) => {
+            if (e.target === reviewModal) {
+                reviewModal.classList.remove('active');
+                setTimeout(() => reviewModal.classList.add('hidden'), 300);
+            }
+        });
+
+        // 5. Star Rating Logic
+        let currentRating = 0;
+        starContainer.addEventListener('click', (e) => {
+            if (e.target.dataset.value) {
+                currentRating = parseInt(e.target.dataset.value);
+                ratingInput.value = currentRating;
+                updateStars(currentRating);
+                document.getElementById('rating-error').classList.add('hidden');
+            }
+        });
+
+        function updateStars(rating) {
+            const stars = starContainer.querySelectorAll('i');
+            stars.forEach(star => {
+                const val = parseInt(star.dataset.value);
+                if (val <= rating) {
+                    star.classList.add('active', 'fill-current');
+                    star.classList.remove('text-gray-300');
+                } else {
+                    star.classList.remove('active', 'fill-current');
+                    star.classList.add('text-gray-300');
+                }
+            });
+        }
+
+        // 6. Helper: Generate Avatar Initials
+        function getInitials(name) {
+            const names = name.split(' ');
+            if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
+            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+        }
+
+        // 7. Helper: Create Star HTML
+        function getStarHtml(rating) {
+            let html = '';
+            for(let i=1; i<=5; i++) {
+                if(i <= rating) {
+                    html += `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-5 h-5 text-yellow-400 fill-current"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                } else {
+                    html += `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-5 h-5 text-yellow-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                }
+            }
+            return html;
+        }
+
+        // 8. Load Reviews from Firestore
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Using a 'reviews' collection inside public data
+                db.collection('artifacts').doc(appId).collection('public').doc('data').collection('reviews')
+                  .orderBy('timestamp', 'desc')
+                  .onSnapshot((snapshot) => {
+                      // Remove old dynamic reviews (keep the first 3 static ones)
+                      const existingCards = reviewsContainer.children;
+                      // We know there are 3 static cards. We want to remove any *after* the 3rd index.
+                      // Easier approach: Get the static cards, clear container, re-add static, then add dynamic.
+                      
+                      const staticReview1 = existingCards[0].cloneNode(true);
+                      const staticReview2 = existingCards[1].cloneNode(true);
+                      const staticReview3 = existingCards[2].cloneNode(true);
+
+                      reviewsContainer.innerHTML = ''; // Clear everything
+                      reviewsContainer.appendChild(staticReview1);
+                      reviewsContainer.appendChild(staticReview2);
+                      reviewsContainer.appendChild(staticReview3);
+
+                      snapshot.forEach((doc) => {
+                          const data = doc.data();
+                          const reviewCard = document.createElement('div');
+                          reviewCard.className = 'bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-left fade-in-review';
+                          
+                          // Assign a random color for the avatar background
+                          const colors = ['bg-primary-hostel', 'bg-accent-hostel', 'bg-secondary-hostel', 'bg-purple-500', 'bg-pink-500'];
+                          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                          const initials = getInitials(data.name);
+
+                          reviewCard.innerHTML = `
+                              <div class="flex items-center mb-4 text-yellow-400">
+                                  ${getStarHtml(data.rating)}
+                              </div>
+                              <p class="text-gray-600 mb-4">"${data.text}"</p>
+                              <div class="flex items-center">
+                                  <div class="h-10 w-10 rounded-full ${randomColor} flex items-center justify-center text-white font-bold shadow-sm">
+                                      ${initials}
+                                  </div>
+                                  <div class="ml-3">
+                                      <p class="text-sm font-medium text-gray-900">${data.name}</p>
+                                      <p class="text-xs text-gray-500">Verified Resident</p>
+                                  </div>
+                              </div>
+                          `;
+                          reviewsContainer.appendChild(reviewCard);
+                      });
+                      
+                      // Re-initialize icons for new elements
+                      if (typeof lucide !== 'undefined') {
+                          lucide.createIcons();
+                      }
+                  }, (error) => {
+                      console.error("Error loading reviews:", error);
+                  });
+            }
+        });
+
+        // 9. Submit Review to Firestore
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Authentication error. Please refresh the page.");
+                return;
+            }
+
+            if(currentRating === 0) {
+                document.getElementById('rating-error').classList.remove('hidden');
+                return;
+            }
+
+            const name = document.getElementById('reviewer-name').value;
+            const text = document.getElementById('review-text').value;
+
+            const submitBtn = reviewForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Posting...</span>';
+
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('reviews').add({
+                    name: name,
+                    rating: currentRating,
+                    text: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    userId: user.uid
+                });
+
+                // Reset Form
+                reviewForm.reset();
+                currentRating = 0;
+                updateStars(0);
+                
+                // Close Modal
+                reviewModal.classList.remove('active');
+                setTimeout(() => reviewModal.classList.add('hidden'), 300);
+
+                // No alert needed, the UI updates automatically via onSnapshot
+            } catch (error) {
+                console.error("Error submitting review:", error);
+                alert("Could not submit review. Please try again.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+
     </script>
 </body>
 </html>
