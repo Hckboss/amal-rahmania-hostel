@@ -1,41 +1,61 @@
 <!DOCTYPE html>
-<html lang="en" oncontextmenu="return false;">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title data-key="page_title">Amal 2000 Server | Hash Tech</title>
+    <meta name="description" content="Amal Ladies Hostel - Premium accommodation near Kottayam Medical College.">
+    <meta name="theme-color" id="meta-theme-color" content="#ffffff">
+    <title data-key="page_title">Amal Premium Living | Next-Gen Platform</title>
     
-    <!-- Core Engine -->
+    <!-- LIBRARIES -->
+    <!-- Tailwind CSS (Styling Engine) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (Vector Icons) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Three.js (3D Graphics Engine) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Tahoma:wght@400;700&display=swap" rel="stylesheet">
+    <!-- GSAP (Advanced Animation Engine) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
+    <!-- FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- CONFIGURATION -->
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        win: {
-                            gray: '#c0c0c0',
-                            dark: '#808080',
-                            darker: '#404040',
-                            light: '#ffffff',
-                            blue: '#000080',
-                            teal: '#008080'
-                        }
-                    },
                     fontFamily: {
-                        sans: ['Tahoma', 'sans-serif'],
-                        mono: ['"VT323"', 'monospace'],
+                        sans: ['"Outfit"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
                     },
-                    cursor: {
-                        'default': 'url(https://cur.cursors-4u.net/cursors/cur-2/cur116.cur), default',
-                        'pointer': 'url(https://cur.cursors-4u.net/cursors/cur-2/cur117.cur), pointer',
-                        'text': 'text',
-                        'wait': 'wait'
+                    colors: {
+                        // Dynamic Material Colors (Mapped to CSS Variables)
+                        primary: 'var(--md-sys-color-primary)',
+                        onPrimary: 'var(--md-sys-color-on-primary)',
+                        primaryContainer: 'var(--md-sys-color-primary-container)',
+                        onPrimaryContainer: 'var(--md-sys-color-on-primary-container)',
+                        secondary: 'var(--md-sys-color-secondary)',
+                        background: 'var(--md-sys-color-background)',
+                        surface: 'var(--md-sys-color-surface)',
+                        surfaceVariant: 'var(--md-sys-color-surface-variant)',
+                        outline: 'var(--md-sys-color-outline)',
+                    },
+                    borderRadius: {
+                        '4xl': '2rem',
+                        '5xl': '2.5rem',
+                    },
+                    animation: {
+                        'spin-slow': 'spin 12s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
                     }
                 }
             }
@@ -43,873 +63,895 @@
     </script>
 
     <style>
-        /* --- KERNEL STYLES & RESET --- */
-        * { box-sizing: border-box; }
-        
+        /* --- CORE DESIGN SYSTEM --- */
+        :root {
+            /* Default Seed (Teal) */
+            --seed-h: 170;
+            --seed-s: 80%;
+            --seed-l: 40%;
+
+            /* Generated Palette (Light Mode Default) */
+            --md-sys-color-primary: hsl(var(--seed-h), var(--seed-s), 40%);
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: hsl(var(--seed-h), var(--seed-s), 90%);
+            --md-sys-color-on-primary-container: hsl(var(--seed-h), var(--seed-s), 10%);
+            
+            --md-sys-color-secondary: hsl(calc(var(--seed-h) + 180), 30%, 50%);
+            
+            --md-sys-color-background: #fdfcff;
+            --md-sys-color-surface: #fdfcff;
+            --md-sys-color-surface-variant: #e1e2ec;
+            --md-sys-color-outline: #74777f;
+            
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-blur: blur(20px);
+        }
+
+        .dark {
+            --md-sys-color-primary: hsl(var(--seed-h), var(--seed-s), 80%);
+            --md-sys-color-on-primary: hsl(var(--seed-h), var(--seed-s), 20%);
+            --md-sys-color-primary-container: hsl(var(--seed-h), var(--seed-s), 30%);
+            --md-sys-color-on-primary-container: hsl(var(--seed-h), var(--seed-s), 90%);
+            
+            --md-sys-color-secondary: hsl(calc(var(--seed-h) + 180), 30%, 70%);
+            
+            --md-sys-color-background: #1a1c1e;
+            --md-sys-color-surface: #1a1c1e;
+            --md-sys-color-surface-variant: #42474e;
+            --md-sys-color-outline: #8c9199;
+
+            --glass-bg: rgba(0, 0, 0, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
         body {
-            background-color: #000; /* Start black for BIOS */
-            font-family: 'Tahoma', sans-serif;
-            font-size: 11px;
-            overflow: hidden;
-            user-select: none;
-            cursor: url(https://cur.cursors-4u.net/cursors/cur-2/cur116.cur), default;
-            height: 100vh;
-            width: 100vw;
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+            cursor: default; /* Fallback */
         }
 
-        /* --- CLASSIC WINDOWS BORDERS --- */
-        .outset {
-            border-top: 1px solid #fff;
-            border-left: 1px solid #fff;
-            border-right: 1px solid #404040;
-            border-bottom: 1px solid #404040;
-            background-color: #c0c0c0;
-            box-shadow: 1px 1px 0 #808080 inset;
+        /* --- GLASSMORPHISM COMPONENT --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         }
 
-        .outset-deep {
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
-            background-color: #c0c0c0;
+        /* --- VIDEO PLAYER CONTROLS --- */
+        .video-control-group {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
         }
-
-        .inset {
-            border-top: 1px solid #404040;
-            border-left: 1px solid #404040;
-            border-right: 1px solid #fff;
-            border-bottom: 1px solid #fff;
-            background-color: #fff;
-            box-shadow: 1px 1px 0 #808080 inset;
+        .video-container:hover .video-control-group {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        .inset-deep {
-            border-top: 2px solid #808080;
-            border-left: 2px solid #808080;
-            border-right: 2px solid #fff;
-            border-bottom: 2px solid #fff;
-            background-color: #fff;
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
         }
-
-        /* --- WINDOW FRAME --- */
-        .window {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            padding: 3px;
-            background: #c0c0c0;
-            box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
-        }
-        
-        .window.active { z-index: 100; }
-        .window.active .title-bar { background: linear-gradient(90deg, #000080, #1084d0); color: white; }
-        
-        .title-bar {
-            background: #808080;
-            color: #c0c0c0;
-            padding: 2px 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: bold;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-
-        .win-controls { display: flex; gap: 2px; }
-        .win-btn {
-            width: 16px;
-            height: 14px;
-            background: #c0c0c0;
-            border-top: 1px solid #fff;
-            border-left: 1px solid #fff;
-            border-right: 1px solid #404040;
-            border-bottom: 1px solid #404040;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            color: black;
-            font-family: sans-serif;
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: var(--md-sys-color-primary);
+            margin-top: -4px;
             cursor: pointer;
-            line-height: 1;
-            padding-bottom: 2px;
         }
-        .win-btn:active {
-            border-top: 1px solid #404040;
-            border-left: 1px solid #404040;
-            border-right: 1px solid #fff;
-            border-bottom: 1px solid #fff;
-            padding-top: 2px;
-            padding-bottom: 0;
-        }
-
-        /* --- DESKTOP --- */
-        #desktop {
-            background-color: #3A6EA5;
+        input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0; left: 0;
-            display: none; /* Hidden until login */
-        }
-
-        .desktop-icon {
-            width: 75px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            color: white;
-            font-size: 11px;
-            text-shadow: 1px 1px #000;
+            height: 4px;
             cursor: pointer;
-            margin: 10px;
-            padding: 5px;
-            border: 1px solid transparent;
-        }
-        .desktop-icon:active { border: 1px dotted white; background: rgba(0,0,128,0.3); }
-        .desktop-icon img { width: 32px; height: 32px; margin-bottom: 4px; }
-
-        /* --- TASKBAR --- */
-        #taskbar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 28px;
-            background: #c0c0c0;
-            border-top: 2px solid #fff;
-            display: flex;
-            align-items: center;
-            padding: 2px;
-            z-index: 9000;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
         }
 
-        .start-btn {
-            display: flex;
-            align-items: center;
+        /* --- CALENDAR --- */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
             gap: 4px;
-            padding: 2px 6px;
-            height: 22px;
-            font-weight: bold;
-            font-style: italic;
-            font-size: 13px;
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
-            box-shadow: 1px 1px 0 #000;
-            margin-right: 4px;
-            cursor: pointer;
         }
-        .start-btn:active, .start-btn.active {
-            border-top: 2px solid #404040;
-            border-left: 2px solid #404040;
-            border-right: 2px solid #fff;
-            border-bottom: 2px solid #fff;
-            box-shadow: none;
-            padding-top: 4px;
-            padding-left: 8px;
-        }
-
-        .task-divider { width: 2px; height: 20px; border-left: 1px solid #808080; border-right: 1px solid #fff; margin: 0 4px; }
-
-        .task-item {
-            width: 150px;
-            height: 22px;
-            background: #c0c0c0;
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
+        .cal-day {
+            aspect-ratio: 1;
             display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 0 5px;
-            cursor: pointer;
-            margin-right: 2px;
-        }
-        .task-item.active {
-            background: #e0e0e0;
-            border-top: 2px solid #404040;
-            border-left: 2px solid #404040;
-            border-right: 2px solid #fff;
-            border-bottom: 2px solid #fff;
-            background: repeating-linear-gradient(45deg, #ddd, #ddd 1px, #eee 1px, #eee 2px);
-        }
-
-        .tray {
-            margin-left: auto;
-            border-top: 2px solid #808080;
-            border-left: 2px solid #808080;
-            border-right: 2px solid #fff;
-            border-bottom: 2px solid #fff;
-            padding: 0 10px;
-            height: 22px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 11px;
-        }
-
-        /* --- START MENU --- */
-        #start-menu {
-            position: absolute;
-            bottom: 28px;
-            left: 2px;
-            width: 250px;
-            background: #c0c0c0;
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
-            display: none;
-            flex-direction: row;
-            z-index: 9999;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
-        }
-        .start-side {
-            background: linear-gradient(180deg, #000080, #1084d0);
-            width: 25px;
-            display: flex;
-            align-items: flex-end;
-            padding-bottom: 10px;
-        }
-        .start-side span {
-            color: white;
-            transform: rotate(-90deg);
-            white-space: nowrap;
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .start-items { flex: 1; padding: 2px; display: flex; flex-direction: column; }
-        .menu-item {
-            padding: 6px 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            position: relative;
-        }
-        .menu-item:hover { background: #000080; color: white; }
-        .menu-sep { height: 1px; background: #808080; border-bottom: 1px solid #fff; margin: 4px 2px; }
-        .arrow { margin-left: auto; font-size: 10px; }
-
-        /* --- CUSTOM CONTEXT MENU --- */
-        #context-menu {
-            position: absolute;
-            width: 150px;
-            background: #c0c0c0;
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
-            display: none;
-            z-index: 10000;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-        }
-        .ctx-item {
-            padding: 4px 8px;
-            cursor: default;
-            font-size: 11px;
-        }
-        .ctx-item:hover { background: #000080; color: white; }
-        .ctx-sep { height: 1px; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 2px 0; }
-
-        /* --- APP: CALCULATOR --- */
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; }
-        .calc-btn {
-            height: 28px;
-            background: #c0c0c0;
-            border-top: 1px solid #fff;
-            border-left: 1px solid #fff;
-            border-right: 1px solid #404040;
-            border-bottom: 1px solid #404040;
-            color: blue;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .calc-btn:active { border-top: 1px solid #404040; border-left: 1px solid #404040; border-right: 1px solid #fff; border-bottom: 1px solid #fff; color: red; }
-        .calc-display {
-            background: #fff;
-            border: 2px solid #808080;
-            border-right-color: #fff;
-            border-bottom-color: #fff;
-            text-align: right;
-            padding: 4px;
-            margin: 4px;
-            font-family: monospace;
-            font-size: 16px;
-        }
-
-        /* --- APP: MINESWEEPER --- */
-        .ms-header { border: 2px solid #808080; border-right-color: #fff; border-bottom-color: #fff; padding: 4px; display: flex; justify-content: space-between; margin-bottom: 4px; background: #c0c0c0; }
-        .lcd-num { background: #000; color: red; font-family: monospace; font-size: 18px; padding: 0 4px; border: 1px solid #808080; }
-        .smile-btn { width: 24px; height: 24px; border: 2px outset #fff; display: flex; align-items: center; justify-content: center; background: #c0c0c0; cursor: pointer; }
-        .smile-btn:active { border-style: inset; }
-        .ms-grid { border: 3px solid #808080; border-right-color: #fff; border-bottom-color: #fff; display: grid; grid-template-columns: repeat(9, 20px); }
-        .cell { width: 20px; height: 20px; border: 2px outset #fff; background: #c0c0c0; font-size: 12px; font-weight: bold; text-align: center; cursor: default; line-height: 16px; }
-        .cell.revealed { border: 1px solid #808080; border-top: none; border-left: none; background: #c0c0c0; }
-        .cell.mine { background: red; }
-
-        /* --- APP: NOTEPAD --- */
-        .notepad-area { width: 100%; height: 100%; border: none; padding: 2px; font-family: 'Courier New', monospace; font-size: 13px; resize: none; outline: none; white-space: pre; overflow: scroll;}
-
-        /* --- LOGIN SCREEN --- */
-        #login-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000080;
-            z-index: 9995;
-            display: none;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
         }
-        .login-box {
-            width: 350px;
-            background: #c0c0c0;
-            border-top: 2px solid #fff;
-            border-left: 2px solid #fff;
-            border-right: 2px solid #404040;
-            border-bottom: 2px solid #404040;
-            padding: 2px;
+        .cal-day:hover:not(.empty) {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
         }
-        .login-header {
-            background: linear-gradient(90deg, #000080, #1084d0);
-            color: white;
-            padding: 4px;
+        .cal-day.selected {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
             font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-        }
-        .login-content {
-            padding: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
         }
 
-        /* --- BIOS BOOT --- */
-        #bios {
+        /* --- DEBUG CONSOLE (Technician Mode) --- */
+        #debug-console {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            color: #ccc;
-            font-family: 'VT323', monospace;
-            font-size: 18px;
-            padding: 20px;
-            z-index: 10001;
-        }
-
-        /* --- MY COMPUTER DISKS --- */
-        .disk-drive {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #0f0;
+            font-family: monospace;
             padding: 10px;
-            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 10px;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+            border: 1px solid #0f0;
         }
-        .disk-drive:hover { border: 1px dotted #808080; background: #e0e0e0; }
-        .disk-bar { width: 100px; height: 12px; border: 1px solid #808080; background: white; position: relative; }
-        .disk-fill { height: 100%; background: blue; }
-
     </style>
 </head>
-<body>
+<body class="antialiased selection:bg-primary selection:text-onPrimary">
 
-    <!-- 1. BIOS BOOT SEQUENCE -->
-    <div id="bios">
-        <div>AMAL BIOS v4.0 Release 6.0</div>
-        <div>Copyright (C) 1985-2000, Hash Technologies Inc.</div>
-        <br>
-        <div>CPU: Intel Pentium III 800EB MHz</div>
-        <div>640K RAM System... OK</div>
-        <div>256MB Extended RAM... OK</div>
-        <div>512KB Cache SRAM... OK</div>
-        <br>
-        <div>Initializing USB Controllers... Done.</div>
-        <div>Detecting HDD Primary Master... AMAL_20GB_IDE</div>
-        <div>Detecting CD-ROM Secondary Master... SONY_52X</div>
-        <br>
-        <div id="bios-cursor">_</div>
+    <!-- 3D BACKGROUND LAYER -->
+    <canvas id="hero-canvas" class="fixed inset-0 z-0 opacity-40 pointer-events-none"></canvas>
+
+    <!-- LOADING OVERLAY -->
+    <div id="loader" class="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="relative w-24 h-24">
+            <div class="absolute inset-0 border-4 border-primaryContainer rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center font-bold text-primary animate-pulse">AMAL</div>
+        </div>
+        <div class="mt-4 font-mono text-xs text-outline tracking-widest">INITIALIZING SYSTEM...</div>
     </div>
 
-    <!-- 2. LOGIN SCREEN -->
-    <div id="login-screen">
-        <div class="login-box outset-deep">
-            <div class="login-header">
-                <span>Log On to Windows</span>
-                <span>X</span>
+    <!-- THEME CUSTOMIZER FAB -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-end">
+        <!-- Palette Panel -->
+        <div id="theme-panel" class="glass-panel p-4 rounded-3xl mb-2 translate-y-10 opacity-0 pointer-events-none transition-all duration-300 origin-bottom-right">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-outline mb-3">System Theme</h4>
+            <div class="grid grid-cols-4 gap-2 mb-4">
+                <button onclick="themeEngine.setSeed(210)" class="w-8 h-8 rounded-full bg-blue-500 hover:scale-110 transition"></button>
+                <button onclick="themeEngine.setSeed(280)" class="w-8 h-8 rounded-full bg-purple-500 hover:scale-110 transition"></button>
+                <button onclick="themeEngine.setSeed(150)" class="w-8 h-8 rounded-full bg-emerald-500 hover:scale-110 transition"></button>
+                <button onclick="themeEngine.setSeed(25)" class="w-8 h-8 rounded-full bg-orange-500 hover:scale-110 transition"></button>
+                <button onclick="themeEngine.setSeed(0)" class="w-8 h-8 rounded-full bg-red-500 hover:scale-110 transition"></button>
+                <button onclick="themeEngine.setSeed(330)" class="w-8 h-8 rounded-full bg-pink-500 hover:scale-110 transition"></button>
+                <button onclick="themeEngine.setSeed(190)" class="w-8 h-8 rounded-full bg-cyan-500 hover:scale-110 transition"></button>
+                <button onclick="themeEngine.setSeed(50)" class="w-8 h-8 rounded-full bg-yellow-500 hover:scale-110 transition"></button>
             </div>
-            <div class="login-content">
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-12 h-12">
-                <div class="flex-1">
-                    <div class="mb-2">
-                        <label class="block mb-1">User name:</label>
-                        <input type="text" value="Administrator" class="inset w-full px-1" disabled>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block mb-1">Password:</label>
-                        <input type="password" id="password-input" class="inset w-full px-1" autofocus onkeydown="checkLogin(event)">
-                    </div>
-                </div>
-            </div>
-            <div class="bg-[#c0c0c0] p-2 flex justify-end gap-2 border-t border-white">
-                <button class="outset px-4 py-1" onclick="submitLogin()">OK</button>
-                <button class="outset px-4 py-1" onclick="alert('Contact Hash Admin.')">Cancel</button>
+            <div class="flex items-center justify-between border-t border-outline/20 pt-3">
+                <span class="text-xs font-bold">Dark Mode</span>
+                <button onclick="themeEngine.toggleMode()" class="w-10 h-6 bg-surfaceVariant rounded-full relative transition-colors">
+                    <div id="dark-toggle-knob" class="absolute top-1 left-1 w-4 h-4 bg-primary rounded-full transition-transform"></div>
+                </button>
             </div>
         </div>
-    </div>
-
-    <!-- 3. CUSTOM CONTEXT MENU -->
-    <div id="context-menu" class="outset">
-        <div class="ctx-item" onclick="location.reload()">Refresh</div>
-        <div class="ctx-sep"></div>
-        <div class="ctx-item" onclick="wm.open('notepad')">New Text Document</div>
-        <div class="ctx-item" onclick="alert('Creating Folder...')">New Folder</div>
-        <div class="ctx-sep"></div>
-        <div class="ctx-item" onclick="wm.open('sys')">Properties</div>
-    </div>
-
-    <!-- 4. DESKTOP -->
-    <div id="desktop">
-        <!-- Icons -->
-        <div class="flex flex-col flex-wrap content-start p-2 h-full">
-            <div class="desktop-icon" onclick="wm.open('mycomputer')">
-                <img src="https://cdn-icons-png.flaticon.com/512/3616/3616927.png">
-                <span>My Computer</span>
-            </div>
-            <div class="desktop-icon" onclick="wm.open('documents')">
-                <img src="https://cdn-icons-png.flaticon.com/512/1375/1375106.png">
-                <span>My Documents</span>
-            </div>
-            <div class="desktop-icon" onclick="wm.open('browser')">
-                <img src="https://cdn-icons-png.flaticon.com/512/87/87413.png">
-                <span>Internet<br>Explorer</span>
-            </div>
-            <div class="desktop-icon" onclick="wm.open('cctv')">
-                <img src="https://cdn-icons-png.flaticon.com/512/3616/3616930.png">
-                <span>Security<br>Center</span>
-            </div>
-            <div class="desktop-icon" onclick="wm.open('notepad')">
-                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965335.png">
-                <span>Notepad</span>
-            </div>
-            <div class="desktop-icon" onclick="wm.open('recycle')">
-                <img src="https://cdn-icons-png.flaticon.com/512/3143/3143497.png">
-                <span>Recycle Bin</span>
-            </div>
-        </div>
-
-        <!-- Taskbar -->
-        <div id="taskbar">
-            <div class="start-btn" onclick="startMenu.toggle()">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Windows_2000_logo.svg" class="w-4 h-4"> Start
-            </div>
-            <div class="task-divider"></div>
-            <div class="flex items-center gap-1 px-1">
-                <img src="https://cdn-icons-png.flaticon.com/512/87/87413.png" class="w-4 h-4 cursor-pointer" title="Launch IE" onclick="wm.open('browser')">
-                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965335.png" class="w-4 h-4 cursor-pointer" title="Launch Notepad" onclick="wm.open('notepad')">
-            </div>
-            <div class="task-divider"></div>
-            <div id="taskbar-items" class="flex flex-1 gap-1 overflow-hidden px-1"></div>
-            <div class="task-divider"></div>
-            <div class="tray">
-                <div class="w-4 h-4 bg-green-500 rounded-full border border-gray-600" title="Online"></div>
-                <img src="https://cdn-icons-png.flaticon.com/512/727/727239.png" class="w-4 h-4">
-                <span id="clock" class="cursor-pointer" onclick="alert('Date: ' + new Date().toDateString())">12:00 PM</span>
-            </div>
-        </div>
-
-        <!-- Start Menu -->
-        <div id="start-menu">
-            <div class="start-side"><span>Amal2000</span></div>
-            <div class="start-items">
-                <div class="menu-item" onclick="wm.open('sys')">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2763/2763294.png" class="w-6 h-6">
-                    <div class="flex flex-col"><span class="font-bold">Windows Update</span></div>
-                </div>
-                <div class="menu-sep"></div>
-                <div class="menu-item">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1040/1040241.png" class="w-6 h-6"> Programs <span class="arrow">▶</span>
-                </div>
-                <div class="menu-item">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1375/1375106.png" class="w-6 h-6"> Documents <span class="arrow">▶</span>
-                </div>
-                <div class="menu-item">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png" class="w-6 h-6"> Settings <span class="arrow">▶</span>
-                </div>
-                <div class="menu-item">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2889/2889312.png" class="w-6 h-6"> Search <span class="arrow">▶</span>
-                </div>
-                <div class="menu-item" onclick="wm.open('run')">
-                    <img src="https://cdn-icons-png.flaticon.com/512/148/148767.png" class="w-6 h-6"> Run...
-                </div>
-                <div class="menu-sep"></div>
-                <div class="menu-item" onclick="location.reload()">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1255/1255909.png" class="w-6 h-6"> Shut Down...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- WINDOWS -->
-
-    <!-- MY COMPUTER -->
-    <div id="win-mycomputer" class="window w-[500px] h-[350px] top-[50px] left-[50px] hidden" data-icon="https://cdn-icons-png.flaticon.com/512/3616/3616927.png" data-title="My Computer">
-        <div class="title-bar">
-            <div class="flex items-center gap-2"><img src="https://cdn-icons-png.flaticon.com/512/3616/3616927.png" class="w-4 h-4"> My Computer</div>
-            <div class="win-controls">
-                <div class="win-btn" onclick="wm.close('mycomputer')">X</div>
-            </div>
-        </div>
-        <div class="flex bg-[#d4d0c8] p-1 gap-2 border-b border-white text-xs">
-            <span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Tools</span><span>Help</span>
-        </div>
-        <div class="flex-1 bg-white inset-deep p-4 overflow-auto">
-            <h3 class="font-bold border-b border-gray-300 mb-2">Hard Disk Drives</h3>
-            <div class="disk-drive cursor-pointer" onclick="alert('Access Denied. System Locked.')">
-                <img src="https://cdn-icons-png.flaticon.com/512/2333/2333469.png" class="w-10 h-10">
-                <div>
-                    <div class="font-bold">Local Disk (C:)</div>
-                    <div class="flex items-center gap-2 text-xs">
-                        <div class="disk-bar"><div class="disk-fill" style="width: 75%"></div></div>
-                        <span>12.5 GB free</span>
-                    </div>
-                </div>
-            </div>
-            <div class="disk-drive cursor-pointer" onclick="wm.open('documents')">
-                <img src="https://cdn-icons-png.flaticon.com/512/2333/2333469.png" class="w-10 h-10">
-                <div>
-                    <div class="font-bold">Data (D:)</div>
-                    <div class="flex items-center gap-2 text-xs">
-                        <div class="disk-bar"><div class="disk-fill" style="width: 20%"></div></div>
-                        <span>32.1 GB free</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="bg-[#d4d0c8] text-xs p-1 border-t border-gray-400 inset">3 Objects</div>
-    </div>
-
-    <!-- NOTEPAD -->
-    <div id="win-notepad" class="window w-[400px] h-[300px] top-[100px] left-[200px] hidden" data-icon="https://cdn-icons-png.flaticon.com/512/2965/2965335.png" data-title="Untitled - Notepad">
-        <div class="title-bar">
-            <div class="flex items-center gap-2"><img src="https://cdn-icons-png.flaticon.com/512/2965/2965335.png" class="w-4 h-4"> Untitled - Notepad</div>
-            <div class="win-controls">
-                <div class="win-btn" onclick="wm.minimize('notepad')">_</div>
-                <div class="win-btn" onclick="wm.maximize('notepad')">□</div>
-                <div class="win-btn" onclick="wm.close('notepad')">X</div>
-            </div>
-        </div>
-        <div class="flex bg-[#c0c0c0] px-1 text-xs gap-3 py-1">
-            <span class="cursor-pointer" onclick="saveNote()">File (Save)</span><span>Edit</span><span>Format</span><span>Help</span>
-        </div>
-        <textarea id="note-area" class="notepad-area inset-deep flex-1 outline-none p-1"></textarea>
-    </div>
-
-    <!-- BROWSER (MAIN SITE) -->
-    <div id="win-browser" class="window w-[800px] h-[600px] top-[20px] left-[100px] hidden" data-icon="https://cdn-icons-png.flaticon.com/512/87/87413.png" data-title="Amal Hostel">
-        <div class="title-bar">
-            <div class="flex items-center gap-2"><img src="https://cdn-icons-png.flaticon.com/512/87/87413.png" class="w-4 h-4"> Amal Hostel - Internet Explorer</div>
-            <div class="win-controls">
-                <div class="win-btn" onclick="wm.minimize('browser')">_</div>
-                <div class="win-btn" onclick="wm.maximize('browser')">□</div>
-                <div class="win-btn" onclick="wm.close('browser')">X</div>
-            </div>
-        </div>
-        <div class="flex bg-[#d4d0c8] p-1 gap-2 border-b border-gray-400 text-xs">
-            <button class="outset px-2">Back</button>
-            <div class="inset flex-1 bg-white px-2 flex items-center">http://www.amalhostel.com</div>
-            <button class="outset px-2">Go</button>
-        </div>
-        <div class="flex-1 bg-white inset-deep overflow-auto m-1 p-8 text-center scroll-smooth">
-            <h1 class="text-3xl font-serif text-blue-800 mb-4 underline">Amal Ladies Hostel</h1>
-            <img src="main image.jpg" class="mx-auto border-4 border-gray-300 w-2/3 shadow-lg mb-4" onerror="this.src='https://placehold.co/400'">
-            <p class="mb-4">Welcome to the premier accommodation facility in Kottayam.</p>
-            <div class="grid grid-cols-2 gap-4 text-left max-w-lg mx-auto">
-                <div class="outset p-4">
-                    <b>Features:</b>
-                    <ul class="list-disc pl-4 mt-2">
-                        <li>24/7 Security</li>
-                        <li>High Speed Internet</li>
-                        <li>Homely Food</li>
-                    </ul>
-                </div>
-                <div class="outset p-4">
-                    <b>Contact:</b>
-                    <p class="mt-2">Phone: +91 96569 62786</p>
-                    <button class="mt-2 outset px-2 py-1 w-full" onclick="alert('Launching WhatsApp protocol...')">Book Now</button>
-                </div>
-            </div>
-        </div>
-        <div class="bg-[#d4d0c8] text-xs p-1 border-t border-gray-400 inset">Done</div>
-    </div>
-
-    <!-- SYSTEM PROPERTIES -->
-    <div id="win-sys" class="window w-[350px] h-[420px] top-[100px] left-[400px] hidden" data-icon="https://cdn-icons-png.flaticon.com/512/2763/2763294.png" data-title="System Properties">
-        <div class="title-bar">
-            <div class="flex items-center gap-2"><img src="https://cdn-icons-png.flaticon.com/512/2763/2763294.png" class="w-4 h-4"> System Properties</div>
-            <div class="win-controls">
-                <div class="win-btn" onclick="wm.close('sys')">X</div>
-            </div>
-        </div>
-        <div class="p-3 bg-[#d4d0c8] flex-1">
-            <div class="flex gap-1 mb-2">
-                <button class="outset px-2 py-1 bg-white border-b-0 relative top-[1px] z-10">General</button>
-                <button class="outset px-2 py-1">Hardware</button>
-            </div>
-            <div class="outset p-4 h-[300px] bg-[#d4d0c8]">
-                <div class="flex gap-4 mb-4">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Windows_2000_logo.svg" class="w-16 h-16">
-                    <div>
-                        <h2 class="font-bold">System:</h2>
-                        <p>Microsoft Windows 2000</p>
-                        <p>Service Pack 2</p>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <h2 class="font-bold">Registered to:</h2>
-                    <p>Hash Technician</p>
-                    <p>Amal Hostel Corp</p>
-                </div>
-                <div>
-                    <h2 class="font-bold">Computer:</h2>
-                    <p>Intel Pentium III</p>
-                    <p>256.0 MB RAM</p>
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 mt-2">
-                <button class="outset px-4" onclick="wm.close('sys')">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        /* --- WINDOW MANAGER --- */
-        class WindowManager {
-            constructor() {
-                this.zIndex = 100;
-                this.initDrag();
-            }
-
-            open(appId) {
-                const win = document.getElementById(`win-${appId}`);
-                if (!win) return;
-                
-                win.classList.remove('hidden');
-                win.style.display = 'flex';
-                
-                // Center first time
-                if (!win.dataset.opened) {
-                    const rect = win.getBoundingClientRect();
-                    win.style.top = (window.innerHeight/2 - rect.height/2) + 'px';
-                    win.style.left = (window.innerWidth/2 - rect.width/2) + 'px';
-                    win.dataset.opened = "true";
-                }
-                
-                this.focus(appId);
-                this.updateTaskbar();
-                startMenu.close();
-            }
-
-            close(appId) {
-                const win = document.getElementById(`win-${appId}`);
-                if(win) {
-                    win.style.display = 'none';
-                    win.classList.add('hidden');
-                    this.updateTaskbar();
-                }
-            }
-
-            minimize(appId) {
-                const win = document.getElementById(`win-${appId}`);
-                if(win) {
-                    win.style.display = 'none';
-                    this.updateTaskbar();
-                }
-            }
-
-            maximize(appId) {
-                const win = document.getElementById(`win-${appId}`);
-                if (win.style.width === '100%') {
-                    win.style.width = win.dataset.w;
-                    win.style.height = win.dataset.h;
-                    win.style.top = win.dataset.t;
-                    win.style.left = win.dataset.l;
-                } else {
-                    win.dataset.w = win.style.width;
-                    win.dataset.h = win.style.height;
-                    win.dataset.t = win.style.top;
-                    win.dataset.l = win.style.left;
-                    win.style.width = '100%';
-                    win.style.height = 'calc(100% - 28px)';
-                    win.style.top = '0';
-                    win.style.left = '0';
-                }
-            }
-
-            focus(appId) {
-                this.zIndex++;
-                const win = document.getElementById(`win-${appId}`);
-                if(win) {
-                    win.style.zIndex = this.zIndex;
-                    document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
-                    win.classList.add('active');
-                    this.updateTaskbar();
-                }
-            }
-
-            updateTaskbar() {
-                const bar = document.getElementById('taskbar-items');
-                bar.innerHTML = '';
-                document.querySelectorAll('.window').forEach(win => {
-                    if (!win.classList.contains('hidden')) {
-                        const id = win.id.replace('win-', '');
-                        const isActive = win.style.display !== 'none' && win.classList.contains('active');
-                        const icon = win.dataset.icon;
-                        const title = win.dataset.title;
-
-                        const btn = document.createElement('div');
-                        btn.className = `task-item ${isActive ? 'active' : ''}`;
-                        btn.innerHTML = `<img src="${icon}" class="w-4 h-4"> <span class="truncate">${title}</span>`;
-                        btn.onclick = () => {
-                            if (win.style.display === 'none') this.open(id);
-                            else if (isActive) this.minimize(id);
-                            else this.focus(id);
-                        };
-                        bar.appendChild(btn);
-                    }
-                });
-            }
-
-            initDrag() {
-                let activeWin = null;
-                let offset = {x:0, y:0};
-
-                document.querySelectorAll('.title-bar').forEach(bar => {
-                    bar.addEventListener('mousedown', (e) => {
-                        if(e.target.classList.contains('win-btn')) return;
-                        activeWin = bar.parentElement;
-                        if(activeWin.style.width === '100%') return;
-                        
-                        const rect = activeWin.getBoundingClientRect();
-                        offset.x = e.clientX - rect.left;
-                        offset.y = e.clientY - rect.top;
-                    });
-                });
-
-                document.addEventListener('mousemove', (e) => {
-                    if (!activeWin) return;
-                    activeWin.style.left = (e.clientX - offset.x) + 'px';
-                    activeWin.style.top = (e.clientY - offset.y) + 'px';
-                });
-
-                document.addEventListener('mouseup', () => {
-                    activeWin = null;
-                });
-            }
-        }
-
-        const wm = new WindowManager();
-
-        /* --- START MENU --- */
-        const startMenu = {
-            toggle: () => {
-                const el = document.getElementById('start-menu');
-                const btn = document.querySelector('.start-btn');
-                if (el.style.display === 'flex') {
-                    el.style.display = 'none';
-                    btn.classList.remove('active');
-                } else {
-                    el.style.display = 'flex';
-                    btn.classList.add('active');
-                }
-            },
-            close: () => {
-                document.getElementById('start-menu').style.display = 'none';
-                document.querySelector('.start-btn').classList.remove('active');
-            }
-        };
-
-        /* --- SYSTEM LOGIC --- */
         
-        // Boot & Login
-        window.onload = () => {
-            const bios = document.getElementById('bios');
-            setTimeout(() => {
-                bios.innerHTML += '<div>Booting Windows 2000...</div>';
-                setTimeout(() => {
-                    bios.style.display = 'none';
-                    document.getElementById('login-screen').style.display = 'flex';
-                }, 1500);
-            }, 2000);
+        <!-- Toggle Button -->
+        <button onclick="toggleThemePanel()" class="w-14 h-14 rounded-2xl bg-primaryContainer text-onPrimaryContainer hover:bg-primary hover:text-onPrimary shadow-xl flex items-center justify-center transition-all duration-300 group">
+            <i data-lucide="palette" class="w-6 h-6 group-hover:rotate-180 transition-transform"></i>
+        </button>
+    </div>
 
-            // Desktop Click Handlers
-            const desktop = document.getElementById('desktop');
-            desktop.addEventListener('mousedown', (e) => {
-                startMenu.close();
-                document.getElementById('context-menu').style.display = 'none';
-            });
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full z-40 transition-all duration-300" id="main-nav">
+        <div class="glass-panel mx-4 mt-4 rounded-2xl px-6 py-4 flex justify-between items-center shadow-lg shadow-black/5">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-primary text-onPrimary flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                </div>
+                <span class="font-serif text-2xl font-bold tracking-tight text-primary">Amal<span class="text-secondary">.</span></span>
+            </a>
 
-            // Custom Context Menu
-            desktop.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                const menu = document.getElementById('context-menu');
-                menu.style.display = 'block';
-                menu.style.left = e.clientX + 'px';
-                menu.style.top = e.clientY + 'px';
-            });
+            <div class="hidden lg:flex items-center gap-8">
+                <a href="#about" class="text-sm font-semibold hover:text-primary transition-colors relative group">
+                    About
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#rooms" class="text-sm font-semibold hover:text-primary transition-colors relative group">
+                    Living
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#amenities" class="text-sm font-semibold hover:text-primary transition-colors relative group">
+                    Amenities
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+                </a>
+                <button onclick="app.openBooking()" class="px-6 py-2.5 bg-primary text-onPrimary rounded-xl font-bold shadow-lg hover:shadow-primary/50 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                    <span>Book Visit</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
 
-            // Clock
-            setInterval(() => {
-                document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            }, 1000);
+            <button class="lg:hidden p-2 text-primary" onclick="alert('Mobile menu logic here')">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </nav>
 
-            // Notepad Persistency (Simulated)
-            const noteArea = document.getElementById('note-area');
-            const savedNote = localStorage.getItem('amal_note');
-            if (savedNote) noteArea.value = savedNote;
-        };
+    <!-- HERO SECTION -->
+    <main>
+        <section class="relative min-h-screen flex items-center pt-28 overflow-hidden">
+            <div class="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1" id="hero-text">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primaryContainer/50 text-onPrimaryContainer text-xs font-bold uppercase tracking-widest mb-6 border border-primary/20 backdrop-blur-md">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        Admissions Open 2025
+                    </div>
+                    <h1 class="text-5xl lg:text-7xl font-serif font-bold leading-[1.1] mb-8 text-transparent bg-clip-text bg-gradient-to-br from-primary to-secondary">
+                        Sanctuary of <br>Serenity & Study
+                    </h1>
+                    <p class="text-lg text-outline max-w-lg mb-10 leading-relaxed">
+                        A professionally managed ladies' residence offering the perfect blend of academic focus and homely comfort. 200m from Kottayam Medical College.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="app.openBooking()" class="px-8 py-4 bg-primary text-onPrimary rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2">
+                            <span>Reserve Space</span>
+                            <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                        </button>
+                        <a href="#rooms" class="px-8 py-4 bg-surfaceVariant text-onSurfaceVariant rounded-2xl font-bold hover:bg-surfaceVariant/80 transition-all flex items-center gap-2">
+                            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                            View Rooms
+                        </a>
+                    </div>
+                    
+                    <div class="mt-16 flex items-center gap-8 border-t border-outline/20 pt-8">
+                        <div>
+                            <p class="text-3xl font-bold text-primary font-serif">10+</p>
+                            <p class="text-xs text-outline uppercase tracking-wider">Years</p>
+                        </div>
+                        <div>
+                            <p class="text-3xl font-bold text-primary font-serif">500+</p>
+                            <p class="text-xs text-outline uppercase tracking-wider">Residents</p>
+                        </div>
+                        <div>
+                            <p class="text-3xl font-bold text-primary font-serif">100%</p>
+                            <p class="text-xs text-outline uppercase tracking-wider">Secure</p>
+                        </div>
+                    </div>
+                </div>
 
-        // Login Logic
-        function checkLogin(e) {
-            if (e.key === 'Enter') submitLogin();
-        }
+                <div class="order-1 lg:order-2 relative h-[600px] flex items-center justify-center">
+                    <!-- Decorative blobs behind image -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] animate-float"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-secondary/20 rounded-full blur-[80px] animate-float" style="animation-delay: -2s;"></div>
+                    
+                    <!-- Main Hero Image with Glass Card Effect -->
+                    <div class="relative z-10 w-[80%] aspect-[3/4] glass-panel rounded-[3rem] p-3 transform rotate-[-3deg] hover:rotate-0 transition-transform duration-700">
+                        <img src="main image.jpg" alt="Hostel Exterior" class="w-full h-full object-cover rounded-[2.5rem] shadow-inner" onerror="this.src='https://placehold.co/600x800?text=Exterior'">
+                        
+                        <!-- Floating Badge -->
+                        <div class="absolute -bottom-6 -right-6 glass-panel p-4 rounded-2xl flex items-center gap-3 animate-float" style="animation-delay: 1s;">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-outline uppercase">Safety Status</p>
+                                <p class="font-bold text-primary">Monitored 24/7</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        function submitLogin() {
-            const pass = document.getElementById('password-input').value;
-            // Allow any password, but check for admin specific code
-            if (pass === 'KL05BC5953') {
-                alert('Welcome back, Technician Hash. Administrator Mode Enabled.');
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('desktop').style.display = 'block';
-                setTimeout(() => wm.open('sys'), 500); // Auto open sys props for admin
-            } else if (pass.length > 0) {
-                // Standard user login with any password
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('desktop').style.display = 'block';
-                setTimeout(() => wm.open('browser'), 500);
-            } else {
-                alert('Please enter a password.');
+        <!-- ABOUT SECTION -->
+        <section id="about" class="py-24 relative">
+            <div class="container mx-auto px-6">
+                <div class="glass-panel p-10 lg:p-16 rounded-[3rem] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    
+                    <div class="grid lg:grid-cols-2 gap-16 items-center relative z-10">
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="w-12 h-1 bg-primary rounded-full"></span>
+                                <span class="text-primary font-bold uppercase tracking-widest text-sm">About Us</span>
+                            </div>
+                            <h2 class="text-4xl font-serif font-bold mb-6">More Than Just A Place To Sleep</h2>
+                            <p class="text-lg text-outline mb-8 leading-relaxed">
+                                Established with a vision to provide a safe haven for students of Kottayam Medical College, Amal Ladies Hostel has evolved into a premier residential community. We leverage technology and hospitality to ensure your focus remains on your studies.
+                            </p>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-surfaceVariant flex items-center justify-center text-primary shrink-0">
+                                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-lg">Prime Location</h4>
+                                        <p class="text-sm text-outline">Located in Arpookara, just a 5-minute walk to the Medical College, saving you hours of commute time weekly.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-surfaceVariant flex items-center justify-center text-primary shrink-0">
+                                        <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-lg">Community First</h4>
+                                        <p class="text-sm text-outline">A culturally diverse, zero-ragging environment where lifelong friendships are forged.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <img src="visiting room.jpg" class="rounded-[2rem] w-full h-64 object-cover shadow-lg transform translate-y-8" alt="Lobby" onerror="this.src='https://placehold.co/400x500?text=Lobby'">
+                            <img src="room.jpg" class="rounded-[2rem] w-full h-64 object-cover shadow-lg transform -translate-y-8" alt="Interior" onerror="this.src='https://placehold.co/400x500?text=Interior'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROOMS & CUSTOM VIDEO PLAYER -->
+        <section id="rooms" class="py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-4xl font-serif font-bold mb-4">Our Living Spaces</h2>
+                    <p class="text-outline">Designed for comfort, engineered for study.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-8 h-auto lg:h-[600px]">
+                    <!-- Large Feature Card -->
+                    <div class="lg:col-span-7 h-[400px] lg:h-full relative group rounded-[2.5rem] overflow-hidden shadow-2xl">
+                        <img src="room with bed.jpg" class="w-full h-full object-cover transition duration-700 group-hover:scale-105" alt="Room" onerror="this.src='https://placehold.co/800x1000?text=Executive+Room'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                        
+                        <div class="absolute bottom-0 left-0 p-8 w-full">
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <div class="bg-primary text-onPrimary text-xs font-bold px-3 py-1 rounded-lg inline-block mb-3">MOST POPULAR</div>
+                                    <h3 class="text-3xl font-serif font-bold text-white mb-2">Triple Sharing Executive</h3>
+                                    <p class="text-gray-300 max-w-md mb-4 line-clamp-2">Spacious room with individual wardrobes, study desks, and attached bathroom. Perfect for group studies.</p>
+                                </div>
+                                <div class="hidden md:block">
+                                    <div class="glass-panel px-4 py-2 rounded-xl flex gap-4 text-white text-sm">
+                                        <span class="flex items-center"><i data-lucide="users" class="w-4 h-4 mr-2"></i> 3 Pax</span>
+                                        <span class="flex items-center"><i data-lucide="maximize" class="w-4 h-4 mr-2"></i> 250 sqft</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Video Player Component -->
+                    <div class="lg:col-span-5 h-[400px] lg:h-full relative glass-panel rounded-[2.5rem] overflow-hidden video-container group">
+                        <video id="main-video" class="w-full h-full object-cover" poster="room.jpg" playsinline loop muted>
+                            <source src="room.mp4" type="video/mp4">
+                        </video>
+                        
+                        <!-- Overlay Play Button -->
+                        <div id="video-overlay" class="absolute inset-0 bg-black/30 flex flex-col items-center justify-center transition-opacity duration-300 cursor-pointer" onclick="videoPlayer.toggle()">
+                            <div class="w-20 h-20 rounded-full glass-panel flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="play" class="w-8 h-8 text-white fill-current ml-1"></i>
+                            </div>
+                            <p class="text-white font-bold tracking-widest mt-4 text-sm uppercase">Virtual Tour</p>
+                        </div>
+
+                        <!-- Custom Controls -->
+                        <div class="absolute bottom-0 left-0 w-full p-6 video-control-group bg-gradient-to-t from-black/80 to-transparent">
+                            <div class="flex items-center gap-4 text-white">
+                                <button onclick="videoPlayer.toggle()"><i id="play-icon" data-lucide="play" class="w-6 h-6 fill-current"></i></button>
+                                <input type="range" id="video-progress" class="flex-1 h-1 bg-white/30 rounded-full appearance-none overflow-hidden" min="0" max="100" value="0">
+                                <button onclick="videoPlayer.toggleMute()"><i id="mute-icon" data-lucide="volume-x" class="w-6 h-6"></i></button>
+                                <button onclick="videoPlayer.fullscreen()"><i data-lucide="maximize" class="w-5 h-5"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AMENITIES (Grid) -->
+        <section id="amenities" class="py-24 bg-surfaceVariant/30">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-serif font-bold text-center mb-16">Premium Amenities</h2>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Item 1 -->
+                    <div class="group p-8 rounded-[2rem] bg-surface hover:bg-primaryContainer transition-colors duration-300 shadow-sm hover:shadow-lg cursor-default border border-outline/10">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                            <i data-lucide="wifi" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Gigabit Fiber</h3>
+                        <p class="text-sm text-outline group-hover:text-onPrimaryContainer">Seamless connectivity for online classes with dedicated backup lines ensuring 99.9% uptime.</p>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="group p-8 rounded-[2rem] bg-surface hover:bg-primaryContainer transition-colors duration-300 shadow-sm hover:shadow-lg cursor-default border border-outline/10">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                            <i data-lucide="zap" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">24/7 Power</h3>
+                        <p class="text-sm text-outline group-hover:text-onPrimaryContainer">Heavy-duty industrial inverters ensure lights, fans, and charging points never go off.</p>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="group p-8 rounded-[2rem] bg-surface hover:bg-primaryContainer transition-colors duration-300 shadow-sm hover:shadow-lg cursor-default border border-outline/10">
+                        <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                            <i data-lucide="utensils" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Hygienic Mess</h3>
+                        <p class="text-sm text-outline group-hover:text-onPrimaryContainer">Homely Kerala cuisine served 3 times a day with special focus on nutrition and taste.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-surfaceVariant text-onSurfaceVariant py-16">
+            <div class="container mx-auto px-6">
+                <div class="grid lg:grid-cols-4 gap-12 mb-12">
+                    <div class="lg:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-8 h-8 rounded bg-primary text-onPrimary flex items-center justify-center"><i data-lucide="home"></i></div>
+                            <span class="font-serif text-2xl font-bold">Amal Hostel</span>
+                        </div>
+                        <p class="text-outline max-w-sm">Redefining student accommodation in Kottayam with safety, hygiene, and community at the core.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-6 text-primary">Quick Links</h4>
+                        <ul class="space-y-3 text-sm text-outline">
+                            <li><a href="#about" class="hover:text-primary transition">About Us</a></li>
+                            <li><a href="#rooms" class="hover:text-primary transition">Living Spaces</a></li>
+                            <li><a href="#" class="hover:text-primary transition">Rules & Regulations</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-6 text-primary">Tech Support</h4>
+                        <div class="glass-panel p-4 rounded-xl flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+                                <i data-lucide="cpu" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Hash Tech</p>
+                                <p class="text-xs opacity-70">Official IT Partner</p>
+                            </div>
+                        </div>
+                        <p class="text-xs mt-2 text-outline">PC, Laptop & CCTV Services</p>
+                    </div>
+                </div>
+                <div class="border-t border-outline/20 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-outline">
+                    <p id="copyright-text" class="cursor-pointer select-none">&copy; 2025 Amal Ladies Hostel. All rights reserved.</p>
+                    <p>Technician: Hash | ID: KL05BC5953</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- BOOKING WIZARD MODAL -->
+    <div id="booking-modal" class="fixed inset-0 z-[60] hidden transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="app.closeBooking()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-surface rounded-[2rem] shadow-2xl p-8 border border-outline/10 scale-95 transition-all duration-300" id="booking-card">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-2xl font-serif font-bold text-primary">Schedule Visit</h3>
+                    <p class="text-xs text-outline">Secure your appointment instantly</p>
+                </div>
+                <button onclick="app.closeBooking()" class="p-2 hover:bg-surfaceVariant rounded-full transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <form id="booking-form" class="space-y-5" onsubmit="event.preventDefault(); app.submitBooking();">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="text-xs font-bold text-outline uppercase ml-1">Full Name</label>
+                        <input type="text" id="b-name" class="w-full p-4 rounded-xl bg-surfaceVariant border-none focus:ring-2 focus:ring-primary outline-none transition" placeholder="Enter name" required>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-xs font-bold text-outline uppercase ml-1">Phone</label>
+                        <input type="tel" id="b-phone" class="w-full p-4 rounded-xl bg-surfaceVariant border-none focus:ring-2 focus:ring-primary outline-none transition" placeholder="+91" required>
+                    </div>
+                </div>
+
+                <!-- Custom Calendar UI -->
+                <div class="bg-surfaceVariant/50 p-4 rounded-2xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-sm" id="cal-month"></span>
+                        <div class="flex gap-1">
+                            <button type="button" onclick="calendar.changeMonth(-1)" class="p-1 hover:bg-surface rounded"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                            <button type="button" onclick="calendar.changeMonth(1)" class="p-1 hover:bg-surface rounded"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-outline mb-2">
+                        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                    </div>
+                    <div id="cal-grid" class="calendar-grid"></div>
+                </div>
+
+                <!-- Time Slots -->
+                <div id="time-selector" class="hidden animate-fade-in-up">
+                    <label class="text-xs font-bold text-outline uppercase ml-1 mb-2 block">Available Slots</label>
+                    <div class="grid grid-cols-3 gap-2" id="time-slots"></div>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-primary text-onPrimary font-bold rounded-xl hover:shadow-lg transition mt-2">
+                    Confirm via WhatsApp
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- DEBUG CONSOLE (Technician) -->
+    <div id="debug-console">
+        <div>HASH_TECH_DEBUGGER_v1.2</div>
+        <div id="debug-fps">FPS: --</div>
+        <div id="debug-mem">MEM: --</div>
+        <div id="debug-theme">THEME: --</div>
+    </div>
+
+    <!-- JAVASCRIPT ENGINE -->
+    <script>
+        /**
+         * ----------------------------------------------------------------------
+         * MODULE: THEME ENGINE (Material You Style)
+         * ----------------------------------------------------------------------
+         */
+        class ThemeEngine {
+            constructor() {
+                this.root = document.documentElement;
+                this.init();
+            }
+
+            init() {
+                // Check local storage or system preference
+                const savedSeed = localStorage.getItem('theme-seed');
+                const savedMode = localStorage.getItem('theme-mode');
+                
+                if (savedSeed) this.setSeed(savedSeed);
+                else this.setSeed(170); // Default Teal
+
+                if (savedMode === 'dark') {
+                    this.root.classList.add('dark');
+                    this.updateToggleUI(true);
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    this.root.classList.add('dark');
+                    this.updateToggleUI(true);
+                }
+            }
+
+            setSeed(hue) {
+                this.root.style.setProperty('--seed-h', hue);
+                localStorage.setItem('theme-seed', hue);
+                
+                // Update Meta Theme Color for Mobile Browsers
+                const isDark = this.root.classList.contains('dark');
+                const metaColor = isDark ? `hsl(${hue}, 80%, 30%)` : `hsl(${hue}, 80%, 90%)`;
+                document.getElementById('meta-theme-color').content = metaColor;
+
+                // UPDATE CURSOR
+                this.updateCursor(hue);
+
+                if(window.debugMode) document.getElementById('debug-theme').innerText = `THEME: HUE ${hue}`;
+            }
+
+            toggleMode() {
+                const isDark = this.root.classList.toggle('dark');
+                localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
+                this.updateToggleUI(isDark);
+                // Re-apply seed to trigger meta/cursor update
+                const hue = getComputedStyle(this.root).getPropertyValue('--seed-h');
+                this.setSeed(hue);
+            }
+
+            updateToggleUI(isDark) {
+                const knob = document.getElementById('dark-toggle-knob');
+                if(knob) knob.style.transform = isDark ? 'translateX(100%)' : 'translateX(0)';
+            }
+
+            updateCursor(hue) {
+                // Generate color string based on current mode and hue
+                const isDark = this.root.classList.contains('dark');
+                // Primary color calculation approx matching CSS vars
+                const color = isDark ? `hsl(${hue}, 80%, 80%)` : `hsl(${hue}, 80%, 40%)`; 
+                const stroke = isDark ? '#000000' : '#ffffff';
+
+                // Modern Arrow Cursor SVG
+                const svgCursor = `
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 2L24 18L14 18L11 28L7 2Z" fill="${color}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+                </svg>`;
+
+                // Pointer Cursor (Hand/Hover) SVG
+                const svgPointer = `
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 2L22 14L14 14L12 24L8 24L10 2Z" fill="${color}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="20" cy="20" r="4" fill="${stroke}" stroke="${color}" stroke-width="2"/>
+                </svg>`;
+
+                const cursorUrl = `url('data:image/svg+xml;utf8,${encodeURIComponent(svgCursor)}') 0 0, auto`;
+                const pointerUrl = `url('data:image/svg+xml;utf8,${encodeURIComponent(svgPointer)}') 0 0, pointer`;
+
+                // Inject dynamic style
+                let styleTag = document.getElementById('dynamic-cursor-style');
+                if (!styleTag) {
+                    styleTag = document.createElement('style');
+                    styleTag.id = 'dynamic-cursor-style';
+                    document.head.appendChild(styleTag);
+                }
+
+                styleTag.innerHTML = `
+                    body, html {
+                        cursor: ${cursorUrl} !important;
+                    }
+                    a, button, [role="button"], input, select, textarea, .cursor-pointer {
+                        cursor: ${pointerUrl} !important;
+                    }
+                `;
             }
         }
 
-        function saveNote() {
-            const val = document.getElementById('note-area').value;
-            localStorage.setItem('amal_note', val);
-            alert('File saved to C:\\Users\\Hash\\Documents\\note.txt');
+        /**
+         * ----------------------------------------------------------------------
+         * MODULE: CALENDAR & BOOKING
+         * ----------------------------------------------------------------------
+         */
+        class CalendarSystem {
+            constructor() {
+                this.date = new Date();
+                this.selectedDate = null;
+                this.selectedTime = null;
+                this.monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            }
+
+            render() {
+                const year = this.date.getFullYear();
+                const month = this.date.getMonth();
+                
+                document.getElementById('cal-month').innerText = `${this.monthNames[month]} ${year}`;
+                
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const today = new Date();
+                const container = document.getElementById('cal-grid');
+                container.innerHTML = '';
+
+                // Empty slots
+                for(let i=0; i<firstDay; i++) container.innerHTML += '<div class="cal-day empty"></div>';
+
+                // Days
+                for(let i=1; i<=daysInMonth; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'cal-day';
+                    el.innerText = i;
+                    
+                    // Disable past dates
+                    const checkDate = new Date(year, month, i);
+                    if (checkDate < new Date(today.setHours(0,0,0,0))) {
+                        el.style.opacity = '0.3';
+                        el.style.pointerEvents = 'none';
+                    }
+
+                    // Selection Logic
+                    if (this.selectedDate && 
+                        this.selectedDate.getDate() === i && 
+                        this.selectedDate.getMonth() === month) {
+                        el.classList.add('selected');
+                    }
+
+                    el.onclick = () => {
+                        this.selectedDate = new Date(year, month, i);
+                        this.render();
+                        this.renderTimeSlots();
+                    };
+                    container.appendChild(el);
+                }
+            }
+
+            changeMonth(dir) {
+                this.date.setMonth(this.date.getMonth() + dir);
+                this.render();
+            }
+
+            renderTimeSlots() {
+                const container = document.getElementById('time-selector');
+                const slotsDiv = document.getElementById('time-slots');
+                container.classList.remove('hidden');
+                slotsDiv.innerHTML = '';
+
+                const times = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "04:00 PM", "05:00 PM"];
+                times.forEach(t => {
+                    const btn = document.createElement('div');
+                    btn.className = 'border border-outline/20 rounded-lg p-2 text-xs text-center cursor-pointer hover:bg-primaryContainer transition';
+                    if (this.selectedTime === t) {
+                        btn.className = 'bg-primary text-onPrimary rounded-lg p-2 text-xs text-center font-bold shadow-md';
+                    }
+                    btn.innerText = t;
+                    btn.onclick = () => {
+                        this.selectedTime = t;
+                        this.renderTimeSlots();
+                    };
+                    slotsDiv.appendChild(btn);
+                });
+            }
         }
+
+        /**
+         * ----------------------------------------------------------------------
+         * MODULE: VIDEO PLAYER
+         * ----------------------------------------------------------------------
+         */
+        class VideoPlayer {
+            constructor() {
+                this.video = document.getElementById('main-video');
+                this.overlay = document.getElementById('video-overlay');
+                this.progress = document.getElementById('video-progress');
+                this.playIcon = document.getElementById('play-icon');
+                this.muteIcon = document.getElementById('mute-icon');
+                this.initListeners();
+            }
+
+            initListeners() {
+                if(!this.video) return;
+                
+                this.video.addEventListener('timeupdate', () => {
+                    const pct = (this.video.currentTime / this.video.duration) * 100;
+                    this.progress.value = pct;
+                });
+
+                this.progress.addEventListener('input', (e) => {
+                    const time = (e.target.value / 100) * this.video.duration;
+                    this.video.currentTime = time;
+                });
+            }
+
+            toggle() {
+                if (this.video.paused) {
+                    this.video.play();
+                    this.overlay.classList.add('opacity-0', 'pointer-events-none');
+                    // Change icon to pause
+                    this.playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'; // crude svg switch
+                } else {
+                    this.video.pause();
+                    this.overlay.classList.remove('opacity-0', 'pointer-events-none');
+                    // Change icon to play
+                    this.playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+                }
+            }
+
+            toggleMute() {
+                this.video.muted = !this.video.muted;
+                if(this.video.muted) {
+                    this.muteIcon.setAttribute('class', 'w-6 h-6 text-red-500'); // Visual cue
+                } else {
+                    this.muteIcon.setAttribute('class', 'w-6 h-6 text-white');
+                }
+            }
+
+            fullscreen() {
+                if (this.video.requestFullscreen) this.video.requestFullscreen();
+            }
+        }
+
+        /**
+         * ----------------------------------------------------------------------
+         * MAIN APPLICATION CONTROLLER
+         * ----------------------------------------------------------------------
+         */
+        const themeEngine = new ThemeEngine();
+        const calendar = new CalendarSystem();
+        const videoPlayer = new VideoPlayer(); // Init later in DOMContentLoaded
+
+        const app = {
+            openBooking: () => {
+                const modal = document.getElementById('booking-modal');
+                const card = document.getElementById('booking-card');
+                modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                setTimeout(() => card.classList.remove('scale-95'), 10);
+                calendar.render();
+            },
+            closeBooking: () => {
+                const modal = document.getElementById('booking-modal');
+                const card = document.getElementById('booking-card');
+                card.classList.add('scale-95');
+                setTimeout(() => modal.classList.add('hidden', 'opacity-0', 'pointer-events-none'), 200);
+            },
+            submitBooking: () => {
+                const name = document.getElementById('b-name').value;
+                const phone = document.getElementById('b-phone').value;
+                
+                if(!name || !phone || !calendar.selectedDate || !calendar.selectedTime) {
+                    alert("Please complete all fields.");
+                    return;
+                }
+
+                const text = `*New Booking*\nName: ${name}\nPhone: ${phone}\nDate: ${calendar.selectedDate.toLocaleDateString()}\nTime: ${calendar.selectedTime}`;
+                window.open(`https://wa.me/919656962786?text=${encodeURIComponent(text)}`, '_blank');
+                app.closeBooking();
+            }
+        };
+
+        // UI Helpers
+        function toggleThemePanel() {
+            const panel = document.getElementById('theme-panel');
+            if (panel.classList.contains('opacity-0')) {
+                panel.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
+            } else {
+                panel.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10');
+            }
+        }
+
+        // 3D Background Logic
+        function init3D() {
+            const canvas = document.getElementById('hero-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.position.z = 20;
+
+            // Particles
+            const geom = new THREE.BufferGeometry();
+            const count = 1000;
+            const pos = new Float32Array(count * 3);
+            for(let i=0; i<count*3; i++) {
+                pos[i] = (Math.random() - 0.5) * 50;
+            }
+            geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            
+            // Get current theme color for particles
+            // We can't easily get CSS var in JS without computed style, defaulting to greyish
+            const mat = new THREE.PointsMaterial({ size: 0.1, color: 0x888888, transparent: true, opacity: 0.5 });
+            const mesh = new THREE.Points(geom, mat);
+            scene.add(mesh);
+
+            let mouseX = 0;
+            let mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX / window.innerWidth - 0.5;
+                mouseY = e.clientY / window.innerHeight - 0.5;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.y += 0.001;
+                mesh.rotation.x += 0.0005;
+                // Parallax
+                camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+                camera.position.y += (-mouseY * 5 - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // Boot
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            init3D();
+            
+            // Remove Loader
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('opacity-0', 'pointer-events-none');
+            }, 800);
+
+            // Technician Easter Egg
+            let clickCount = 0;
+            document.getElementById('copyright-text').addEventListener('click', () => {
+                clickCount++;
+                if (clickCount === 3) {
+                    document.getElementById('debug-console').style.display = 'block';
+                    window.debugMode = true;
+                    // Start stats loop
+                    setInterval(() => {
+                        document.getElementById('debug-fps').innerText = `FPS: ${Math.floor(Math.random() * 20 + 40)}`;
+                        document.getElementById('debug-mem').innerText = `MEM: ${Math.floor(Math.random() * 100 + 100)}MB`;
+                    }, 1000);
+                }
+            });
+        });
 
     </script>
 </body>
